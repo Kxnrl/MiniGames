@@ -8,7 +8,7 @@
 #include <emitsoundany>
 #include <cg_core>
 
-#define PLUGIN_VERSION "1.7 - 2016/07/30"
+#define PLUGIN_VERSION "1.7 - 2016/08/14"
 #define PLUGIN_PREFIX "[\x0EPlaneptune\x01]  "
 #define PLUGIN_PREFIX_CREDITS "\x01 \x04[Store]  "
 
@@ -404,8 +404,7 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 		}
 		else
 		{
-			if(!CG_IsBlacklist(attacker))
-				Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+1, "MG-击杀玩家");
+			Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+1, "MG-击杀玩家");
 			PrintToChat(attacker, "%s \x10你击杀\x07 %N \x10获得了\x04 1 Credits", PLUGIN_PREFIX_CREDITS, client);
 		}
 
