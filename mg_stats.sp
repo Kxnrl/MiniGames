@@ -31,22 +31,23 @@ enum STAT_TYPES
 	Onlines
 }
 
+STAT_TYPES g_eStatistical[MAXPLAYERS+1][STAT_TYPES];
+STAT_TYPES g_eSession[MAXPLAYERS+1][STAT_TYPES];
+
 bool g_bOnDB[MAXPLAYERS+1];
 bool g_bIsPA[MAXPLAYERS+1];
 bool g_bAutoBhop[MAXPLAYERS+1];
 bool g_bOnGround[MAXPLAYERS+1];
 bool g_bClientRoundEach[MAXPLAYERS+1][MAXPLAYERS+1];
-bool g_bPrint[MAXPLAYERS+1];
-bool g_bChanged;
+
+bool g_bRandomTeam;
 bool g_bEnable;
-bool g_bRoundEndGame;
-bool g_bLockTeam;
+bool g_bEndGame;
 bool g_bBetting;
 bool g_bBetTimeout;
-bool g_bRoundLock;
+bool g_bEndDelay;
 bool g_bWarmup;
-STAT_TYPES g_eStatistical[MAXPLAYERS+1][STAT_TYPES];
-STAT_TYPES g_eSession[MAXPLAYERS+1][STAT_TYPES];
+
 Handle g_hDB;
 char g_szSignature[MAXPLAYERS+1][256];
 char g_szHitName[8][32] = {"身体", "头", "胸", "肚子", "左手", "右手", "左腿", "右腿"};
@@ -54,7 +55,6 @@ char g_szClientHit[MAXPLAYERS+1][1024];
 char g_szHitClient[MAXPLAYERS+1][1024];
 int g_iRANK[MAXPLAYERS+1];
 int g_iPAID[MAXPLAYERS+1];
-int g_iClientTeam[MAXPLAYERS+1];
 int g_iClientBetPot[MAXPLAYERS+1];
 int g_iClientBetTeam[MAXPLAYERS+1];
 int g_iClientRoundEach[MAXPLAYERS+1];
@@ -62,7 +62,7 @@ int g_iClientRoundKill[MAXPLAYERS+1];
 int g_iClientRoundScore[MAXPLAYERS+1];
 int g_iClientRoundDamage[MAXPLAYERS+1];
 int g_iClientRoundAssists[MAXPLAYERS+1];
-static int g_iClientFirstKill;
+int g_iClientFirstKill;
 int g_iBombRing;
 int g_iHalo;
 int g_iReconnectDB;
@@ -90,10 +90,10 @@ ArrayList array_players;
 public Plugin myinfo = 
 {
 	name = " [MG] - Analytics ",
-	author = "maoling ( shAna.xQy )",
+	author = "maoling ( xQy )",
 	description = "Ex",
 	version = PLUGIN_VERSION,
-	url = "http://steamcommunity.com/id/shAna_xQy/"
+	url = "http://steamcommunity.com/id/_xQy_/"
 };
 
 public void OnPluginStart()
@@ -140,18 +140,14 @@ public void OnPluginStart()
 	AutoExecConfig(true, "mg_core");
 }
 
-public OnPluginEnd()
+public void OnPluginEnd()
 {
 	for (int client=1; client<=MaxClients; ++client)
-	{
 		if(IsClientInGame(client) && !IsFakeClient(client))
-		{
 			SavePlayer(client);
-		}
-	}
 }
 
-public OnConfigsExecuted()
+public void OnConfigsExecuted()
 {
 	SetConVarInt(FindConVar("sv_damage_print_enable"), 0);
 	SetConVarInt(FindConVar("sv_staminamax"), 0);
@@ -170,40 +166,38 @@ public OnConfigsExecuted()
 	SetConVarString(CVAR_TE_SECONDARY, "", true, false);
 	SetConVarInt(FindConVar("sv_enablebunnyhopping"), GetConVarInt(CVAR_AUTOBHOP));
 	g_fBhopSpeed = GetConVarFloat(CVAR_BHOPSPEED);
-	g_bChanged = GetConVarInt(CVAR_CHANGED) == 1 ? true : false;
-	if(g_bChanged)
+	g_bRandomTeam = view_as<bool>(GetConVarInt(CVAR_CHANGED));
+	
+	if(g_bRandomTeam)
 		SetConVarInt(FindConVar("mp_autoteambalance"), 0);
 	else
 		SetConVarInt(FindConVar("mp_autoteambalance"), 1);
 }
 
-public OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)
+public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)
 {
-	if(!StrEqual(newValue, ""))
-	{
-		SetConVarString(CAVR_CT_MELEE, "", true, false);
-		SetConVarString(CVAR_CT_PRIMARY, "", true, false);
-		SetConVarString(CVAR_CT_SECONDARY, "", true, false);
-		SetConVarString(CAVR_TE_MELEE, "", true, false);
-		SetConVarString(CVAR_TE_PRIMARY, "", true, false);
-		SetConVarString(CVAR_TE_SECONDARY, "", true, false);
-	}
+	SetConVarString(CAVR_CT_MELEE, "", true, false);
+	SetConVarString(CVAR_CT_PRIMARY, "", true, false);
+	SetConVarString(CVAR_CT_SECONDARY, "", true, false);
+	SetConVarString(CAVR_TE_MELEE, "", true, false);
+	SetConVarString(CVAR_TE_PRIMARY, "", true, false);
+	SetConVarString(CVAR_TE_SECONDARY, "", true, false);
 	if(convar == CVAR_AUTOBHOP)
 		SetConVarInt(FindConVar("sv_enablebunnyhopping"), StringToInt(newValue));
 	if(convar == CVAR_BHOPSPEED)
 		g_fBhopSpeed = StringToFloat(newValue);
 	if(convar == CVAR_CHANGED)
 	{
-		g_bChanged = StringToInt(newValue) == 1 ? true : false;
+		g_bRandomTeam = view_as<bool>(GetConVarInt(CVAR_CHANGED));
 		
-		if(g_bChanged)
+		if(g_bRandomTeam)
 			SetConVarInt(FindConVar("mp_autoteambalance"), 0);
 		else
 			SetConVarInt(FindConVar("mp_autoteambalance"), 1);
 	}
 }
 
-public OnMapStart()
+public void OnMapStart()
 {
 	CreateTimer(0.2, Timer_SetClientData, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 
@@ -215,7 +209,7 @@ public OnMapStart()
 	AddFileToDownloadsTable("sound/maoling/ninja/ninjawin.mp3");
 	g_iBombRing = PrecacheModel(VMT_BOMBRING);
 	g_iHalo = PrecacheModel(VMT_HALO);
-	
+
 	SetConVarInt(FindConVar("sv_damage_print_enable"), 0);
 	SetConVarInt(FindConVar("sv_staminamax"), 0);
 	SetConVarInt(FindConVar("sv_staminajumpcost"), 0);
@@ -239,7 +233,7 @@ public Action Timer_Waruup(Handle timer)
 	CheckPlayerCount();
 }
 
-public OnMapEnd()
+public void OnMapEnd()
 {
 	if(g_hTimerBeacon != INVALID_HANDLE)
 	{
@@ -248,20 +242,19 @@ public OnMapEnd()
 	}
 }
 
-public CG_OnClientLoaded(client)
+public void CG_OnClientLoaded(int client)
 {
-	if(g_hDB != INVALID_HANDLE && client)
-		LoadPlayer(client);
-	
-	g_iClientTeam[client] = 0;
 	g_fKD[client] = 0.0;
 	g_iClientBetPot[client] = 0;
 	g_iClientBetTeam[client] = 0;
 
 	CheckPlayerCount();
+	
+	if(g_hDB != INVALID_HANDLE && client)
+		LoadPlayer(client);
 }
 
-public OnClientDisconnect(client)
+public void OnClientDisconnect(int client)
 {
 	if(g_hDB != INVALID_HANDLE && client)
 		SavePlayer(client);
@@ -292,7 +285,7 @@ public Action Event_PlayerHurt(Handle event, const char[] name, bool dontBroadca
 
 	if(attacker == client || client < 1 || client > MaxClients)
 		return;
-	
+
 	if(!g_bClientRoundEach[attacker][client])
 	{
 		g_bClientRoundEach[attacker][client] = true;
@@ -313,6 +306,13 @@ public Action Event_PlayerHurt(Handle event, const char[] name, bool dontBroadca
 	{
 		Format(g_szHitClient[attacker], 1024, "%s\n  #受害者[%N], 伤害[%d], 部位[背刺], 武器[%s]", g_szHitClient[attacker], client, damage, szWeapon);
 		Format(g_szClientHit[client], 1024, "%s\n #攻击者[%N], 伤害[%d], 部位[背刺], 武器[%s]", g_szClientHit[client], attacker, damage, szWeapon);
+		
+		int reqid = CG_GetReqID(attacker);
+		if(reqid == 211 && damage >= 100)
+		{
+			CG_SetReqRate(attacker, CG_GetReqRate(attacker)+1);
+			CG_CheckReq(attacker);	
+		}
 	}
 	else
 	{
@@ -380,50 +380,54 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 	}
 
 	if(client == attacker || attacker == 0)
+		return;
+	
+	char weapon[64];
+	GetEventString(event, "weapon", weapon, 64);
+
+	g_eSession[attacker][Kills] += 1;
+	g_eSession[attacker][Score] += 3;
+	
+	g_iClientRoundKill[attacker]++;
+	g_iClientRoundScore[attacker] += 2;
+	
+	if(g_iClientFirstKill == 0)
+		g_iClientFirstKill = attacker;
+
+
+	if(StrContains(weapon, "negev", false) != -1 || StrContains(weapon, "m249", false) != -1 || StrContains(weapon, "p90", false) != -1 || StrContains(weapon, "hegrenade", false) != -1)
 	{
-		
-	}	
+
+	}
 	else
 	{
-		char weapon[64];
-		GetEventString(event, "weapon", weapon, 64);
-	
-		g_eSession[attacker][Kills] += 1;
-		g_eSession[attacker][Score] += 3;
-		
-		g_iClientRoundKill[attacker]++;
-		g_iClientRoundScore[attacker] += 2;
-		
-		if(g_iClientFirstKill == 0)
-			g_iClientFirstKill = attacker;
-
-
-		if(StrContains(weapon, "negev", false) != -1 || StrContains(weapon, "m249", false) != -1 || StrContains(weapon, "p90", false) != -1 || StrContains(weapon, "hegrenade", false) != -1)
-		{
-	
-		}
-		else
-		{
-			Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+1, "MG-击杀玩家");
-			PrintToChat(attacker, "%s \x10你击杀\x07 %N \x10获得了\x04 1 Credits", PLUGIN_PREFIX_CREDITS, client);
-		}
-
-		if(StrContains(weapon, "knife", false) != -1)
-		{
-			g_eSession[attacker][Knife] += 1;
-			g_eSession[attacker][Score] += 2;
-		}
-		if(StrContains(weapon, "taser", false) != -1)
-		{
-			g_eSession[attacker][Taser] += 1;
-			g_eSession[attacker][Score] += 2;
-		}
-		
-		Format(g_szHitClient[attacker], 1024, "%s\n  #你杀死了[%N], 武器[%s]", g_szHitClient[attacker], client, weapon);
-		Format(g_szClientHit[client], 1024, "%s\n  #你被[%N]杀死了, 武器[%s]", g_szClientHit[client], attacker, weapon);
+		Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+1, "MG-击杀玩家");
+		PrintToChat(attacker, "%s \x10你击杀\x07 %N \x10获得了\x04 1 Credits", PLUGIN_PREFIX_CREDITS, client);
 	}
 
-	if(g_bEnable && !g_bRoundEndGame && !g_bBetting && !g_bRoundLock)
+	if(StrContains(weapon, "knife", false) != -1)
+	{
+		g_eSession[attacker][Knife] += 1;
+		g_eSession[attacker][Score] += 2;
+	}
+	if(StrContains(weapon, "taser", false) != -1)
+	{
+		g_eSession[attacker][Taser] += 1;
+		g_eSession[attacker][Score] += 2;
+		
+		int reqid = CG_GetReqID(attacker);
+		if(reqid == 221)
+		{
+			CG_SetReqRate(attacker, CG_GetReqRate(attacker)+1);
+			CG_CheckReq(attacker);	
+		}
+	}
+	
+	Format(g_szHitClient[attacker], 1024, "%s\n  #你杀死了[%N], 武器[%s]", g_szHitClient[attacker], client, weapon);
+	Format(g_szClientHit[client], 1024, "%s\n  #你被[%N]杀死了, 武器[%s]", g_szClientHit[client], attacker, weapon);
+
+
+	if(g_bEnable && !g_bEndGame && !g_bBetting && !g_bEndDelay)
 	{
 		g_iCTcounts = 0;
 		g_iTEcounts = 0;
@@ -454,7 +458,7 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 		if(g_iTEcounts == 1 || g_iCTcounts == 1 || (g_iCTcounts == 2 && g_iTEcounts == 2))
 		{
 			PrintToChatAll("%s \x0F基佬相爱相杀的时刻到了\x01...", PLUGIN_PREFIX);
-			g_bRoundEndGame = true;
+			g_bEndGame = true;
 			g_bBetting = true;
 			g_bBetTimeout = false;
 			CreateTimer(15.0, Timer_Timeout);
@@ -463,14 +467,13 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 		}
 	}
 	
-	if(!g_bPrint[client])
-		ShowDamageAnalytics(client);
+	ShowDamageAnalytics(client);
 }
 
 public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast)
 {
-	g_bRoundEndGame = false;
-	g_bRoundLock = true;
+	g_bEndGame = false;
+	g_bEndDelay = true;
 	
 	if(g_hTimerBeacon != INVALID_HANDLE)
 	{
@@ -483,121 +486,36 @@ public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast
 	if(g_bBetting && winner >= 2)
 		SettlementBetting(winner);
 
-	if(g_bChanged)
+	if(g_bRandomTeam)
 		CreateTimer(2.0, Timer_RoundEndDelay, _, TIMER_FLAG_NO_MAPCHANGE);
 	
 	if(g_bEnable)
 		CreateTimer(4.0, Timer_Delay);
 	
 	for(int client = 1; client <= MaxClients; ++client)
+	{
 		if(IsClientInGame(client))
-			if(!g_bPrint[client])
+		{
+			if(IsPlayerAlive(client))
 				ShowDamageAnalytics(client);
-}
-
-public Action Timer_RoundEndDelay(Handle timer)
-{
-/*	//LogMessage("============Round End Scrable Team Start============");
-	
-	int total;
-	for(int x = 1; x <= MaxClients; ++x)
-	{
-		if(!IsClientInGame(x))
-			continue;
-		
-		if(GetClientTeam(x) > 1)
-			total++;
-		
-		//LogMessage("Client %N  OrignTeam: %d", x, GetClientTeam(x));
-	}
-	
-	int ts = RoundToFloor(float(total)*0.5);
-	
-	//LogMessage("----------total: %d   ts : %d----------", total, ts);
-	
-	for(int client = 1; client <= MaxClients; ++client)
-	{
-		if(!IsClientInGame(client))
-			continue;
-		
-		if(GetClientTeam(client) <= 1)
-			continue;
-		
-		if(PA_GetGroupID(client) == 9999 || PA_GetGroupID(client) == 9998)
-		{
-			if(GetClientTeam(client) == 2)
-				continue;
-			else
-				CS_SwitchTeam(client, 2);
 			
-			//LogMessage("Client %N  Skip to TE", client);
-			ts--;
-		}
-		else if(ts >= 1)
-		{
-			g_iClientTeam[client] = GetRandomInt(2, 3);
-			
-			if(IsPlayerAlive(client))
-				CS_SwitchTeam(client, g_iClientTeam[client]);
-			else
-				ChangeClientTeam(client, g_iClientTeam[client]);
-			
-			//LogMessage("Client %N  Move To %d", client, g_iClientTeam[client]);
-
-			if(g_iClientTeam[client] == 2)
-				ts--;
-		}
-		else
-		{
-			g_iClientTeam[client] = 3;
-			//LogMessage("Client %N  Move To 3", client);
-			if(IsPlayerAlive(client))
-				CS_SwitchTeam(client, g_iClientTeam[client]);
-			else
-				ChangeClientTeam(client, g_iClientTeam[client]);
-		}
-	}
-	
-	//LogMessage("============Round End Scrable Team Sucessful============");
-	
-	g_bLockTeam = true;
-
-	if(CheckTeamBalancer())
-	{
-		//PrintToChatAll("%s  \x04当前地图开启随机组队模式!!!", PLUGIN_PREFIX);
-
-		for(int i = 1; i <= MaxClients; ++i)
-		{
-			if(IsClientInGame(i))
+			int reqid = CG_GetReqID(client);
+			if(reqid == 201)
 			{
-				int team = GetClientTeam(i);
-				
-				if(team <= 1)
-					continue;
-				
-				char buffer[128];
-				
-				if(team == 2)
-				{
-					PrintToChat(i, "%s 你已被移动到\x07恐怖分子", PLUGIN_PREFIX);
-					Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
-				}
-				if(team == 3)
-				{
-					PrintToChat(i, "%s 你已被移动到\x0B反恐精英", PLUGIN_PREFIX);
-					Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
-				}
-
-				Handle pb = StartMessageOne("HintText", i);
-				PbSetString(pb, "text", buffer);
-				EndMessage();
+				CG_SetReqRate(client, CG_GetReqRate(client)+1);
+				CG_CheckReq(client);	
+			}
+			else if(reqid == 231 && g_iClientRoundKill[client] >= 10)
+			{
+				CG_SetReqRate(client, 10);
+				CG_CheckReq(client);
 			}
 		}
 	}
-	else
-		CreateTimer(0.1, Timer_RoundEndDelay, _, TIMER_FLAG_NO_MAPCHANGE);
-	*/
-	
+}
+
+public Action Timer_RoundEndDelay(Handle timer)
+{	
 	array_players.Clear();
 
 	int counts;
@@ -618,7 +536,7 @@ public Action Timer_RoundEndDelay(Handle timer)
 	
 	counts = RoundToNearest(counts*0.5);
 	
-	int client, number;
+	int client, number, team;
 	while((number = RandomArray()) != -1)
 	{
 		client = array_players.Get(number);
@@ -626,22 +544,22 @@ public Action Timer_RoundEndDelay(Handle timer)
 		char buffer[128];
 		if(counts > 0)
 		{
-			g_iClientTeam[client] = 2;
+			team = 2;
 			counts--;
 			PrintToChat(client, "%s 你已被移动到\x07恐怖分子", PLUGIN_PREFIX);
 			Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
 		}
 		else
 		{
-			g_iClientTeam[client] = 3;
+			team = 3;
 			PrintToChat(client, "%s 你已被移动到\x0B反恐精英", PLUGIN_PREFIX);
 			Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
 		}
 		
 		if(IsPlayerAlive(client))
-			CS_SwitchTeam(client, g_iClientTeam[client]);
+			CS_SwitchTeam(client, team);
 		else
-			ChangeClientTeam(client, g_iClientTeam[client]);
+			ChangeClientTeam(client, team);
 		
 		Handle pb = StartMessageOne("HintText", client);
 		PbSetString(pb, "text", buffer);
@@ -688,7 +606,7 @@ stock RandomArray()
 
 public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
-	g_bRoundEndGame = false;
+	g_bEndGame = false;
 	
 	if(g_hTimerBeacon != INVALID_HANDLE)
 	{
@@ -698,8 +616,7 @@ public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadca
 	
 	g_bBetting = false;
 	g_bBetTimeout = true;
-	g_bLockTeam = false;
-	g_bRoundLock = false;
+	g_bEndDelay = false;
 	g_iClientFirstKill = 0;
 	g_iTagType++;
 	if(g_iTagType > 3)
@@ -710,25 +627,7 @@ public Action Event_PlayerTeam(Handle event, const char[] name, bool dontBroadca
 {
 	SetEventBroadcast(event, true);
 	
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	
-	if(g_bLockTeam)
-	{
-		int new_team = GetEventInt(event, "team");
-		int old_team = GetEventInt(event, "oldteam");
-		
-		if(old_team <= 1)
-			return Plugin_Continue;
-
-		if(new_team != g_iClientTeam[client] && g_iClientTeam[client] > 1)
-		{
-			SetEventInt(event, "team", g_iClientTeam[client]);
-		}
-		
-		return Plugin_Changed;
-	}
-
-	return Plugin_Continue;
+	return Plugin_Changed;
 }
 
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
@@ -1143,10 +1042,7 @@ public Action Timer_SetClientData(Handle timer)
 	{
 		if(!IsClientInGame(client))
 			continue;
-		
-		if(g_bLockTeam)
-			continue;
-		
+
 		char tag[32];
 		
 		if(g_iTagType == 1)
@@ -1207,7 +1103,7 @@ public Action Timer_Beacon(Handle timer, any data)
 {
 	CreateBeacons();
 
-	if(g_bRoundEndGame)
+	if(g_bEndGame)
 		g_hTimerBeacon = CreateTimer(2.0, Timer_Beacon);
 	else
 		g_hTimerBeacon = INVALID_HANDLE;
