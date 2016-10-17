@@ -8,7 +8,7 @@
 #include <emitsoundany>
 #include <cg_core>
 
-#define PLUGIN_VERSION "1.7 - 2016/08/14"
+#define PLUGIN_VERSION "1.8 - 2016/10/02"
 #define PLUGIN_PREFIX "[\x0EPlaneptune\x01]  "
 #define PLUGIN_PREFIX_CREDITS "\x01 \x04[Store]  "
 
@@ -316,6 +316,8 @@ public Action Event_PlayerHurt(Handle event, const char[] name, bool dontBroadca
 	}
 	else
 	{
+		if(g_iPAID[client] == 9999)
+			damage /= 2;
 		Format(g_szHitClient[attacker], 1024, "%s\n  #受害者[%N], 伤害[%d], 部位[%s], 武器[%s]", g_szHitClient[attacker], client, damage, g_szHitName[hitgroup], szWeapon);
 		Format(g_szClientHit[client], 1024, "%s\n  #攻击者[%N], 伤害[%d], 部位[%s], 武器[%s]", g_szClientHit[client], attacker, damage, g_szHitName[hitgroup], szWeapon);
 	}
@@ -370,7 +372,8 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 	if(!IsClientInGame(client))
 		return;
 
-	g_eSession[client][Deaths] += 1;
+	g_eSession[client][Deaths]++;
+	//PrintToChat(client, "%s  \x0C国庆活动-火力全开 \x07>>> \x04被杀不计", PLUGIN_PREFIX);
 	
 	int assister = GetClientOfUserId(GetEventInt(event, "assister"));
 	if(assister <= MaxClients && assister > 0 && IsClientInGame(assister))
@@ -403,6 +406,13 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 	{
 		Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+1, "MG-击杀玩家");
 		PrintToChat(attacker, "%s \x10你击杀\x07 %N \x10获得了\x04 1 Credits", PLUGIN_PREFIX_CREDITS, client);
+		
+		//if(GetRandomInt(1, 100) <= 10)
+		//{
+		//	int iCredits = GetRandomInt(25, 100);
+		//	Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+iCredits, "MG-国庆节活动");
+		//	PrintToChatAll("%s \x0C国庆活动-Copycat \x07>>> \x10%N\x04击杀\x10%N\x04获得了\x0F%d\x04Credits", PLUGIN_PREFIX, attacker, client, iCredits);
+		//}
 	}
 
 	if(StrContains(weapon, "knife", false) != -1)
