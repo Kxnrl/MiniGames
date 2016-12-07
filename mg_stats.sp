@@ -9,7 +9,7 @@
 #include <cg_core>
 
 #define PLUGIN_VERSION "1.8 - 2016/10/02"
-#define PLUGIN_PREFIX "[\x0EPlaneptune\x01]  "
+#define PLUGIN_PREFIX "[\x0CCG\x01]  "
 #define PLUGIN_PREFIX_CREDITS "\x01 \x04[Store]  "
 
 #define sndBeacon "maoling/mg/beacon.mp3"
@@ -98,8 +98,6 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
-	ConnectSQL();
-	
 	RegConsoleCmd("sm_rank", Cmd_Rank);
 	RegConsoleCmd("sm_top", Cmd_Top);
 	RegConsoleCmd("sm_autojump", Cmd_Jump)
@@ -199,6 +197,7 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 
 public void OnMapStart()
 {
+	CheckDatabaseAvaliable();
 	CreateTimer(0.2, Timer_SetClientData, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 
 	PrecacheSoundAny(sndBeacon);
@@ -225,6 +224,31 @@ public void OnMapStart()
 	
 	g_bWarmup = true;
 	CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime"))-1.0, Timer_Waruup, _, TIMER_FLAG_NO_MAPCHANGE);
+}
+
+public void CheckDatabaseAvaliable()
+{
+	g_hDB = CG_GetGameDatabase();
+
+	if(g_hDB == INVALID_HANDLE)
+	{
+		g_iReconnectDB++;
+		
+		LogError("Connection to SQL database has failed, Try %d", g_iReconnectDB);
+		
+		if(g_iReconnectDB >= 100) 
+			SetFailState("PLUGIN STOPPED - Reason: can not connect to database, retry 100! - PLUGIN STOPPED");
+		else if(g_iReconnectDB > 5) 
+			CreateTimer(5.0, Timer_ReConnect);
+		else if(g_iReconnectDB > 3)
+			CreateTimer(3.0, Timer_ReConnect);
+		else
+			CreateTimer(1.0, Timer_ReConnect);
+
+		return;
+	}
+
+	g_iReconnectDB = 1;
 }
 
 public Action Timer_Waruup(Handle timer)
@@ -306,13 +330,6 @@ public Action Event_PlayerHurt(Handle event, const char[] name, bool dontBroadca
 	{
 		Format(g_szHitClient[attacker], 1024, "%s\n  #受害者[%N], 伤害[%d], 部位[背刺], 武器[%s]", g_szHitClient[attacker], client, damage, szWeapon);
 		Format(g_szClientHit[client], 1024, "%s\n #攻击者[%N], 伤害[%d], 部位[背刺], 武器[%s]", g_szClientHit[client], attacker, damage, szWeapon);
-		
-		int reqid = CG_GetReqID(attacker);
-		if(reqid == 211 && damage >= 100)
-		{
-			CG_SetReqRate(attacker, CG_GetReqRate(attacker)+1);
-			CG_CheckReq(attacker);	
-		}
 	}
 	else
 	{
@@ -424,13 +441,6 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 	{
 		g_eSession[attacker][Taser] += 1;
 		g_eSession[attacker][Score] += 2;
-		
-		int reqid = CG_GetReqID(attacker);
-		if(reqid == 221)
-		{
-			CG_SetReqRate(attacker, CG_GetReqRate(attacker)+1);
-			CG_CheckReq(attacker);	
-		}
 	}
 	
 	Format(g_szHitClient[attacker], 1024, "%s\n  #你杀死了[%N], 武器[%s]", g_szHitClient[attacker], client, weapon);
@@ -508,18 +518,6 @@ public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast
 		{
 			if(IsPlayerAlive(client))
 				ShowDamageAnalytics(client);
-			
-			int reqid = CG_GetReqID(client);
-			if(reqid == 201)
-			{
-				CG_SetReqRate(client, CG_GetReqRate(client)+1);
-				CG_CheckReq(client);	
-			}
-			else if(reqid == 231 && g_iClientRoundKill[client] >= 10)
-			{
-				CG_SetReqRate(client, 10);
-				CG_CheckReq(client);
-			}
 		}
 	}
 }
@@ -1177,17 +1175,14 @@ void CreateBeacons()
 	}
 }
 
-void ConnectSQL()
+public Action Timer_ReConnect(Handle timer)
 {
-	if(g_hDB != INVALID_HANDLE)
-		CloseHandle(g_hDB);
-	
-	g_hDB = INVALID_HANDLE;
-	
-	if (SQL_CheckConfig("csgo"))
-		SQL_TConnect(ConnectSQLCallback, "csgo");
-	else
-		SetFailState("Connect to Database Failed! Error: no config entry found for 'csgo' in databases.cfg");
+	CheckDatabaseAvaliable();
+}
+
+public void CG_OnServerLoaded()
+{
+	CheckDatabaseAvaliable();
 }
 
 public ConnectSQLCallback(Handle owner, Handle hndl, const char[] error, any data)
@@ -1230,12 +1225,6 @@ public ConnectSQLCallback(Handle owner, Handle hndl, const char[] error, any dat
 	CheckPlayerCount();
 }
 
-public Action Timer_ReConnect(Handle timer, any data)
-{
-	ConnectSQL();
-	return Plugin_Stop;
-}
-
 public Action OnPlayerRunCmd(client, &buttons, &impulse, float vel[3], float angles[3], &weapon, &subtype, &cmdnum, &tickcount, &seed, mouse[2])
 {
 	if(!IsValidClient(client) || !IsPlayerAlive(client))
@@ -1273,13 +1262,8 @@ public SpeedCap(client)
 	
 	float speedlimit = g_fBhopSpeed;
 	
-	if(CG_GetClientFaith(client) == 1)
-	{
-		if(PA_GetGroupID(client) == 9999)
-			speedlimit *= 1.15;
-		else
-			speedlimit *= 1.1;
-	}
+	if(PA_GetGroupID(client) == 9999)
+		speedlimit *= 1.15;
 
 	if(g_bOnGround[client])
 	{
