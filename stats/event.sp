@@ -112,7 +112,7 @@ public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadca
 {
 	g_bEndGame = false;
 	ClearTimer(g_tBeacon);
-	
+
 	g_bBetting = false;
 	g_bBetTimeout = true;
 	g_iTagType = (g_iTagType == 3) ? 0 : g_iTagType+1;

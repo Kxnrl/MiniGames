@@ -97,7 +97,7 @@ public void OnPluginStart()
 	
 	ConVar_OnPluginStart()
 
-	array_players = new ArrayList();
+	array_players = CreateArray();
 
 	AutoExecConfig(true, "mg_core");
 }

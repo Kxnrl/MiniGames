@@ -12,17 +12,16 @@ public Action RemoveRadar(Handle timer, int client)
 
 public Action Timer_RoundEndDelay(Handle timer)
 {	
-	array_players.Clear();
+	ClearArray(array_players);
 
 	for(int x = 1; x <= MaxClients; ++x)
-		if(IsClientInGame(x))
-			if(GetClientTeam(x) >= 2)
-				array_players.Push(x);
+		if(IsClientInGame(x) && GetClientTeam(x) >= 2)
+			PushArrayCell(array_players, x);
 
-	int client, number, team, counts = RoundToNearest(counts*0.5);
+	int client, number, team, counts = RoundToNearest(GetArraySize(array_players)*0.5);
 	while((number = RandomArray()) != -1)
 	{
-		client = array_players.Get(number);
+		client = GetArrayCell(array_players, number);
 
 		char buffer[128];
 		if(counts > 0)
@@ -51,7 +50,7 @@ public Action Timer_RoundEndDelay(Handle timer)
 		RemoveFromArray(array_players, number);
 	}
 
-	array_players.Clear();
+	ClearArray(array_players);
 }
 
 public Action Timer_ReConnect(Handle timer)
