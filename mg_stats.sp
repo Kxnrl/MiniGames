@@ -4,6 +4,7 @@
 #include <store>
 #include <emitsoundany>
 #include <cg_core>
+#include <diamond>
 
 #undef REQUIRE_EXTENSIONS
 #tryinclude <steamworks>
@@ -39,6 +40,7 @@ bool g_bEndGame;
 bool g_bBetting;
 bool g_bBetTimeout;
 bool g_bWarmup;
+bool g_bMapCredits;
 float g_fBhopSpeed;
 
 int g_iRank[MAXPLAYERS+1];
@@ -53,6 +55,7 @@ float g_fKD[MAXPLAYERS+1];
 
 Handle g_hDB;
 Handle g_tBeacon;
+Handle g_tWarmup;
 
 Handle CAVR_CT_MELEE
 Handle CVAR_CT_PRIMARY;
@@ -126,8 +129,10 @@ public void OnMapStart()
 
 	g_iTagType = 0;
 	g_bWarmup = true;
+	g_bMapCredits = true;
 
-	CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime"))-1.0, Timer_Waruup, _, TIMER_FLAG_NO_MAPCHANGE);
+	ClearTimer(g_tWarmup);
+	g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime"))+1.0, Timer_Waruup, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public void OnMapEnd()
@@ -811,7 +816,14 @@ void SettlementBetting(int winner)
 				}
 			}
 			else
+			{
 				PrintToChat(i, "%s \x10你菠菜输了\x04 %d 信用点", PREFIX_STORE, g_iBetPot[i]);
+				if(GetRandomInt(1, 100) >= 80)
+				{
+					Store_SetClientCredits(i, Store_GetClientCredits(i)+g_iBetPot[i], "MG-新年活动-菠菜失败返还");
+					PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04运气爆炸,获得菠菜失败返还...", i);
+				}
+			}
 
 			g_iBetPot[i] = 0;
 			g_iBetTeam[i] = 0;
@@ -825,4 +837,94 @@ void SettlementBetting(int winner)
 
 	g_iBettingTotalCT = 0;
 	g_iBettingTotalTE = 0;
+}
+
+void Diamonds_KillChecked(int client, bool knife)
+{
+	if(GetRandomInt(0, 100) > 80)
+	{
+		int diamonds = GetRandomInt(1, 3);
+		if(CG_SetClientDiamond(client, CG_GetClientDiamond(client)+diamonds))
+			PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04%s获得\x0F%d钻石", client, knife ? "刀杀" : "电死", diamonds);
+		else
+			PrintToChat(client, "[\x10新年快乐\x01]  你没有注册论坛会员,失去了这次获得钻石的机会");
+	}
+	else
+	{
+		int credits = GetRandomInt(10, 30);
+		if(CG_GetDiscuzUID(client) > 0 && CG_GetPlayerID(client) > 0)
+		{
+			Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-knife_taser");
+			PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04%s获得\x0F%d信用点", client, knife ? "刀杀" : "电死", credits);
+		}
+		else
+			PrintToChat(client, "[\x10新年快乐\x01]  你没有注册论坛会员,失去了这次获得信用点的机会");
+	}
+}
+
+void Diamonds_MapScore(int client)
+{
+	if(CG_GetDiscuzUID(client) <= 0)
+	{
+		PrintToChat(client, "[\x10新年快乐\x01]  你没有注册论坛会员,失去了这次获得钻石和信用点的机会");
+		return;
+	}
+
+	int score = CS_GetClientContributionScore(client);
+	CG_SetClientDiamond(client, CG_GetClientDiamond(client)+RoundToFloor(score*0.05));
+	Store_SetClientCredits(client, Store_GetClientCredits(client)+score, "Casual-新年活动-knife_taser");
+	PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04在线满30分钟获得\x0F%d钻石\x04|\x0F%d信用点", client, RoundToFloor(score*0.05), score);
+}
+
+void Diamonds_NadeKill(int client)
+{
+	int credits = GetRandomInt(15, 30);
+	if(CG_GetDiscuzUID(client) > 0 && CG_GetPlayerID(client) > 0)
+	{
+		Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-投掷物击杀");
+		PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04投掷物杀敌获得\x0F%d信用点", client, credits);
+	}
+	else
+		PrintToChat(client, "[\x10新年快乐\x01]  你没有注册论坛会员,失去了这次获得信用点的机会");
+}
+
+void Diamonds_HSKill(int client)
+{
+	if(GetRandomInt(0, 100) > 5)
+		return;
+	
+	if(CG_GetDiscuzUID(client) <= 0)
+	{
+		PrintToChat(client, "[\x10新年快乐\x01]  你没有注册论坛会员,失去了这次获得钻石和信用点的机会");
+		return;
+	}
+
+	if(GetRandomInt(0, 100) > 80)
+	{
+		int diamonds = GetRandomInt(1, 3);
+		CG_SetClientDiamond(client, CG_GetClientDiamond(client)+diamonds);
+		PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04爆头杀敌获得\x0F%d钻石", client, diamonds);
+	}
+	else
+	{
+		int credits = GetRandomInt(1, 250);
+		Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-爆头杀敌");
+		PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04爆头杀敌获得\x0F%d信用点", client, credits);
+	}
+}
+
+void Diamonds_EndGameWinner(int client)
+{
+	if(CG_GetDiscuzUID(client) <= 0)
+	{
+		PrintToChat(client, "[\x10新年快乐\x01]  你没有注册论坛会员,失去了这次获得钻石和信用点的机会");
+		return;
+	}
+	
+	if(GetRandomInt(0, 100) > 50)
+		return;
+	
+	int credits = GetRandomInt(10, 50);
+	Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-EndGame");
+	PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04最后1V1获胜获得\x0F%d信用点", client, credits);
 }

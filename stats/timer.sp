@@ -1,7 +1,11 @@
 public Action Timer_Waruup(Handle timer)
 {
+	g_tWarmup = INVALID_HANDLE;
 	g_bWarmup = false;
 	CheckPlayerCount();
+
+	if(GameRules_GetProp("m_bWarmupPeriod") == 1)
+		ServerCommand("mp_warmup_end");
 }
 
 public Action RemoveRadar(Handle timer, int client)

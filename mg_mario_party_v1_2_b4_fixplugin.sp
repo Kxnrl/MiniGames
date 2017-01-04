@@ -1,40 +1,27 @@
-#include <sourcemod>
+#include <sdktools>
 
-bool g_bIsMario;
-
-public OnPluginStart()
+public void OnMapStart()
 {
-	RegAdminCmd("sm_fix", Cmd_Fix, ADMFLAG_SLAY);
-	HookEvent("round_start", Event_RoundStart);
-	g_bIsMario = false;
-}
-
-public OnMapStart()
-{
-	new String:szMapName[128];
+	char szMapName[128];
 	GetCurrentMap(szMapName, 128);
 	if(StrContains(szMapName, "mario_party", false ) != -1)
-		g_bIsMario = true;
-	else
-		ServerCommand("sm plugins unload mg_mario_party_v1_2_b4_fixplugin.smx");
+	{
+		HookEvent("round_start", Event_RoundStart);
+	}
 }
 
-public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroadcast)
+public void OnMapEnd()
 {
-	if(g_bIsMario)
-		FixBug();
+	char szMapName[128];
+	GetCurrentMap(szMapName, 128);
+	if(StrContains(szMapName, "mario_party", false ) != -1)
+	{
+		HookEvent("round_start", Event_RoundStart);
+	}
 }
 
-public Action:Cmd_Fix(int client, int args)
-{
-	if(g_bIsMario)
-		FixBug();
-}
-
-stock FixBug()
+public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
 	Handle mp_teammates_are_enemies = FindConVar("mp_teammates_are_enemies");
-	int CVAR = GetConVarInt(mp_teammates_are_enemies);
-	if(CVAR == 1)
-		ServerCommand("sm_cvar mp_teammates_are_enemies 0");
+	SetConVarInt(mp_teammates_are_enemies, 0);
 }

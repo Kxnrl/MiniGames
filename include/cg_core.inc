@@ -4,9 +4,10 @@ forward void CG_OnClientLoaded(int client);
 forward void PA_OnClientLoaded(int client);
 forward void CP_OnCPCouple(int Neptune, int Noire);
 forward void CP_OnCPDivorce(int Neptune, int Noire);
+forward void CG_OnNewDay(int date);
+forward bool CG_OnCheckAuthTerm(int client, int authid);
 forward bool CG_APIStoreSetCredits(int client, int credits, const char[] reason, bool immed);
 forward  int CG_APIStoreGetCredits(int client);
-forward void CG_OnNewDay(int date);
 
 native  int CG_GetServerID();
 native  int CG_GetOnlines(int client);

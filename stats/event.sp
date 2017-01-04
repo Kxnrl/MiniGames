@@ -32,12 +32,22 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 	{
 		g_eSession[attacker][Knife] += 1;
 		g_eSession[attacker][Score] += 2;
+		Diamonds_KillChecked(attacker, true);
 	}
 	if(StrContains(weapon, "taser", false) != -1)
 	{
 		g_eSession[attacker][Taser] += 1;
 		g_eSession[attacker][Score] += 2;
+		Diamonds_KillChecked(attacker, false);
 	}
+	
+	if(StrContains(weapon, "decoy", false) != -1 || StrContains(weapon, "smoke", false) != -1)
+	{
+		Diamonds_NadeKill(attacker);
+	}
+	
+	if(GetEventBool(event, "headshot"))
+		Diamonds_HSKill(attacker);
 
 	if(!g_bEndGame && !g_bBetting)
 	{
@@ -62,6 +72,31 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 			SetupBeacon();
 			SetupBetting();
 		}
+	}
+	
+	if(g_bEndGame)
+	{
+		int ct, te, lastCT, lastTE;
+		for(int i = 1; i <= MaxClients; ++i)
+			if(IsClientInGame(i) && IsPlayerAlive(i))
+			{
+				if(GetClientTeam(i) == 2)
+				{
+					te++;
+					lastTE = i;
+				}
+					
+				if(GetClientTeam(i) == 3)
+				{	
+					ct++;
+					lastCT = i;
+				}
+			}
+		if(te == 1 && ct == 0 && IsValidClient(lastTE))
+			Diamonds_EndGameWinner(lastTE);
+		
+		if(te == 0 && ct == 1 && IsValidClient(lastCT))
+			Diamonds_EndGameWinner(lastCT);
 	}
 }
 
@@ -128,4 +163,15 @@ public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast
 
 	if(g_bRandomTeam)
 		CreateTimer(2.0, Timer_RoundEndDelay, _, TIMER_FLAG_NO_MAPCHANGE);
+	
+	int timeleft;
+	GetMapTimeLeft(timeleft);
+	if(g_bEnable && timeleft < 0 && g_bMapCredits)
+	{
+		g_bMapCredits = false;
+
+		for(int client = 1; client <= MaxClients; ++client)
+			if(IsClientInGame(client) && g_bOnDB[client] && (GetTime() - g_eSession[client][Onlines] >= 1800))
+				Diamonds_MapScore(client);
+	}
 }

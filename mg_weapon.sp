@@ -1,5 +1,5 @@
-#include <sourcemod>
 #include <sdktools>
+#pragma newdecls required
 
 public void OnPluginStart()
 {
