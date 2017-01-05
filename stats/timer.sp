@@ -26,6 +26,15 @@ public Action Timer_RoundEndDelay(Handle timer)
 	while((number = RandomArray()) != -1)
 	{
 		client = GetArrayCell(array_players, number);
+		
+		if(g_iAuthId[client] == 9999)
+		{
+			RemoveFromArray(array_players, number);
+			if(GetClientTeam(client) == 2)
+				counts--;
+
+			continue;
+		}
 
 		char buffer[128];
 		if(counts > 0)

@@ -76,9 +76,9 @@ ArrayList array_players;
 public Plugin myinfo = 
 {
 	name		= " [MG] - Analytics ",
-	author		= "maoling ( xQy )",
+	author		= "Kyle",
 	description	= "Ex",
-	version		= "2.0fix - 2016/12/23",
+	version		= "2.1.1 - 2017/01/05",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -132,7 +132,7 @@ public void OnMapStart()
 	g_bMapCredits = true;
 
 	ClearTimer(g_tWarmup);
-	g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime"))+1.0, Timer_Waruup, _, TIMER_FLAG_NO_MAPCHANGE);
+	g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime"))+1.0, Timer_Waruup);
 }
 
 public void OnMapEnd()
@@ -206,15 +206,15 @@ void SavePlayer(int client)
 	g_eStatistical[client][Onlines] = GetTime() - g_eSession[client][Onlines] + g_eStatistical[client][Onlines];
 
 	Format(m_szQuery, 512, "UPDATE `rank_mg` SET name='%s', kills=kills+'%d', deaths=deaths+'%d', suicides=suicides+'%d', taser=taser+'%d', knife='%d', score='%d', onlines='%d' WHERE steamid='%s';",
-								m_szEname,
-								g_eSession[client][Kills],
-								g_eSession[client][Deaths],
-								g_eSession[client][Suicides],
-								g_eSession[client][Taser],
-								g_eSession[client][Knife],
-								g_eStatistical[client][Score],
-								g_eStatistical[client][Onlines],
-								m_szAuth);
+							m_szEname,
+							g_eSession[client][Kills],
+							g_eSession[client][Deaths],
+							g_eSession[client][Suicides],
+							g_eSession[client][Taser],
+							g_eSession[client][Knife],
+							g_eStatistical[client][Score],
+							g_eStatistical[client][Onlines],
+							m_szAuth);
 
 	SQL_TQuery(g_hDB, SQL_SaveCallback, m_szQuery, GetClientUserId(client), DBPrio_High);
 
