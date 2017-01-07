@@ -20,26 +20,12 @@ public Action Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadc
 	g_fVelocity[client][0] = 0.0;
 	g_fVelocity[client][1] = 0.0;
 	g_fVelocity[client][2] = 0.0;
-
-	CreateTimer(0.1, Timer_SpawnPost, client);
-}
-
-public Action Timer_SpawnPost(Handle timer, int client)
-{
-	if(IsClientInGame(client) && IsPlayerAlive(client) && GetPlayerWeaponSlot(client, 2) == -1)
-	{
-		SetEntProp(client, Prop_Send, "m_ArmorValue", 50, 1);
-		GivePlayerItem(client, "weapon_knife");
-	}
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	if(!IsPlayerAlive(client))
-	{
-		
 		return Plugin_Continue;
-	}
 	
 	if(buttons & IN_BACK)
 		return Plugin_Continue;

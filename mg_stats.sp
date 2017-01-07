@@ -851,7 +851,7 @@ void Diamonds_KillChecked(int client, bool knife)
 	}
 	else
 	{
-		int credits = GetRandomInt(10, 30);
+		int credits = GetRandomInt(5, 30);
 		if(CG_GetDiscuzUID(client) > 0 && CG_GetPlayerID(client) > 0)
 		{
 			Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-knife_taser");
@@ -878,7 +878,7 @@ void Diamonds_MapScore(int client)
 
 void Diamonds_NadeKill(int client)
 {
-	int credits = GetRandomInt(15, 30);
+	int credits = GetRandomInt(5, 15);
 	if(CG_GetDiscuzUID(client) > 0 && CG_GetPlayerID(client) > 0)
 	{
 		Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-投掷物击杀");
@@ -907,7 +907,7 @@ void Diamonds_HSKill(int client)
 	}
 	else
 	{
-		int credits = GetRandomInt(1, 250);
+		int credits = GetRandomInt(1, 50);
 		Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-爆头杀敌");
 		PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04爆头杀敌获得\x0F%d信用点", client, credits);
 	}

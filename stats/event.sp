@@ -169,9 +169,10 @@ public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast
 	if(g_bEnable && timeleft < 0 && g_bMapCredits)
 	{
 		g_bMapCredits = false;
+		LogMessage("Give On Map Last Round");
 
 		for(int client = 1; client <= MaxClients; ++client)
-			if(IsClientInGame(client) && g_bOnDB[client] && (GetTime() - g_eSession[client][Onlines] >= 1800))
+			if(IsClientInGame(client) && g_bOnDB[client] && (GetTime() - g_eSession[client][Onlines] >= 1500))
 				Diamonds_MapScore(client);
 	}
 }
