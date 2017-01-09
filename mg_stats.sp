@@ -97,6 +97,7 @@ public void OnPluginStart()
 	HookEvent("round_start", Event_RoundStart, EventHookMode_Post);
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 	HookEvent("player_team", Event_PlayerTeam, EventHookMode_Pre);
+	HookEvent("cs_win_panel_match", Event_WinPanel, EventHookMode_Post);
 	
 	ConVar_OnPluginStart()
 
