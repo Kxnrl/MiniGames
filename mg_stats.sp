@@ -78,7 +78,7 @@ public Plugin myinfo =
 	name		= " [MG] - Analytics ",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "2.1.1 - 2017/01/05",
+	version		= "2.1.2 - 2017/01/10",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -635,8 +635,8 @@ void ShowBettingMenu(int client)
 	AddMenuItemEx(menu, ITEMDRAW_SPACER, "", "");
 	AddMenuItemEx(menu, ITEMDRAW_SPACER, "", "");
 	AddMenuItemEx(menu, ITEMDRAW_SPACER, "", "");
-	AddMenuItemEx(menu, ITEMDRAW_DISABLED, "3", "我选择CT获胜");
-	AddMenuItemEx(menu, ITEMDRAW_DISABLED, "2", "我选择TE获胜");
+	AddMenuItemEx(menu, ITEMDRAW_DEFAULT, "3", "我选择CT获胜");
+	AddMenuItemEx(menu, ITEMDRAW_DEFAULT, "2", "我选择TE获胜");
 
 	SetMenuExitButton(menu, true);
 	DisplayMenu(menu, client, 10);

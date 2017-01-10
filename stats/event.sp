@@ -163,16 +163,24 @@ public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast
 
 	if(g_bRandomTeam)
 		CreateTimer(2.0, Timer_RoundEndDelay, _, TIMER_FLAG_NO_MAPCHANGE);
-	
-	int timeleft;
-	GetMapTimeLeft(timeleft);
-	if(g_bEnable && timeleft < 0 && g_bMapCredits)
+}
+
+public Action Event_WinPanel(Handle event, const char[] name, bool dontBroadcast)
+{
+	if(g_bEnable)
 	{
-		g_bMapCredits = false;
-		LogMessage("Give On Map Last Round");
+		LogMessage("Event_WinPanel");
 
 		for(int client = 1; client <= MaxClients; ++client)
-			if(IsClientInGame(client) && g_bOnDB[client] && (GetTime() - g_eSession[client][Onlines] >= 1500))
-				Diamonds_MapScore(client);
+		{
+			if(IsClientInGame(client) && g_bOnDB[client])
+			{
+				SavePlayer(client);
+				if(g_bMapCredits && (GetTime() - g_eSession[client][Onlines] >= 1500))
+					Diamonds_MapScore(client);
+			}
+		}
 	}
+
+	g_bMapCredits = false;
 }
