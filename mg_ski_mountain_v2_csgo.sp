@@ -44,17 +44,18 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 
 		TeleportEntity(client, fOrigin, NULL_VECTOR, g_fVelocity[client]);
 
-		
-		if(CheckIfPlayerIsStuck(client))
-		{
-			fOrigin[2] -= 5.0;
-			TeleportEntity(client, fOrigin, NULL_VECTOR, g_fVelocity[client]);
-		}
+		//if(CheckIfPlayerIsStuck(client))
+		//{
+		//	fOrigin[2] -= 5.0;
+		//	TeleportEntity(client, fOrigin, NULL_VECTOR, g_fVelocity[client]);
+		//	
+		//	PrintToChat(client, "[\x04MG\x01] \x05DEBUG \x0C>>> \x0AFix Stuck...");
+		//}
 
-		PrintToChat(client, "[\x04MG\x01] \x05DEBUG \x0C>>> \x0AFix Stuck...");
+		//PrintToChat(client, "[\x04MG\x01] \x05DEBUG \x0C>>> \x0AFix Speed...");
 	}
-	
-	PrintHintText(client, "Current Speed: %.2f\nNearest Speed: %.2f", currentspeed, oldspeed);
+
+	//PrintHintText(client, "Current Speed: %.2f\nNearest Speed: %.2f", currentspeed, oldspeed);
 
 	g_fVelocity[client][0] = fVelocity[0];
 	g_fVelocity[client][1] = fVelocity[1];

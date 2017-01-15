@@ -3,6 +3,7 @@ public void OnMapStart()
 	CreateTimer(240.0, Timer_Check, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
+public Action Timer_Check(Handle timer)
 {
 	for(int client = 1; client <= MaxClients; ++client)
 		if(IsClientInGame(client))
