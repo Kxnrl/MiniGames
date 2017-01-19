@@ -16,10 +16,19 @@ bool g_bDropWeaponFix = true;
 bool g_bRoundEndFix = true;
 bool g_bWeaponCanUse = true;
 
+public Plugin myinfo =
+{
+	name = " MG Weapon ",
+	author = "Kyle",
+	description = "",
+	version = "1.0",
+	url = "http://steamcommunity.com/id/_xQy_/"
+};
+
 public void OnPluginStart()
 {
 	HookEvent("round_end", Event_RoundEnd, EventHookMode_Post);
-	HookEvent("round_prestart", Event_RountStart, EventHookMode_Pre);
+	HookEvent("round_start", Event_RountStart, EventHookMode_Post);
 	HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
 
 	RegAdminCmd("giveak47", Cmd_GiveAK47, ADMFLAG_ROOT);
@@ -83,20 +92,25 @@ public void OnClientDisconnect(int client)
 	SDKUnhook(client, SDKHook_WeaponCanUse, OnWeaponCanUse);
 }
 
-public Action Event_RountStart(Handle event, const char[] name, bool dontBroadcast)
+public void Event_RountStart(Handle event, const char[] name, bool dontBroadcast)
 {
 	g_bWeaponCanUse = true;
 }
 
-public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast)
+public void Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast)
 {
 	if(!g_bRoundEndFix)
+		return;
+	
+	int timeleft;
+	GetMapTimeLeft(timeleft);
+	if(timeleft < 10)
 		return;
 
 	CreateTimer(GetConVarFloat(FindConVar("mp_round_restart_delay"))-1.0, Timer_RoundEnd, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public Action Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
+public void Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 {
 	RequestFrame(OnClientSpawn, GetClientOfUserId(GetEventInt(event, "userid")));
 }
