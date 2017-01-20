@@ -16,7 +16,7 @@ public void OnMapEnd()
 	GetCurrentMap(szMapName, 128);
 	if(StrContains(szMapName, "mario_party", false ) != -1)
 	{
-		HookEvent("round_start", Event_RoundStart);
+		UnhookEvent("round_start", Event_RoundStart);
 	}
 }
 
