@@ -37,18 +37,29 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
 		return Plugin_Handled;
 	}
 	
+	if(GetUserFlagBits(client) & ADMFLAG_ROOT)
+	{
+		ChangeClientTeam(client, newteam);
+		return Plugin_Handled;
+	}
+	
 	if(newteam == oldteam)
 		return Plugin_Handled;
 
 	if(oldteam >= TEAM_SPECTATE)
 	{
-		if(newteam <= TEAM_SPECTATE)
+		if(newteam < TEAM_SPECTATE)
 		{
 			newteam = TEAM_SPECTATE;
 			ChangeClientTeam(client, TEAM_SPECTATE);
 			return Plugin_Handled;
 		}
-		return GetConVarBool(FindConVar("mg_randomteam")) ? Plugin_Handled : Plugin_Continue;
+		else
+		{
+			newteam = GetAllowTeam();
+			ChangeClientTeam(client, newteam);
+			return Plugin_Handled;
+		}
 	}
 
 	ChangeClientTeam(client, TEAM_SPECTATE);
