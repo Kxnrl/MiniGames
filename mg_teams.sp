@@ -48,7 +48,7 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
 
 	if(oldteam >= TEAM_SPECTATE)
 	{
-		if(newteam < TEAM_SPECTATE)
+		if(newteam <= TEAM_SPECTATE)
 		{
 			newteam = TEAM_SPECTATE;
 			ChangeClientTeam(client, TEAM_SPECTATE);
