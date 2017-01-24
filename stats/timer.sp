@@ -144,3 +144,13 @@ public Action Timer_SetClientData(Handle timer)
 		}
 	}
 }
+
+public Action Timer_BurnAll(Handle timer)
+{
+	g_tBurn = INVALID_HANDLE;
+	for(int client = 1; client <= MaxClients; ++client)
+		if(IsClientInGame(client))
+			if(IsPlayerAlive(client))
+				if(g_iAuthId[client] != 9999)
+					IgniteEntity(client, 120.0);
+}

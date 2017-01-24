@@ -1,9 +1,9 @@
-public Action Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
+public void Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 {
 	CreateTimer(0.0, RemoveRadar, GetClientOfUserId(GetEventInt(event, "userid")));
 }
 
-public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadcast)
+public void Event_PlayerDeath(Handle event, const char[] name, bool dontBroadcast)
 {
 	if(g_bWarmup || !g_bEnable)
 		return;
@@ -48,6 +48,9 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 	
 	if(GetEventBool(event, "headshot"))
 		Diamonds_HSKill(attacker);
+	
+	if(g_bRoundEnding)
+		return;
 
 	if(!g_bEndGame && !g_bBetting)
 	{
@@ -143,20 +146,37 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 		PrintToChatAll(m_szMsg);
 }
 
-public Action Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
+public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
 {
 	g_bEndGame = false;
+	g_bRoundEnding = false;
 	ClearTimer(g_tBeacon);
 
 	g_bBetting = false;
 	g_bBetTimeout = true;
 	g_iTagType = (g_iTagType == 3) ? 0 : g_iTagType+1;
+	
+	ClearTimer(g_tBurn);
+	if(GetConVarBool(CVAR_AUTOBURN))
+		g_tBurn = CreateTimer(GetConVarFloat(CVAR_BURNDELAY), Timer_BurnAll);
 }
 
-public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast)
+public void Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast)
 {
 	g_bEndGame = false;
+	g_bRoundEnding = true;
 	ClearTimer(g_tBeacon);
+	
+	if(g_tBurn == INVALID_HANDLE)
+	{
+		for(int client = 1; client <= MaxClients; ++client)
+			if(IsClientInGame(client))
+				if(IsPlayerAlive(client))
+					if(g_iAuthId[client] != 9999)
+						ExtinguishEntity(client);
+	}
+	else
+		ClearTimer(g_tBurn);
 
 	if(g_bBetting)
 		SettlementBetting(GetEventInt(event, "winner"));
@@ -165,7 +185,7 @@ public Action Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast
 		CreateTimer(2.0, Timer_RoundEndDelay, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public Action Event_WinPanel(Handle event, const char[] name, bool dontBroadcast)
+public void Event_WinPanel(Handle event, const char[] name, bool dontBroadcast)
 {
 	if(g_bEnable)
 	{

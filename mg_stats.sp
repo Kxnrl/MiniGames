@@ -41,6 +41,7 @@ bool g_bBetting;
 bool g_bBetTimeout;
 bool g_bWarmup;
 bool g_bMapCredits;
+bool g_bRoundEnding;
 float g_fBhopSpeed;
 
 int g_iRank[MAXPLAYERS+1];
@@ -48,7 +49,6 @@ int g_iAuthId[MAXPLAYERS+1];
 int g_iBetPot[MAXPLAYERS+1];
 int g_iBetTeam[MAXPLAYERS+1];
 bool g_bOnDB[MAXPLAYERS+1];
-bool g_bAutoBhop[MAXPLAYERS+1];
 bool g_bOnGround[MAXPLAYERS+1];
 char g_szSignature[MAXPLAYERS+1][256];
 float g_fKD[MAXPLAYERS+1];
@@ -56,6 +56,7 @@ float g_fKD[MAXPLAYERS+1];
 Handle g_hDB;
 Handle g_tBeacon;
 Handle g_tWarmup;
+Handle g_tBurn;
 
 Handle CAVR_CT_MELEE
 Handle CVAR_CT_PRIMARY;
@@ -66,6 +67,9 @@ Handle CVAR_TE_SECONDARY;
 Handle CVAR_BHOPSPEED;
 Handle CVAR_AUTOBHOP;
 Handle CVAR_CHANGED;
+Handle CVAR_AUTOBURN;
+Handle CVAR_BURNDELAY;
+
 ArrayList array_players;
 
 #include "stats/cvars.sp"
@@ -75,10 +79,10 @@ ArrayList array_players;
 
 public Plugin myinfo = 
 {
-	name		= " [MG] - Analytics ",
+	name		= "[MG] - Analytics",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "2.1.2 - 2017/01/10",
+	version		= "2.1.3 - 2017/01/24",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -86,7 +90,6 @@ public void OnPluginStart()
 {
 	RegConsoleCmd("sm_rank", Cmd_Rank);
 	RegConsoleCmd("sm_top", Cmd_Top);
-	RegConsoleCmd("sm_autojump", Cmd_Jump)
 	RegConsoleCmd("sm_kill", Cmd_killme); 
 	RegConsoleCmd("kill", Cmd_killme);
 	RegConsoleCmd("sm_bc", Cmd_Bet);
@@ -131,6 +134,7 @@ public void OnMapStart()
 	g_iTagType = 0;
 	g_bWarmup = true;
 	g_bMapCredits = true;
+	g_bRoundEnding = false;
 
 	ClearTimer(g_tWarmup);
 	g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime"))+1.0, Timer_Waruup);
@@ -138,6 +142,7 @@ public void OnMapStart()
 
 public void OnMapEnd()
 {
+	ClearTimer(g_tBurn);
 	ClearTimer(g_tBeacon);
 }
 
@@ -148,7 +153,6 @@ public void CG_OnClientLoaded(int client)
 	g_iBetPot[client] = 0;
 	g_iBetTeam[client] = 0;
 	g_iAuthId[client] = PA_GetGroupID(client);
-	g_bAutoBhop[client] = (g_iAuthId[client] == 9000 || g_iAuthId[client] == 9001) ? false : true;
 
 	CheckPlayerCount();
 
@@ -426,25 +430,6 @@ public Action Cmd_Rank(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action Cmd_Jump(int client, int args)
-{
-	if(!client)
-		return Plugin_Handled;
-		
-	if(g_bAutoBhop[client])
-	{
-		g_bAutoBhop[client] = false;
-		PrintToChat(client, "%s  自动连跳\x07已关闭", PREFIX);
-	}
-	else if(g_iAuthId[client] != 9000 && g_iAuthId[client] != 9001)
-	{
-		g_bAutoBhop[client] = true;
-		PrintToChat(client, "%s  自动连跳\x04已开启", PREFIX);
-	}
-
-	return Plugin_Handled;
-}
-
 public Action Cmd_Top(int client, int args)
 {
 	if(!client)
@@ -514,27 +499,14 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	if(!IsValidClient(client) || !IsPlayerAlive(client))
 		return Plugin_Continue;	
 	
-	if (GetEntityFlags(client) & FL_ONGROUND)
+	if(GetEntityFlags(client) & FL_ONGROUND)
 		g_bOnGround[client]=true;
 	else
 		g_bOnGround[client]=false;
 
 	SpeedCap(client);
-	ServerSidedAutoBhop(client, buttons);
 
 	return Plugin_Continue;
-}
-
-public void ServerSidedAutoBhop(int client, int &buttons)
-{
-	if(!IsValidClient(client) || !g_bAutoBhop[client])
-		return;
-
-	if(buttons & IN_JUMP)
-		if(!(g_bOnGround[client]))
-			if(!(GetEntityMoveType(client) & MOVETYPE_LADDER))
-				if(GetEntProp(client, Prop_Data, "m_nWaterLevel") <= 1)
-					buttons &= ~IN_JUMP;
 }
 
 public void SpeedCap(int client)
