@@ -1,5 +1,6 @@
 #include <sdktools>
 #include <sdkhooks>
+#include <cg_core>
 
 #pragma newdecls required
 
@@ -27,10 +28,6 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
-	HookEvent("round_end", Event_RoundEnd, EventHookMode_Post);
-	HookEvent("round_start", Event_RountStart, EventHookMode_Post);
-	HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
-
 	RegAdminCmd("giveak47", Cmd_GiveAK47, ADMFLAG_ROOT);
 	RegAdminCmd("givem4a1", Cmd_GiveM4A1, ADMFLAG_ROOT);
 	RegAdminCmd("givem4a4", Cmd_GiveM4A4, ADMFLAG_ROOT);
@@ -92,27 +89,41 @@ public void OnClientDisconnect(int client)
 	SDKUnhook(client, SDKHook_WeaponCanUse, OnWeaponCanUse);
 }
 
-public void Event_RountStart(Handle event, const char[] name, bool dontBroadcast)
+public void OnMapStart()
+{
+	g_bWeaponCanUse = true;
+	CreateTimer(1.0, Timer_CheckWarmup, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+}
+
+public Action Timer_CheckWarmup(Handle timer)
+{
+	if(GameRules_GetProp("m_bWarmupPeriod") == 1)
+	{
+		g_bWeaponCanUse = true;
+		return Plugin_Continue;
+	}
+	
+	return Plugin_Stop;
+}
+
+public void CG_OnRoundStart()
 {
 	g_bWeaponCanUse = true;
 }
 
-public void Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast)
+public void CG_OnRoundEnd()
 {
-	if(!g_bRoundEndFix)
-		return;
-	
 	int timeleft;
 	GetMapTimeLeft(timeleft);
 	if(timeleft < 10)
 		return;
-
+	
 	CreateTimer(GetConVarFloat(FindConVar("mp_round_restart_delay"))-1.0, Timer_RoundEnd, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public void Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
+public void CG_OnClientSpawn(int client)
 {
-	RequestFrame(OnClientSpawn, GetClientOfUserId(GetEventInt(event, "userid")));
+	RequestFrame(OnClientSpawn, client);
 }
 
 public Action Timer_Slay(Handle timer, int userid)
@@ -121,7 +132,17 @@ public Action Timer_Slay(Handle timer, int userid)
 	if(IsValidClient(client))
 	{
 		ForcePlayerSuicide(client);
-		PrintToChatAll("[\x04MG\x01]  \x0B%N\x01使用\x09连狙\x01时遭遇天谴[\x07100HP\x01]", client);
+		PrintToChatAll("[\x04MG\x01]  \x0B%N\x01使用\x09连狙\x01时遭遇天谴", client);
+	}
+}
+
+public Action Timer_Slay2(Handle timer, int userid)
+{
+	int client = GetClientOfUserId(userid);
+	if(IsValidClient(client))
+	{
+		ForcePlayerSuicide(client);
+		PrintToChatAll("[\x04MG\x01]  \x0B%N\x01使用\x09某种不可描述的东西\x01时遭遇天谴", client);
 	}
 }
 
@@ -151,7 +172,12 @@ public Action Timer_RoundEnd(Handle timer)
 	for(int client=1; client<=MaxClients; ++client)
 		if(IsClientInGame(client))
 			if(IsPlayerAlive(client))
+			{
+				SetEntProp(client, Prop_Send, "m_bHasHeavyArmor", 0);
+				SetEntProp(client, Prop_Send, "m_ArmorValue", 0, 1);
+				SetEntProp(client, Prop_Send, "m_bHasHelmet", 0);
 				RemoveAllWeapon(client);
+			}
 
 	g_bWeaponCanUse = false;
 }
@@ -173,25 +199,23 @@ public void OnWeaponEquip(int client, int weapon)
 {
 	if(!IsValidEdict(weapon))
 		return;
-	
-	if(!g_bSlayGaygun && !g_bRestrictAwp)
-		return;
-	
+
 	char classname[32];
 	GetEdictClassname(weapon, classname, 32);
 	
-	if(g_bRestrictAwp && StrEqual(classname, "weapon_awp"))
+	if(StrEqual(classname, "weapon_flashbang") && CG_GetClientId(client) != 1)
+	{
+		CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay2, GetClientUserId(client));
+	}
+	else if(g_bRestrictAwp && StrEqual(classname, "weapon_awp"))
 	{
 		PrintToChat(client, "[\x04MG\x01]  \x07当前地图限制Awp的使用");
 		RequestFrame(RemoveRestriceWeapon, weapon);
-		return;
 	}
-
-	if(StrEqual(classname, "weapon_scar20") || StrEqual(classname, "weapon_g3sg1"))
+	else if(g_bSlayGaygun && (StrEqual(classname, "weapon_scar20") || StrEqual(classname, "weapon_g3sg1")))
 	{
 		RequestFrame(RemoveRestriceWeapon, weapon);
-		if(g_bSlayGaygun)
-			CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay, GetClientUserId(client));
+		CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay, GetClientUserId(client));
 	}
 }
 
@@ -201,7 +225,7 @@ public void CheckWeaponEquip(int entity)
 		return;
 
 	char entname[64];
-	GetEntPropString(entity, Prop_Data, "m_iName", entname, sizeof(entname));
+	GetEntPropString(entity, Prop_Data, "m_iName", entname, 64);
 	if(!StrEqual(entname, ""))
 		return;
 
@@ -260,6 +284,9 @@ public Action Cmd_GiveAWP(int client, int args)
 
 stock void RemoveAllWeapon(int client)
 {
+	if(!g_bRoundEndFix)
+		return;
+
 	RemoveWeaponBySlot(client, 0);
 	RemoveWeaponBySlot(client, 1);
 	while(RemoveWeaponBySlot(client, 2)){}
