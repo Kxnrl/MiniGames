@@ -13,17 +13,29 @@ public Plugin myinfo =
 
 public void CG_OnClientLoaded(int client)
 {
-	if(PA_GetGroupID(client) == 9999)
+	if(CG_GetClientGId(client) == 9999)
 	{
-		CreateTimer(0.5, Timer_Armor, client);
+		CreateTimer(0.5, Timer_Armor, client, TIMER_REPEAT);
 		SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
+		SDKHook(client, SDKHook_WeaponDropPost, OnWeaponDrop);
 	}
 }
 
 public void OnClientDisconnect(int client)
 {
-	if(PA_GetGroupID(client) == 9999)
+	if(CG_GetClientGId(client) == 9999)
+	{
 		SDKUnhook(client, SDKHook_OnTakeDamage, OnTakeDamage);
+		SDKUnhook(client, SDKHook_WeaponDropPost, OnWeaponDrop);
+	}
+}
+
+public void OnWeaponDrop(int client, int weapon)
+{
+	if(!IsValidEdict(weapon))
+		return;
+
+	AcceptEntityInput(weapon, "Kill");
 }
 
 public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3])
@@ -74,14 +86,10 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 		{
 			if(damage > 400.0)
 			{
-				damage = 300.0;
+				damage = 280.0;
 				return Plugin_Changed;
 			}
 		}
-		else
-			damage *= 0.8;
-		
-		return Plugin_Changed;
 	}
 	
 	return Plugin_Continue;
@@ -91,13 +99,14 @@ public Action Timer_Armor(Handle timer, int client)
 {
 	if(!IsClientInGame(client))
 		return Plugin_Stop;
-	
+
 	if(!IsPlayerAlive(client))
 		return Plugin_Continue;
-	
-	if(GetEntProp(client, Prop_Send, "m_ArmorValue") <= 0)
+
+	if(GetEntProp(client, Prop_Send, "m_ArmorValue") < 1)
 	{
 		SetEntProp(client, Prop_Send, "m_ArmorValue", 10, 1);
+		PrintToConsole(client, "Re Armor");
 		//RequestFrame(ResetArmorValue, client);
 	}
 	
