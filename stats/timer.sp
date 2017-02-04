@@ -14,6 +14,30 @@ public Action RemoveRadar(Handle timer, int client)
 		SetEntProp(client, Prop_Send, "m_iHideHUD", HIDE_RADAR);
 }
 
+public Action CheckClientKD(Handle timer, int client)
+{
+	if(IsValidClient(client) && IsPlayerAlive(client) && g_bOnDB[client] && g_iAuthId[client] != 9999)
+	{
+		float k = float(GetClientFrags(client));
+		float d = float(GetClientDeaths(client));
+		float a = float(CS_GetClientAssists(client));
+		float m = float(CS_GetMVPCount(client));
+		if(k >= 10.0)
+		{
+			if(d == 0.0)
+				d = 1.0;
+			
+			float kd = (k+(a/2)+m)/d;
+
+			if((g_fKD[client] >= 2.0 && kd >= 4.0) || (g_fKD[client] < 2.0 && kd >= 6.0))
+			{
+				ForcePlayerSuicide(client);
+				tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,被雷神劈死了...", PREFIX, client);
+			}
+		}
+	}
+}
+
 public Action Timer_RoundEndDelay(Handle timer)
 {	
 	ClearArray(array_players);
@@ -41,13 +65,13 @@ public Action Timer_RoundEndDelay(Handle timer)
 		{
 			team = 2;
 			counts--;
-			PrintToChat(client, "%s 你已被移动到\x07恐怖分子", PREFIX);
+			PrintToChat(client, "%s \x04随机组队\x01>>>  你已被移动到\x07恐怖分子", PREFIX);
 			Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
 		}
 		else
 		{
 			team = 3;
-			PrintToChat(client, "%s 你已被移动到\x0B反恐精英", PREFIX);
+			PrintToChat(client, "%s  \x04随机组队\x01>>>  你已被移动到\x0B反恐精英", PREFIX);
 			Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
 		}
 		
@@ -97,7 +121,7 @@ public Action Timer_SetClientData(Handle timer)
 		
 		switch(g_iTagType)
 		{
-			case 0: PA_GetGroupName(client, tag, 32);
+			case 0: CG_GetClientGName(client, tag, 32);
 			case 1: {if(!g_iRank[client]) Format(tag, 32, "Top - NORANK", g_iRank[client]); else Format(tag, 32, "Top - %d", g_iRank[client]);}
 			case 2: Format(tag, 32, "K/D  %.2f", g_fKD[client]);
 			case 3: MG_GetRankName(client, tag, 32);
@@ -115,7 +139,7 @@ public Action Timer_SetClientData(Handle timer)
 			ReplaceString(m_szName, 64, "<", "〈");
 			ReplaceString(m_szName, 64, ">", "〉");
 			
-			CG_GetSignature(target, m_szSigature, 256);
+			CG_GetClientSignature(target, m_szSigature, 256);
 			ReplaceString(m_szSigature, 1024, "{白}", "");
 			ReplaceString(m_szSigature, 1024, "{红}", "");
 			ReplaceString(m_szSigature, 1024, "{粉}", "");
@@ -130,8 +154,8 @@ public Action Timer_SetClientData(Handle timer)
 			ReplaceString(m_szSigature, 1024, "{亮蓝}", "");
 			ReplaceString(m_szSigature, 1024, "{蓝}", "");
 			
-			PA_GetGroupName(target, m_szAuth, 64);
-			if(PA_GetGroupID(target) == 9999)
+			CG_GetClientGName(target, m_szAuth, 64);
+			if(CG_GetClientGId(target) == 9999)
 				Format(m_szAuth, 64, "<font color='#FF00FF'>%s", m_szAuth);
 			else
 				Format(m_szAuth, 64, "<font color='#FF8040'>%s", m_szAuth);

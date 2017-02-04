@@ -1,23 +1,18 @@
-public void Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
+public void CG_OnClientSpawn(int client)
 {
-	CreateTimer(0.0, RemoveRadar, GetClientOfUserId(GetEventInt(event, "userid")));
+	CreateTimer(0.0, RemoveRadar, client);
+	CreateTimer(1.0, CheckClientKD, client);
 }
 
-public void Event_PlayerDeath(Handle event, const char[] name, bool dontBroadcast)
+public void CG_OnClientDeath(int client, int attacker, int assister, bool headshot, const char[] weapon)
 {
 	if(g_bWarmup || !g_bEnable)
 		return;
-
-	int attacker = GetClientOfUserId(GetEventInt(event, "attacker"));
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 
 	g_eSession[client][Deaths]++;
 
 	if(client == attacker || !IsValidClient(attacker))
 		return;
-
-	char weapon[64];
-	GetEventString(event, "weapon", weapon, 64);
 
 	g_eSession[attacker][Kills] += 1;
 	g_eSession[attacker][Score] += 3;
@@ -46,7 +41,7 @@ public void Event_PlayerDeath(Handle event, const char[] name, bool dontBroadcas
 		Diamonds_NadeKill(attacker);
 	}
 	
-	if(GetEventBool(event, "headshot"))
+	if(headshot)
 		Diamonds_HSKill(attacker);
 	
 	if(g_bRoundEnding)
@@ -103,20 +98,13 @@ public void Event_PlayerDeath(Handle event, const char[] name, bool dontBroadcas
 	}
 }
 
-public Action Event_PlayerTeam(Handle event, const char[] name, bool dontBroadcast)
-{
-	SetEventBroadcast(event, true);
-	
-	return Plugin_Changed;
-}
-
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
 {
 	SetEventBroadcast(event, true);
 
 	int client = GetClientOfUserId(GetEventInt(event, "userid"));
 	char AuthoirzedName[32], m_szMsg[512];
-	PA_GetGroupName(client, AuthoirzedName, 32);
+	CG_GetClientGName(client, AuthoirzedName, 32);
 	FormatEx(m_szMsg, 512, "%s  \x04%N\x01离开了游戏 \x0B认证\x01[\x0C%s\x01]  \x01排名\x04%d  \x0CK/D\x04%.2f \x0C得分\x04%d  \x01签名: \x07%s", 
 							PREFIX, 
 							client, 
@@ -144,9 +132,11 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 		PrintToChatAll("%s  萌新\x04%N\x01离开了游戏", PREFIX, client);
 	else
 		PrintToChatAll(m_szMsg);
+	
+	return Plugin_Changed;
 }
 
-public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast)
+public void CG_OnRoundStart()
 {
 	g_bEndGame = false;
 	g_bRoundEnding = false;
@@ -161,7 +151,7 @@ public void Event_RoundStart(Handle event, const char[] name, bool dontBroadcast
 		g_tBurn = CreateTimer(GetConVarFloat(CVAR_BURNDELAY), Timer_BurnAll);
 }
 
-public void Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast)
+public void CG_OnRoundEnd(int winner)
 {
 	g_bEndGame = false;
 	g_bRoundEnding = true;
@@ -179,7 +169,7 @@ public void Event_RoundEnd(Handle event, const char[] name, bool dontBroadcast)
 		ClearTimer(g_tBurn);
 
 	if(g_bBetting)
-		SettlementBetting(GetEventInt(event, "winner"));
+		SettlementBetting(winner);
 
 	if(g_bRandomTeam)
 		CreateTimer(2.0, Timer_RoundEndDelay, _, TIMER_FLAG_NO_MAPCHANGE);

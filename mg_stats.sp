@@ -69,6 +69,7 @@ Handle CVAR_AUTOBHOP;
 Handle CVAR_CHANGED;
 Handle CVAR_AUTOBURN;
 Handle CVAR_BURNDELAY;
+Handle CVAR_AUTOJUMP;
 
 ArrayList array_players;
 
@@ -82,7 +83,7 @@ public Plugin myinfo =
 	name		= "[MG] - Analytics",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "2.1.3 - 2017/01/24",
+	version		= "2.2.1 - 2017/02/05",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -94,15 +95,10 @@ public void OnPluginStart()
 	RegConsoleCmd("kill", Cmd_killme);
 	RegConsoleCmd("sm_bc", Cmd_Bet);
 
-	HookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
-	HookEvent("player_death", Event_PlayerDeath, EventHookMode_Post);
-	HookEvent("round_end", Event_RoundEnd, EventHookMode_Post);
-	HookEvent("round_start", Event_RoundStart, EventHookMode_Post);
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
-	HookEvent("player_team", Event_PlayerTeam, EventHookMode_Pre);
 	HookEvent("cs_win_panel_match", Event_WinPanel, EventHookMode_Post);
-	
-	ConVar_OnPluginStart()
+
+	ConVar_OnPluginStart();
 
 	array_players = CreateArray();
 
@@ -152,7 +148,7 @@ public void CG_OnClientLoaded(int client)
 	g_fKD[client] = 0.0;
 	g_iBetPot[client] = 0;
 	g_iBetTeam[client] = 0;
-	g_iAuthId[client] = PA_GetGroupID(client);
+	g_iAuthId[client] = CG_GetClientGId(client);
 
 	CheckPlayerCount();
 
@@ -311,7 +307,7 @@ public void SQL_RankCallback(Handle owner, Handle hndl, const char[] error, int 
 			if(StrEqual(szSteamID ,mySteamID))
 			{
 				g_iRank[client] = iIndex;
-				CG_GetSignature(client, g_szSignature[client], 256);
+				CG_GetClientSignature(client, g_szSignature[client], 256);
 				g_fKD[client] = (g_eStatistical[client][Kills]*1.0)/(g_eStatistical[client][Deaths]*1.0);
 				
 				CheckClientLocation(client);
@@ -341,10 +337,10 @@ public int APIWebResponse(char[] szLoc, int client)
 	if(!IsValidClient(client))
 		return;
 	
-	ReplaceString(szLoc, 256, "中国中国", "中国");
+	ReplaceString(szLoc, 256, "中国中国", "");
 
 	char AuthoirzedName[32], m_szMsg[512];
-	PA_GetGroupName(client, AuthoirzedName, 32);
+	CG_GetClientGName(client, AuthoirzedName, 32);
 	Format(m_szMsg, 512, "%s \x04%N\x01进入了游戏 \x0B认证\x01[\x0C%s\x01]  \x01排名\x04%d  \x0CK/D\x04%.2f \x0C得分\x04%d \x0C来自\x01: \x05%s  \x01签名: \x07%s", 
 							PREFIX, 
 							client, 
@@ -518,7 +514,7 @@ public void SpeedCap(int client)
 	
 	float speedlimit = g_fBhopSpeed;
 	
-	if(PA_GetGroupID(client) == 9999)
+	if(CG_GetClientGId(client) == 9999)
 		speedlimit *= 1.15;
 
 	if(g_bOnGround[client])
@@ -825,7 +821,7 @@ void Diamonds_KillChecked(int client, bool knife)
 	else
 	{
 		int credits = GetRandomInt(5, 30);
-		if(CG_GetDiscuzUID(client) > 0 && CG_GetPlayerID(client) > 0)
+		if(CG_GetClientUId(client) > 0 && CG_GetClientId(client) > 0)
 		{
 			Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-knife_taser");
 			PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04%s获得\x0F%d信用点", client, knife ? "刀杀" : "电死", credits);
@@ -837,7 +833,7 @@ void Diamonds_KillChecked(int client, bool knife)
 
 void Diamonds_MapScore(int client)
 {
-	if(CG_GetDiscuzUID(client) <= 0)
+	if(CG_GetClientUId(client) <= 0)
 	{
 		PrintToChat(client, "[\x10新年快乐\x01]  你没有注册论坛会员,失去了这次获得钻石和信用点的机会");
 		return;
@@ -852,7 +848,7 @@ void Diamonds_MapScore(int client)
 void Diamonds_NadeKill(int client)
 {
 	int credits = GetRandomInt(5, 15);
-	if(CG_GetDiscuzUID(client) > 0 && CG_GetPlayerID(client) > 0)
+	if(CG_GetClientUId(client) > 0 && CG_GetClientId(client) > 0)
 	{
 		Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-投掷物击杀");
 		PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04投掷物杀敌获得\x0F%d信用点", client, credits);
@@ -866,7 +862,7 @@ void Diamonds_HSKill(int client)
 	if(GetRandomInt(0, 100) > 5)
 		return;
 	
-	if(CG_GetDiscuzUID(client) <= 0)
+	if(CG_GetClientUId(client) <= 0)
 	{
 		PrintToChat(client, "[\x10新年快乐\x01]  你没有注册论坛会员,失去了这次获得钻石和信用点的机会");
 		return;
@@ -888,7 +884,7 @@ void Diamonds_HSKill(int client)
 
 void Diamonds_EndGameWinner(int client)
 {
-	if(CG_GetDiscuzUID(client) <= 0)
+	if(CG_GetClientUId(client) <= 0)
 	{
 		PrintToChat(client, "[\x10新年快乐\x01]  你没有注册论坛会员,失去了这次获得钻石和信用点的机会");
 		return;
