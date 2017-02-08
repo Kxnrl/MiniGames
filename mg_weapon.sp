@@ -16,6 +16,7 @@ bool g_bSlayGaygun = true;
 bool g_bDropWeaponFix = true;
 bool g_bRoundEndFix = true;
 bool g_bWeaponCanUse = true;
+//bool g_bWeaponChecked[2048+1];
 
 public Plugin myinfo =
 {
@@ -59,16 +60,12 @@ public void OnPluginEnd()
 			OnClientDisconnect(i);
 }
 
-public int OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)
+public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)
 {
-	if(convar == mg_roundendfix)
-		g_bRoundEndFix = view_as<bool>(StringToInt(newValue));
-	else if(convar == mg_dropweaponfix)
-		g_bDropWeaponFix = view_as<bool>(StringToInt(newValue));
-	else if(convar == mg_slaygaygun)
-		g_bSlayGaygun = view_as<bool>(StringToInt(newValue));
-	else if(convar == mg_restrictawp)
-		g_bRestrictAwp = view_as<bool>(StringToInt(newValue));
+	g_bRoundEndFix = GetConVarBool(mg_roundendfix);
+	g_bDropWeaponFix = GetConVarBool(mg_dropweaponfix);
+	g_bSlayGaygun = GetConVarBool(mg_slaygaygun);
+	g_bRestrictAwp = GetConVarBool(mg_restrictawp);
 }
 
 public void OnClientPostAdminCheck(int client)
@@ -92,32 +89,66 @@ public void OnClientDisconnect(int client)
 public void OnMapStart()
 {
 	g_bWeaponCanUse = true;
-	CreateTimer(1.0, Timer_CheckWarmup, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(3.0, Timer_CheckWarmup, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+}
+
+public void OnConfigsExecuted()
+{
+	//SetConVarInt(FindConVar("mp_death_drop_gun"), 0);
+	//SetConVarInt(FindConVar("mp_death_drop_grenade"), 0);
+	g_bRoundEndFix = GetConVarBool(mg_roundendfix);
+	g_bDropWeaponFix = GetConVarBool(mg_dropweaponfix);
+	g_bSlayGaygun = GetConVarBool(mg_slaygaygun);
+	g_bRestrictAwp = GetConVarBool(mg_restrictawp);
 }
 
 public Action Timer_CheckWarmup(Handle timer)
 {
-	if(GameRules_GetProp("m_bWarmupPeriod") == 1)
+	if(GameRules_GetProp("m_bWarmupPeriod") != 1)
+		return Plugin_Stop;
+	
+	g_bWeaponCanUse = true;
+	
+	for(int x = MaxClients+1; x <= 2048; ++x)
 	{
-		g_bWeaponCanUse = true;
-		return Plugin_Continue;
+		if(!IsValidEdict(x))
+			continue;
+		
+		char classname[32];
+		GetEdictClassname(x, classname, 32);
+		if(StrContains(classname, "weapon_") != 0)
+			continue;
+		
+		if(GetEntProp(x, Prop_Send, "m_hPrevOwner") <= 0)
+			continue;
+
+		if(GetEntPropEnt(x, Prop_Send, "m_hOwnerEntity") > 0)
+			continue;
+		
+		AcceptEntityInput(x, "Kill");
 	}
 	
-	return Plugin_Stop;
+	//SetConVarInt(FindConVar("mp_death_drop_gun"), 1);
+	//SetConVarInt(FindConVar("mp_death_drop_grenade"), 1);
+	//SetConVarInt(FindConVar("sv_penetration_type"), 0);
+	
+	return Plugin_Continue;
 }
 
 public void CG_OnRoundStart()
 {
 	g_bWeaponCanUse = true;
+	//for(int x = MaxClients+1; x <= 2048; ++x)
+	//	g_bWeaponChecked[x] = false;
 }
 
-public void CG_OnRoundEnd()
+public void CG_OnRoundEnd(int winner)
 {
 	int timeleft;
 	GetMapTimeLeft(timeleft);
 	if(timeleft < 10)
 		return;
-	
+
 	CreateTimer(GetConVarFloat(FindConVar("mp_round_restart_delay"))-1.0, Timer_RoundEnd, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
@@ -178,8 +209,8 @@ public Action Timer_RoundEnd(Handle timer)
 				SetEntProp(client, Prop_Send, "m_bHasHelmet", 0);
 				RemoveAllWeapon(client);
 			}
-
-	g_bWeaponCanUse = false;
+	if(g_bRoundEndFix)
+		g_bWeaponCanUse = false;
 }
 
 public Action OnWeaponCanUse(int client, int weapon)
@@ -189,7 +220,31 @@ public Action OnWeaponCanUse(int client, int weapon)
 
 	if(!g_bDropWeaponFix)
 		return Plugin_Continue;
+/*	
+	if(g_bWeaponChecked[weapon])
+		return Plugin_Continue;
+	
+	char classname[32];
+	GetEdictClassname(weapon, classname, 32);
+	int weaponslot = GetWeaponSlot(classname);
+	int clientslot = GetPlayerWeaponSlot(client, weaponslot);
+	
+	if(clientslot == -1)
+	{
+		PrintToChatAll("%N %d[%d] is free", client, weaponslot, weapon);
+		g_bWeaponChecked[weapon] = true;
+		return Plugin_Continue;
+	}
 
+	char szweapon[32];
+	GetEdictClassname(clientslot, szweapon, 32);
+	if(!StrEqual(szweapon, classname))
+	{
+		g_bWeaponChecked[weapon] = true;
+		PrintToChatAll("%N %d is different of act", client, weaponslot, weapon);
+		return Plugin_Continue;
+	}
+*/
 	RequestFrame(CheckWeaponEquip, weapon);
 	
 	return Plugin_Continue;
@@ -202,10 +257,10 @@ public void OnWeaponEquip(int client, int weapon)
 
 	char classname[32];
 	GetEdictClassname(weapon, classname, 32);
-	
-	if(StrEqual(classname, "weapon_flashbang") && CG_GetClientId(client) != 1)
+	if(StrEqual(classname, "weapon_flashbang"))
 	{
-		CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay2, GetClientUserId(client));
+		if(CG_GetClientId(client) != 1)
+			CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay2, GetClientUserId(client));
 	}
 	else if(g_bRestrictAwp && StrEqual(classname, "weapon_awp"))
 	{
@@ -215,7 +270,8 @@ public void OnWeaponEquip(int client, int weapon)
 	else if(g_bSlayGaygun && (StrEqual(classname, "weapon_scar20") || StrEqual(classname, "weapon_g3sg1")))
 	{
 		RequestFrame(RemoveRestriceWeapon, weapon);
-		CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay, GetClientUserId(client));
+		if(CG_GetClientId(client) != 1)
+			CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay, GetClientUserId(client));
 	}
 }
 
@@ -223,6 +279,9 @@ public void CheckWeaponEquip(int entity)
 {
 	if(!IsValidEdict(entity))
 		return;
+	
+	//if(g_bWeaponChecked[entity])
+	//	return;
 
 	char entname[64];
 	GetEntPropString(entity, Prop_Data, "m_iName", entname, 64);
@@ -242,7 +301,7 @@ public void RemoveRestriceWeapon(int entity)
 {
 	if(!IsValidEdict(entity))
 		return;
-	
+
 	AcceptEntityInput(entity, "Kill");
 } 
 
@@ -317,4 +376,18 @@ stock bool RemoveWeaponBySlot(int client, int slot)
 stock bool IsValidClient(int client)
 {
 	return (1 <= client <= MaxClients && IsClientInGame(client) && !IsFakeClient(client)) ? true : false;
+}
+
+stock int GetWeaponSlot(const char[] weapon)
+{
+	if(StrEqual(weapon, "weapon_hkp2000") || StrEqual(weapon, "weapon_p250") || StrEqual(weapon, "weapon_elite") || StrEqual(weapon, "weapon_fiveseven") || StrEqual(weapon, "weapon_tec9") || StrEqual(weapon, "weapon_glock") || StrEqual(weapon, "weapon_deagle"))
+		return 1;
+	else if(StrEqual(weapon, "weapon_taser") || StrEqual(weapon, "weapon_knife"))
+		return 2;
+	else if(StrEqual(weapon, "grenade"))
+		return 3;
+	else if(StrEqual(weapon, "weapon_c4") || StrEqual(weapon, "weapon_healthshot"))
+		return 4;
+	else
+		return 0;
 }
