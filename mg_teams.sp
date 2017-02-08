@@ -18,6 +18,17 @@ public Plugin myinfo =
 public void OnPluginStart() 
 {
 	AddCommandListener(Command_Jointeam, "jointeam");
+	AddCommandListener(Command_AntiKill, "kill");
+	AddCommandListener(Command_AntiKill, "explode");
+	AddCommandListener(Command_AntiKill, "sm_kill");
+}
+
+public Action Command_AntiKill(int client, const char[] command, int argc)
+{
+	if(GetUserFlagBits(client) & ADMFLAG_ROOT)
+		return Plugin_Handled;
+
+	return Plugin_Continue;
 }
 
 public Action Command_Jointeam(int client, const char[] command, int argc)
@@ -29,16 +40,22 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
 	GetCmdArg(1, arg, 4);
 	int newteam = StringToInt(arg);
 	int oldteam = GetClientTeam(client);
-
-	if(oldteam == TEAM_UNASSIGNED)
+	
+	if(GetUserFlagBits(client) & ADMFLAG_ROOT)
 	{
-		newteam = GetAllowTeam();
 		ChangeClientTeam(client, newteam);
 		return Plugin_Handled;
 	}
 	
-	if(GetUserFlagBits(client) & ADMFLAG_ROOT)
+	if(IsPlayerAlive(client))
 	{
+		PrintToChat(client, " \x02活着的时候不能切换队伍");
+		return Plugin_Handled;
+	}
+
+	if(oldteam == TEAM_UNASSIGNED)
+	{
+		newteam = GetAllowTeam();
 		ChangeClientTeam(client, newteam);
 		return Plugin_Handled;
 	}
