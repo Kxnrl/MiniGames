@@ -44,6 +44,7 @@ bool g_bMapCredits;
 bool g_bRoundEnding;
 float g_fBhopSpeed;
 
+int g_iRoundKill[MAXPLAYERS+1];
 int g_iRank[MAXPLAYERS+1];
 int g_iAuthId[MAXPLAYERS+1];
 int g_iBetPot[MAXPLAYERS+1];
@@ -83,7 +84,7 @@ public Plugin myinfo =
 	name		= "[MG] - Analytics",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "2.2.1 - 2017/02/05",
+	version		= "2.3 - 2017/02/08",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 

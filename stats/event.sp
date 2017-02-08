@@ -13,6 +13,8 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 
 	if(client == attacker || !IsValidClient(attacker))
 		return;
+	
+	g_iRoundKill[attacker]++;
 
 	g_eSession[attacker][Kills] += 1;
 	g_eSession[attacker][Score] += 3;

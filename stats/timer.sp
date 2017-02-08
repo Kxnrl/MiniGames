@@ -16,26 +16,33 @@ public Action RemoveRadar(Handle timer, int client)
 
 public Action CheckClientKD(Handle timer, int client)
 {
-	if(IsValidClient(client) && IsPlayerAlive(client) && g_bOnDB[client] && g_iAuthId[client] != 9999)
+	if(IsValidClient(client) && IsPlayerAlive(client) && g_iAuthId[client] != 9999)
 	{
-		float k = float(GetClientFrags(client));
-		float d = float(GetClientDeaths(client));
-		float a = float(CS_GetClientAssists(client));
-		float m = float(CS_GetMVPCount(client));
-		if(k >= 10.0)
+		if(g_iRoundKill[client] > 6)
 		{
-			if(d == 0.0)
-				d = 1.0;
+			ForcePlayerSuicide(client);
+			tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,被雷神劈死了...", PREFIX, client);
+		}
+		else if(g_eSession[client][Kills] >= 10)
+		{
+			float k = float(g_eSession[client][Kills]);
+			float d = float(g_eSession[client][Deaths]);
+			float a = float(CS_GetClientAssists(client));
+			float m = float(CS_GetMVPCount(client));
 			
+			if(d == 0.0) d = 1.0;
+
 			float kd = (k+(a/2)+m)/d;
 
-			if((g_fKD[client] >= 2.0 && kd >= 4.0) || (g_fKD[client] < 2.0 && kd >= 6.0))
+			if(kd >= 6.0)
 			{
 				ForcePlayerSuicide(client);
 				tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,被雷神劈死了...", PREFIX, client);
 			}
 		}
 	}
+	
+	g_iRoundKill[client] = 0;
 }
 
 public Action Timer_RoundEndDelay(Handle timer)
@@ -57,6 +64,14 @@ public Action Timer_RoundEndDelay(Handle timer)
 			if(GetClientTeam(client) == 2)
 				counts--;
 
+			continue;
+		}
+		
+		if(CG_GetClientUId(client) == 1290)
+		{
+			CS_SwitchTeam(client, 2);
+			RemoveFromArray(array_players, number);
+			counts--;
 			continue;
 		}
 
