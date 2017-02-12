@@ -84,7 +84,7 @@ public Plugin myinfo =
 	name		= "[MG] - Analytics",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "2.3 - 2017/02/08",
+	version		= "2.3 - 2017/02/11",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -134,7 +134,7 @@ public void OnMapStart()
 	g_bRoundEnding = false;
 
 	ClearTimer(g_tWarmup);
-	g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime"))+1.0, Timer_Waruup);
+	g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime"))+1.0, Timer_Warmup);
 }
 
 public void OnMapEnd()
@@ -475,16 +475,10 @@ public int MenuHandler_MenuTopPlayers(Handle menu, MenuAction action, int param1
 	}
 }
 
-
-
-
-
 void SetupBeacon()
 {
 	g_tBeacon = CreateTimer(2.0, Timer_Beacon);
 }
-
-
 
 public void CG_OnServerLoaded()
 {
@@ -493,7 +487,7 @@ public void CG_OnServerLoaded()
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
-	if(!IsValidClient(client) || !IsPlayerAlive(client))
+	if(!IsPlayerAlive(client))
 		return Plugin_Continue;	
 	
 	if(GetEntityFlags(client) & FL_ONGROUND)
@@ -510,18 +504,18 @@ public void SpeedCap(int client)
 {
 	static bool IsOnGround[MAXPLAYERS+1]; 
 
-	float CurVelVec[3];
-	GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
-	
-	float speedlimit = g_fBhopSpeed;
-	
-	if(CG_GetClientGId(client) == 9999)
-		speedlimit *= 1.15;
-
 	if(g_bOnGround[client])
 	{
 		if(!IsOnGround[client])
 		{
+			float CurVelVec[3];
+			GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
+			
+			float speedlimit = g_fBhopSpeed;
+
+			if(CG_GetClientGId(client) == 9999)
+				speedlimit *= 1.15;
+
 			IsOnGround[client] = true;    
 			if(GetVectorLength(CurVelVec) > speedlimit)
 			{
@@ -591,8 +585,6 @@ void SetupBetting()
 
 	EmitSoundToAllAny("maoling/ninja/ninjawin.mp3", SOUND_FROM_WORLD, SNDCHAN_AUTO, SNDLEVEL_NORMAL, SND_NOFLAGS, 0.5);
 }
-
-
 
 void ShowBettingMenu(int client)
 {
@@ -809,6 +801,12 @@ void SettlementBetting(int winner)
 	g_iBettingTotalTE = 0;
 }
 
+void RemoveRadar(int client)
+{
+	if(IsValidClient(client))
+		SetEntProp(client, Prop_Send, "m_iHideHUD", HIDE_RADAR);
+}
+
 void Diamonds_KillChecked(int client, bool knife)
 {
 	if(GetRandomInt(0, 100) > 80)
@@ -841,9 +839,9 @@ void Diamonds_MapScore(int client)
 	}
 
 	int score = CS_GetClientContributionScore(client);
-	CG_SetClientDiamond(client, CG_GetClientDiamond(client)+RoundToFloor(score*0.05));
-	Store_SetClientCredits(client, Store_GetClientCredits(client)+score, "Casual-新年活动-knife_taser");
-	PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04在线满30分钟获得\x0F%d钻石\x04|\x0F%d信用点", client, RoundToFloor(score*0.05), score);
+	CG_SetClientDiamond(client, CG_GetClientDiamond(client)+RoundToFloor(score*0.02));
+	Store_SetClientCredits(client, Store_GetClientCredits(client)+RoundToFloor(score*0.3), "Casual-新年活动-MapScore");
+	PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04在线满25分钟获得\x0F%d钻石\x04|\x0F%d信用点", client, RoundToFloor(score*0.05), score);
 }
 
 void Diamonds_NadeKill(int client)
@@ -871,13 +869,13 @@ void Diamonds_HSKill(int client)
 
 	if(GetRandomInt(0, 100) > 80)
 	{
-		int diamonds = GetRandomInt(1, 3);
+		int diamonds = GetRandomInt(1, 2);
 		CG_SetClientDiamond(client, CG_GetClientDiamond(client)+diamonds);
 		PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04爆头杀敌获得\x0F%d钻石", client, diamonds);
 	}
 	else
 	{
-		int credits = GetRandomInt(1, 50);
+		int credits = GetRandomInt(1, 30);
 		Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-爆头杀敌");
 		PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04爆头杀敌获得\x0F%d信用点", client, credits);
 	}
