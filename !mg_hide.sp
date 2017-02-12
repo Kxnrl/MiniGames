@@ -7,6 +7,12 @@ int g_iClientTeam[MAXPLAYERS+1];
 public void OnPluginStart()
 {
 	RegConsoleCmd("sm_hide", Command_Hide);
+	CreateTimer(60.0, Timer_Broadcast, _, TIMER_REPEAT);
+}
+
+public Action Timer_Broadcast(Handle timer)
+{
+	PrintToChatAll("[\x04MG\x01]  输入\x07!hide\x01即可屏蔽队友");
 }
 
 public void OnClientPostAdminCheck(int client)
