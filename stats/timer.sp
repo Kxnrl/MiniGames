@@ -1,24 +1,27 @@
-public Action Timer_Waruup(Handle timer)
+public Action Timer_Warmup(Handle timer)
 {
 	g_tWarmup = INVALID_HANDLE;
 	g_bWarmup = false;
 	CheckPlayerCount();
 
-	if(GameRules_GetProp("m_bWarmupPeriod") == 1)
-		ServerCommand("mp_warmup_end");
+	CreateTimer(1.0, Timer_CheckWarmup, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public Action RemoveRadar(Handle timer, int client)
+public Action Timer_CheckWarmup(Handle timer)
 {
-	if(IsValidClient(client))
-		SetEntProp(client, Prop_Send, "m_iHideHUD", HIDE_RADAR);
+	if(GameRules_GetProp("m_bWarmupPeriod") != 1)
+		return Plugin_Stop;
+
+	ServerCommand("mp_warmup_end");
+
+	return Plugin_Continue;
 }
 
 public Action CheckClientKD(Handle timer, int client)
 {
 	if(IsValidClient(client) && IsPlayerAlive(client) && g_iAuthId[client] != 9999)
 	{
-		if(g_iRoundKill[client] > 6)
+		if(g_iRoundKill[client] >= 8)
 		{
 			ForcePlayerSuicide(client);
 			tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,被雷神劈死了...", PREFIX, client);
@@ -27,14 +30,14 @@ public Action CheckClientKD(Handle timer, int client)
 		{
 			float k = float(g_eSession[client][Kills]);
 			float d = float(g_eSession[client][Deaths]);
-			float a = float(CS_GetClientAssists(client));
-			float m = float(CS_GetMVPCount(client));
+			//float a = float(CS_GetClientAssists(client));
+			//float m = float(CS_GetMVPCount(client));
 			
 			if(d == 0.0) d = 1.0;
 
-			float kd = (k+(a/2)+m)/d;
+			//float kd = (k+(a/2)+m)/d;
 
-			if(kd >= 6.0)
+			if(k/d >= 6.0)
 			{
 				ForcePlayerSuicide(client);
 				tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,被雷神劈死了...", PREFIX, client);
@@ -48,56 +51,51 @@ public Action CheckClientKD(Handle timer, int client)
 public Action Timer_RoundEndDelay(Handle timer)
 {	
 	ClearArray(array_players);
+	
+	int teams[MAXPLAYERS+1];
 
 	for(int x = 1; x <= MaxClients; ++x)
-		if(IsClientInGame(x) && GetClientTeam(x) >= 2)
+		if(IsClientInGame(x))
+		{
+			teams[x] = GetClientTeam(x);
+			if(teams[x] <= 1)
+				continue;
 			PushArrayCell(array_players, x);
+		}
+
 
 	int client, number, team, counts = RoundToNearest(GetArraySize(array_players)*0.5);
 	while((number = RandomArray()) != -1)
 	{
 		client = GetArrayCell(array_players, number);
-		
-		if(g_iAuthId[client] == 9999)
-		{
-			RemoveFromArray(array_players, number);
-			if(GetClientTeam(client) == 2)
-				counts--;
-
-			continue;
-		}
-		
-		if(CG_GetClientUId(client) == 1290)
-		{
-			CS_SwitchTeam(client, 2);
-			RemoveFromArray(array_players, number);
-			counts--;
-			continue;
-		}
 
 		char buffer[128];
 		if(counts > 0)
 		{
 			team = 2;
 			counts--;
-			PrintToChat(client, "%s \x04随机组队\x01>>>  你已被移动到\x07恐怖分子", PREFIX);
+			//PrintToChat(client, "%s \x04随机组队\x01>>>  你已被移动到\x07恐怖分子", PREFIX);
 			Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
 		}
 		else
 		{
 			team = 3;
-			PrintToChat(client, "%s  \x04随机组队\x01>>>  你已被移动到\x0B反恐精英", PREFIX);
+			//PrintToChat(client, "%s  \x04随机组队\x01>>>  你已被移动到\x0B反恐精英", PREFIX);
 			Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
 		}
-		
+
 		if(IsPlayerAlive(client))
 			CS_SwitchTeam(client, team);
 		else
 			ChangeClientTeam(client, team);
 		
-		Handle pb = StartMessageOne("HintText", client);
-		PbSetString(pb, "text", buffer);
-		EndMessage();
+		//Handle pb = StartMessageOne("HintText", client);
+		//PbSetString(pb, "text", buffer);
+		//EndMessage();
+		if(teams[client] != team)
+			PrintCenterText(client, buffer);
+		else
+			Store_ResetPlayerArms(client);
 
 		RemoveFromArray(array_players, number);
 	}

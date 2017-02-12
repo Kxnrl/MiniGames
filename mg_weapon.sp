@@ -160,7 +160,7 @@ public void CG_OnClientSpawn(int client)
 public Action Timer_Slay(Handle timer, int userid)
 {
 	int client = GetClientOfUserId(userid);
-	if(IsValidClient(client))
+	if(IsValidClient(client) && CG_GetClientId(client) != 1)
 	{
 		ForcePlayerSuicide(client);
 		PrintToChatAll("[\x04MG\x01]  \x0B%N\x01使用\x09连狙\x01时遭遇天谴", client);
@@ -250,28 +250,37 @@ public Action OnWeaponCanUse(int client, int weapon)
 	return Plugin_Continue;
 }
 
+public Action CS_OnBuyCommand(int client, const char[] weapon)
+{
+	if(CG_GetClientId(client) == 1)
+		return Plugin_Continue;
+	
+	if(StrContains(weapon, "flash", false) == -1)
+		return Plugin_Continue;
+	
+	CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay2, GetClientUserId(client));
+	
+	return Plugin_Continue;
+}
+
 public void OnWeaponEquip(int client, int weapon)
 {
 	if(!IsValidEdict(weapon))
 		return;
-
+	
 	char classname[32];
 	GetEdictClassname(weapon, classname, 32);
-	if(StrEqual(classname, "weapon_flashbang"))
-	{
-		if(CG_GetClientId(client) != 1)
-			CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay2, GetClientUserId(client));
-	}
-	else if(g_bRestrictAwp && StrEqual(classname, "weapon_awp"))
+
+	if(g_bRestrictAwp && StrEqual(classname, "weapon_awp"))
 	{
 		PrintToChat(client, "[\x04MG\x01]  \x07当前地图限制Awp的使用");
 		RequestFrame(RemoveRestriceWeapon, weapon);
 	}
-	else if(g_bSlayGaygun && (StrEqual(classname, "weapon_scar20") || StrEqual(classname, "weapon_g3sg1")))
+	
+	if(g_bSlayGaygun && (StrEqual(classname, "weapon_scar20") || StrEqual(classname, "weapon_g3sg1")))
 	{
 		RequestFrame(RemoveRestriceWeapon, weapon);
-		if(CG_GetClientId(client) != 1)
-			CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay, GetClientUserId(client));
+		CreateTimer(GetRandomFloat(1.0, 3.0), Timer_Slay, GetClientUserId(client));
 	}
 }
 

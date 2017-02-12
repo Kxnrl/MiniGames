@@ -1,6 +1,6 @@
 public void CG_OnClientSpawn(int client)
 {
-	CreateTimer(0.0, RemoveRadar, client);
+	RequestFrame(RemoveRadar, client);
 	CreateTimer(1.0, CheckClientKD, client);
 }
 
@@ -29,7 +29,7 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 	{
 		g_eSession[attacker][Knife] += 1;
 		g_eSession[attacker][Score] += 2;
-		Diamonds_KillChecked(attacker, true);
+		//Diamonds_KillChecked(attacker, true);
 	}
 	if(StrContains(weapon, "taser", false) != -1)
 	{
@@ -103,38 +103,6 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
 {
 	SetEventBroadcast(event, true);
-
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
-	char AuthoirzedName[32], m_szMsg[512];
-	CG_GetClientGName(client, AuthoirzedName, 32);
-	FormatEx(m_szMsg, 512, "%s  \x04%N\x01离开了游戏 \x0B认证\x01[\x0C%s\x01]  \x01排名\x04%d  \x0CK/D\x04%.2f \x0C得分\x04%d  \x01签名: \x07%s", 
-							PREFIX, 
-							client, 
-							AuthoirzedName, 
-							g_iRank[client], 
-							g_fKD[client],
-							g_eStatistical[client][Score],
-							g_szSignature[client]
-							);
-	ReplaceString(m_szMsg, 512, "{白}", "\x01");
-	ReplaceString(m_szMsg, 512, "{红}", "\x02");
-	ReplaceString(m_szMsg, 512, "{粉}", "\x03");
-	ReplaceString(m_szMsg, 512, "{绿}", "\x04");
-	ReplaceString(m_szMsg, 512, "{黄}", "\x05");
-	ReplaceString(m_szMsg, 512, "{亮绿}", "\x06");
-	ReplaceString(m_szMsg, 512, "{亮红}", "\x07");
-	ReplaceString(m_szMsg, 512, "{灰}", "\x08");
-	ReplaceString(m_szMsg, 512, "{褐}", "\x09");
-	ReplaceString(m_szMsg, 512, "{橙}", "\x10");
-	ReplaceString(m_szMsg, 512, "{紫}", "\x0E");
-	ReplaceString(m_szMsg, 512, "{亮蓝}", "\x0B");
-	ReplaceString(m_szMsg, 512, "{蓝}", "\x0C");
-
-	if(!g_iRank[client])
-		PrintToChatAll("%s  萌新\x04%N\x01离开了游戏", PREFIX, client);
-	else
-		PrintToChatAll(m_szMsg);
-	
 	return Plugin_Changed;
 }
 
