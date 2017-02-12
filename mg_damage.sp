@@ -1,10 +1,11 @@
 #include <cg_core>
 #include <sdktools>
 #include <sdkhooks>
+#include <store>
 
 public Plugin myinfo =
 {
-	name = " MG Damage ",
+	name = "MG Damage",
 	author = "Kyle",
 	description = "",
 	version = "1.0",
@@ -27,6 +28,22 @@ public void OnClientDisconnect(int client)
 	{
 		SDKUnhook(client, SDKHook_OnTakeDamage, OnTakeDamage);
 		SDKUnhook(client, SDKHook_WeaponDropPost, OnWeaponDrop);
+	}
+}
+
+public void CG_OnClientSpawn(int client)
+{
+	if(CG_GetClientGId(client) == 9999)
+		CreateTimer(3.0, Timer_ClientModel, client);
+}
+
+public Action Timer_ClientModel(Handle timer, int client)
+{
+	if(IsClientInGame(client) && CG_GetClientGId(client) == 9999 && IsPlayerAlive(client))
+	{
+		SetEntityModel(client, "models/player/custom_player/maoling/vocaloid/hatsune_miku/cybertech/miku.mdl");
+		SetEntPropString(client, Prop_Send, "m_szArmsModel", "models/player/custom_player/maoling/vocaloid/hatsune_miku/cybertech/miku_arms.mdl");
+		Store_ResetPlayerArms(client);
 	}
 }
 
@@ -106,6 +123,7 @@ public Action Timer_Armor(Handle timer, int client)
 	if(GetEntProp(client, Prop_Send, "m_ArmorValue") < 1)
 	{
 		SetEntProp(client, Prop_Send, "m_ArmorValue", 10, 1);
+		SetEntProp(client, Prop_Send, "m_bHasHelmet", 1);
 		PrintToConsole(client, "Re Armor");
 		//RequestFrame(ResetArmorValue, client);
 	}
