@@ -35,16 +35,16 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 	{
 		g_eSession[attacker][Taser] += 1;
 		g_eSession[attacker][Score] += 2;
-		Diamonds_KillChecked(attacker, false);
+		//Diamonds_KillChecked(attacker, false);
 	}
 	
-	if(StrContains(weapon, "decoy", false) != -1 || StrContains(weapon, "smoke", false) != -1)
-	{
-		Diamonds_NadeKill(attacker);
-	}
+	//if(StrContains(weapon, "decoy", false) != -1 || StrContains(weapon, "smoke", false) != -1)
+	//{
+	//	Diamonds_NadeKill(attacker);
+	//}
 	
-	if(headshot)
-		Diamonds_HSKill(attacker);
+	//if(headshot)
+	//	Diamonds_HSKill(attacker);
 	
 	if(g_bRoundEnding)
 		return;
@@ -92,11 +92,11 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 					lastCT = i;
 				}
 			}
-		if(te == 1 && ct == 0 && IsValidClient(lastTE))
-			Diamonds_EndGameWinner(lastTE);
+		//if(te == 1 && ct == 0 && IsValidClient(lastTE))
+		//	Diamonds_EndGameWinner(lastTE);
 		
-		if(te == 0 && ct == 1 && IsValidClient(lastCT))
-			Diamonds_EndGameWinner(lastCT);
+		//if(te == 0 && ct == 1 && IsValidClient(lastCT))
+		//	Diamonds_EndGameWinner(lastCT);
 	}
 }
 
@@ -156,8 +156,8 @@ public void Event_WinPanel(Handle event, const char[] name, bool dontBroadcast)
 			if(IsClientInGame(client) && g_bOnDB[client])
 			{
 				SavePlayer(client);
-				if(g_bMapCredits && (GetTime() - g_eSession[client][Onlines] >= 1500))
-					Diamonds_MapScore(client);
+				//if(g_bMapCredits && (GetTime() - g_eSession[client][Onlines] >= 1500))
+				//	Diamonds_MapScore(client);
 			}
 		}
 	}

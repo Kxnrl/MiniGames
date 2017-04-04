@@ -4,7 +4,7 @@
 #include <store>
 #include <emitsoundany>
 #include <cg_core>
-#include <diamond>
+//#include <diamond>
 
 #undef REQUIRE_EXTENSIONS
 #tryinclude <steamworks>
@@ -806,7 +806,7 @@ void RemoveRadar(int client)
 	if(IsValidClient(client))
 		SetEntProp(client, Prop_Send, "m_iHideHUD", HIDE_RADAR);
 }
-
+/*
 void Diamonds_KillChecked(int client, bool knife)
 {
 	if(GetRandomInt(0, 100) > 80)
@@ -895,4 +895,4 @@ void Diamonds_EndGameWinner(int client)
 	int credits = GetRandomInt(10, 50);
 	Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, "MG-新年活动-EndGame");
 	PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04最后1V1获胜获得\x0F%d信用点", client, credits);
-}
+}*/
