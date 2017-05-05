@@ -30,12 +30,8 @@ public Action CheckClientKD(Handle timer, int client)
 		{
 			float k = float(g_eSession[client][Kills]);
 			float d = float(g_eSession[client][Deaths]);
-			//float a = float(CS_GetClientAssists(client));
-			//float m = float(CS_GetMVPCount(client));
-			
-			if(d == 0.0) d = 1.0;
 
-			//float kd = (k+(a/2)+m)/d;
+			if(d == 0.0) d = 1.0;
 
 			if(k/d >= 6.0)
 			{
@@ -74,13 +70,11 @@ public Action Timer_RoundEndDelay(Handle timer)
 		{
 			team = 2;
 			counts--;
-			//PrintToChat(client, "%s \x04随机组队\x01>>>  你已被移动到\x07恐怖分子", PREFIX);
 			Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
 		}
 		else
 		{
 			team = 3;
-			//PrintToChat(client, "%s  \x04随机组队\x01>>>  你已被移动到\x0B反恐精英", PREFIX);
 			Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
 		}
 
@@ -88,10 +82,7 @@ public Action Timer_RoundEndDelay(Handle timer)
 			CS_SwitchTeam(client, team);
 		else
 			ChangeClientTeam(client, team);
-		
-		//Handle pb = StartMessageOne("HintText", client);
-		//PbSetString(pb, "text", buffer);
-		//EndMessage();
+
 		if(teams[client] != team)
 			PrintCenterText(client, buffer);
 		else

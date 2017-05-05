@@ -53,7 +53,7 @@ public void OnConfigsExecuted()
 	SetConVarInt(FindConVar("sv_maxvelocity"), 3500);
 	SetConVarInt(FindConVar("sv_full_alltalk"), 1);
 	SetConVarInt(FindConVar("sv_enablebunnyhopping"), 1);
-	//SetConVarInt(FindConVar("sv_autobunnyhopping"), 1);
+	SetConVarInt(FindConVar("sv_autobunnyhopping"), 1);
 	SetConVarString(CAVR_CT_MELEE, "", true, false);
 	SetConVarString(CVAR_CT_PRIMARY, "", true, false);
 	SetConVarString(CVAR_CT_SECONDARY, "", true, false);

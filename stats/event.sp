@@ -34,22 +34,12 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 	{
 		g_eSession[attacker][Knife] += 1;
 		g_eSession[attacker][Score] += 2;
-		//Diamonds_KillChecked(attacker, true);
 	}
 	if(StrContains(weapon, "taser", false) != -1)
 	{
 		g_eSession[attacker][Taser] += 1;
 		g_eSession[attacker][Score] += 2;
-		//Diamonds_KillChecked(attacker, false);
 	}
-	
-	//if(StrContains(weapon, "decoy", false) != -1 || StrContains(weapon, "smoke", false) != -1)
-	//{
-	//	Diamonds_NadeKill(attacker);
-	//}
-	
-	//if(headshot)
-	//	Diamonds_HSKill(attacker);
 }
 
 void CheckEndGame()
@@ -81,31 +71,6 @@ void CheckEndGame()
 			SetupBetting();
 		}
 	}
-	/*
-	if(g_bEndGame)
-	{
-		int ct, te, lastCT, lastTE;
-		for(int i = 1; i <= MaxClients; ++i)
-			if(IsClientInGame(i) && IsPlayerAlive(i))
-			{
-				if(GetClientTeam(i) == 2)
-				{
-					te++;
-					lastTE = i;
-				}
-					
-				if(GetClientTeam(i) == 3)
-				{	
-					ct++;
-					lastCT = i;
-				}
-			}
-		//if(te == 1 && ct == 0 && IsValidClient(lastTE))
-		//	Diamonds_EndGameWinner(lastTE);
-		
-		//if(te == 0 && ct == 1 && IsValidClient(lastCT))
-		//	Diamonds_EndGameWinner(lastCT);
-	}*/
 }
 
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
