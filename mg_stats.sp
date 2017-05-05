@@ -796,5 +796,8 @@ void SettlementBetting(int winner)
 void RemoveRadar(int client)
 {
 	if(IsValidClient(client))
+	{
 		SetEntProp(client, Prop_Send, "m_iHideHUD", HIDE_RADAR);
+		SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 0.0);
+	}
 }

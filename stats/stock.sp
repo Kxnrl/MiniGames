@@ -87,6 +87,8 @@ stock void CreateBeacons()
 		
 		if(!IsPlayerAlive(i))
 			continue;
+		
+		SetEntPropFloat(i, Prop_Send, "m_flDetectedByEnemySensorTime", 99999.0);
 
 		float fPos[3];
 		GetClientAbsOrigin(i, fPos);
