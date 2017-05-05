@@ -7,8 +7,6 @@ Handle CVAR_TE_SECONDARY;
 Handle CVAR_BHOPSPEED;
 Handle CVAR_BUNNYHOP;
 Handle CVAR_CHANGED;
-Handle CVAR_AUTOBURN;
-Handle CVAR_BURNDELAY;
 Handle CVAR_AUTOJUMP;
 
 void ConVar_OnPluginStart()
@@ -23,8 +21,9 @@ void ConVar_OnPluginStart()
 	CVAR_BUNNYHOP = FindConVar("sv_enablebunnyhopping");
 	CVAR_BHOPSPEED = CreateConVar("mg_bhopspeed", "250.0", "bhop sped limit", _, true, 200.0, true, 3500.0);
 	CVAR_CHANGED = CreateConVar("mg_randomteam", "1", "scrable team", _, true, 0.0, true, 1.0);
-	CVAR_AUTOBURN = CreateConVar("mg_autoburn", "1", "burn all client", _, true, 0.0, true, 1.0);
-	CVAR_BURNDELAY = CreateConVar("mg_burndelay", "120.0", "burn delay after round start", _, true, 60.0, true, 600.0);
+	
+	CreateConVar("mg_autoburn", "1", "burn all client", _, true, 0.0, true, 1.0);
+	CreateConVar("mg_burndelay", "120.0", "burn delay after round start", _, true, 60.0, true, 600.0);
 
 	HookConVarChange(CAVR_CT_MELEE, OnSettingChanged);
 	HookConVarChange(CVAR_CT_PRIMARY, OnSettingChanged);
@@ -36,6 +35,8 @@ void ConVar_OnPluginStart()
 	HookConVarChange(CVAR_CHANGED, OnSettingChanged);
 	HookConVarChange(CVAR_AUTOJUMP, OnSettingChanged);
 	HookConVarChange(CVAR_BUNNYHOP, OnSettingChanged);
+	
+	AutoExecConfig(true, "mg_core");
 }
 
 void ConVar_OnMapStart()
@@ -74,9 +75,8 @@ void LockConVar()
 	SetConVarInt(CVAR_AUTOJUMP, 1);
 	SetConVarInt(CVAR_BUNNYHOP, 1);
 	g_fBhopSpeed = GetConVarFloat(CVAR_BHOPSPEED);
-	g_bRandomTeam = GetConVarBool(CVAR_CHANGED);
 
-	if(g_bRandomTeam)
+	if(GetConVarBool(CVAR_CHANGED))
 		SetConVarInt(FindConVar("mp_autoteambalance"), 0);
 	else
 		SetConVarInt(FindConVar("mp_autoteambalance"), 1);
