@@ -6,14 +6,19 @@ public void CG_OnClientSpawn(int client)
 
 public void CG_OnClientDeath(int client, int attacker, int assister, bool headshot, const char[] weapon)
 {
-	if(g_bWarmup || !g_bEnable)
+	if(g_bWarmup)
+		return;
+	
+	CheckEndGame();
+	
+	if(!g_bEnable)
 		return;
 
 	g_eSession[client][Deaths]++;
 
 	if(client == attacker || !IsValidClient(attacker))
 		return;
-	
+
 	g_iRoundKill[attacker]++;
 
 	g_eSession[attacker][Kills] += 1;
@@ -45,7 +50,10 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 	
 	//if(headshot)
 	//	Diamonds_HSKill(attacker);
-	
+}
+
+void CheckEndGame()
+{
 	if(g_bRoundEnding)
 		return;
 
@@ -73,7 +81,7 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 			SetupBetting();
 		}
 	}
-	
+	/*
 	if(g_bEndGame)
 	{
 		int ct, te, lastCT, lastTE;
@@ -97,7 +105,7 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 		
 		//if(te == 0 && ct == 1 && IsValidClient(lastCT))
 		//	Diamonds_EndGameWinner(lastCT);
-	}
+	}*/
 }
 
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)

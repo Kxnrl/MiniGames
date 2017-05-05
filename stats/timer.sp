@@ -4,7 +4,7 @@ public Action Timer_Warmup(Handle timer)
 	g_bWarmup = false;
 	CheckPlayerCount();
 
-	CreateTimer(1.0, Timer_CheckWarmup, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(5.0, Timer_CheckWarmup, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Timer_CheckWarmup(Handle timer)

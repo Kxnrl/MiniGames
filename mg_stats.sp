@@ -751,13 +751,13 @@ void SettlementBetting(int winner)
 	if(winner == 2)
 	{
 		vol = g_iBettingTotalTE;
-		totalcredits = RoundToFloor(g_iBettingTotalCT*0.9);
+		totalcredits = RoundToFloor(g_iBettingTotalCT*0.8);
 	}
 
 	if(winner == 3)
 	{
 		vol = g_iBettingTotalCT;
-		totalcredits = RoundToFloor(g_iBettingTotalTE*0.9);
+		totalcredits = RoundToFloor(g_iBettingTotalTE*0.8);
 	}
 
 	for(int i = 1; i <= MaxClients; ++i)
@@ -780,11 +780,11 @@ void SettlementBetting(int winner)
 			else
 			{
 				PrintToChat(i, "%s \x10你菠菜输了\x04 %d 信用点", PREFIX_STORE, g_iBetPot[i]);
-				if(GetRandomInt(1, 100) >= 80)
-				{
-					Store_SetClientCredits(i, Store_GetClientCredits(i)+g_iBetPot[i], "MG-新年活动-菠菜失败返还");
-					PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04运气爆炸,获得菠菜失败返还...", i);
-				}
+				//if(GetRandomInt(1, 100) >= 80)
+				//{
+				//	Store_SetClientCredits(i, Store_GetClientCredits(i)+g_iBetPot[i], "MG-新年活动-菠菜失败返还");
+				//	PrintToChatAll("[\x10新年快乐\x01]  \x0C%N\x04运气爆炸,获得菠菜失败返还...", i);
+				//}
 			}
 
 			g_iBetPot[i] = 0;
