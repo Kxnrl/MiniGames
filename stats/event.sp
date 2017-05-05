@@ -6,7 +6,7 @@ public void CG_OnClientSpawn(int client)
 
 public void CG_OnClientDeath(int client, int attacker, int assister, bool headshot, const char[] weapon)
 {
-	if(g_bWarmup)
+	if(g_tWarmup != INVALID_HANDLE)
 		return;
 	
 	CheckEndGame();
@@ -121,19 +121,7 @@ public void CG_OnRoundEnd(int winner)
 public void Event_WinPanel(Handle event, const char[] name, bool dontBroadcast)
 {
 	if(g_bEnable)
-	{
-		LogMessage("Event_WinPanel");
-
 		for(int client = 1; client <= MaxClients; ++client)
-		{
-			if(IsClientInGame(client) && g_bOnDB[client])
-			{
+			if(g_bOnDB[client])
 				SavePlayer(client);
-				//if(g_bMapCredits && (GetTime() - g_eSession[client][Onlines] >= 1500))
-				//	Diamonds_MapScore(client);
-			}
-		}
-	}
-
-	g_bMapCredits = false;
 }

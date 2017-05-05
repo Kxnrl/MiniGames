@@ -35,7 +35,7 @@ stock void CheckPlayerCount()
 	else
 		g_bEnable = true;
 	
-	if(g_bWarmup)
+	if(g_tWarmup != INVALID_HANDLE)
 		g_bEnable = false;
 }
 
@@ -106,13 +106,13 @@ stock void CreateBeacons()
 					index++;
 				}
 			}
-			TE_SetupBeamRingPoint(fPos, 10.0, 750.0, g_iBombRing, g_iHalo, 0, 10, 0.6, 10.0, 0.5, {255, 75, 75, 255}, 5, 0);
+			TE_SetupBeamRingPoint(fPos, 10.0, 750.0, g_iRing, g_iHalo, 0, 10, 0.6, 10.0, 0.5, {255, 75, 75, 255}, 5, 0);
 			TE_Send(Clients, index);
 			EmitSoundToAllAny("maoling/mg/beacon.mp3", i);
 		}
 		else
 		{
-			TE_SetupBeamRingPoint(fPos, 10.0, 750.0, g_iBombRing, g_iHalo, 0, 10, 0.6, 10.0, 0.5, {255, 75, 75, 255}, 5, 0);
+			TE_SetupBeamRingPoint(fPos, 10.0, 750.0, g_iRing, g_iHalo, 0, 10, 0.6, 10.0, 0.5, {255, 75, 75, 255}, 5, 0);
 			TE_SendToAll();
 			EmitSoundToAllAny("maoling/mg/beacon.mp3", i);
 		}

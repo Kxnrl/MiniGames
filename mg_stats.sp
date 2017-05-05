@@ -4,9 +4,7 @@
 #include <store>
 #include <emitsoundany>
 #include <cg_core>
-
-#undef REQUIRE_EXTENSIONS
-#tryinclude <steamworks>
+#include <steamworks>
 
 #pragma newdecls required
 
@@ -28,8 +26,9 @@ enum STAT_TYPES
 STAT_TYPES g_eStatistical[MAXPLAYERS+1][STAT_TYPES];
 STAT_TYPES g_eSession[MAXPLAYERS+1][STAT_TYPES];
 
-int g_iBombRing;
+int g_iRing;
 int g_iHalo;
+
 int g_iBettingTotalCT;
 int g_iBettingTotalTE;
 int g_iTagType;
@@ -38,8 +37,6 @@ bool g_bEnable;
 bool g_bEndGame;
 bool g_bBetting;
 bool g_bBetTimeout;
-bool g_bWarmup;
-bool g_bMapCredits;
 bool g_bRoundEnding;
 float g_fBhopSpeed;
 
@@ -57,19 +54,6 @@ Handle g_hDB;
 Handle g_tBeacon;
 Handle g_tWarmup;
 Handle g_tBurn;
-
-Handle CAVR_CT_MELEE
-Handle CVAR_CT_PRIMARY;
-Handle CVAR_CT_SECONDARY;
-Handle CAVR_TE_MELEE
-Handle CVAR_TE_PRIMARY;
-Handle CVAR_TE_SECONDARY;
-Handle CVAR_BHOPSPEED;
-Handle CVAR_AUTOBHOP;
-Handle CVAR_CHANGED;
-Handle CVAR_AUTOBURN;
-Handle CVAR_BURNDELAY;
-Handle CVAR_AUTOJUMP;
 
 ArrayList array_players;
 
@@ -115,25 +99,20 @@ public void OnPluginEnd()
 public void OnMapStart()
 {
 	CheckDatabaseAvaliable();
-	CreateTimer(0.2, Timer_SetClientData, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	CreateTimer(0.25, Timer_SetClientData, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 
 	PrecacheSoundAny("maoling/mg/beacon.mp3");
 	PrecacheSoundAny("maoling/ninja/ninjawin.mp3");
 	AddFileToDownloadsTable("sound/maoling/mg/beacon.mp3");
 	AddFileToDownloadsTable("sound/maoling/ninja/ninjawin.mp3");
-	
-	g_iBombRing = PrecacheModel("materials/sprites/bomb_planted_ring.vmt");
+
+	g_iRing = PrecacheModel("materials/sprites/bomb_planted_ring.vmt");
 	g_iHalo = PrecacheModel("materials/sprites/halo.vmt");
-	
+
 	ConVar_OnMapStart();
 
-	g_iTagType = 0;
-	g_bWarmup = true;
-	g_bMapCredits = true;
-	g_bRoundEnding = false;
-
 	ClearTimer(g_tWarmup);
-	g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime"))+1.0, Timer_Warmup);
+	g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime")), Timer_Warmup);
 }
 
 public void OnMapEnd()

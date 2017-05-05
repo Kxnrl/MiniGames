@@ -1,3 +1,16 @@
+Handle CAVR_CT_MELEE
+Handle CVAR_CT_PRIMARY;
+Handle CVAR_CT_SECONDARY;
+Handle CAVR_TE_MELEE
+Handle CVAR_TE_PRIMARY;
+Handle CVAR_TE_SECONDARY;
+Handle CVAR_BHOPSPEED;
+Handle CVAR_BUNNYHOP;
+Handle CVAR_CHANGED;
+Handle CVAR_AUTOBURN;
+Handle CVAR_BURNDELAY;
+Handle CVAR_AUTOJUMP;
+
 void ConVar_OnPluginStart()
 {
 	CAVR_CT_MELEE = FindConVar("mp_ct_default_melee");
