@@ -512,7 +512,7 @@ public void SpeedCap(int client)
 			
 			float speedlimit = g_fBhopSpeed;
 
-			if(CG_GetClientGId(client) == 9999)
+			if(g_iAuthId[client] == 9999)
 				speedlimit *= 1.15;
 
 			IsOnGround[client] = true;    

@@ -92,7 +92,7 @@ stock void CreateBeacons()
 		GetClientAbsOrigin(i, fPos);
 		fPos[2] += 8;
 
-		if(CG_GetClientGId(i) == 9999)
+		if(g_iAuthId[i] == 9999)
 		{
 			int[] Clients = new int[MaxClients];
 			int index = 0;

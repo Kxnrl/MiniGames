@@ -5,6 +5,8 @@ public Action Timer_Warmup(Handle timer)
 	CheckPlayerCount();
 
 	CreateTimer(5.0, Timer_CheckWarmup, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	
+	return Plugin_Stop;
 }
 
 public Action Timer_CheckWarmup(Handle timer)
@@ -42,6 +44,8 @@ public Action CheckClientKD(Handle timer, int client)
 	}
 	
 	g_iRoundKill[client] = 0;
+	
+	return Plugin_Stop;
 }
 
 public Action Timer_RoundEndDelay(Handle timer)
@@ -94,6 +98,8 @@ public Action Timer_RoundEndDelay(Handle timer)
 	ClearArray(array_players);
 	
 	CreateTimer(0.1, Timer_CleanWeapon);
+	
+	return Plugin_Stop;
 }
 
 public Action Timer_CleanWeapon(Handle timer)
@@ -108,31 +114,33 @@ public Action Timer_CleanWeapon(Handle timer)
 public Action Timer_ReConnect(Handle timer)
 {
 	CheckDatabaseAvaliable();
+	
+	return Plugin_Stop;
 }
 
 public Action Timer_Timeout(Handle timer)
 {
 	g_bBetTimeout = true;
+	
+	return Plugin_Stop;
 }
 
 public Action Timer_Beacon(Handle timer)
 {
 	CreateBeacons();
 
-	if(g_bEndGame)
-		g_tBeacon = CreateTimer(2.0, Timer_Beacon);
-	else
-		g_tBeacon = INVALID_HANDLE;
+	g_tBeacon = g_bEndGame ? CreateTimer(2.0, Timer_Beacon) : INVALID_HANDLE;
+	
+	return Plugin_Stop;
 }
 
-public Action Timer_SetClientData(Handle timer)
+public void CG_OnGlobalTimer()
 {
+	char tag[32];
 	for(int client = 1; client <= MaxClients; ++client)
 	{
 		if(!IsClientInGame(client))
 			continue;
-
-		char tag[32];
 		
 		switch(g_iTagType)
 		{
@@ -143,40 +151,42 @@ public Action Timer_SetClientData(Handle timer)
 		}
 
 		CS_SetClientClanTag(client, tag);
+	}
+}
+
+public Action Timer_SetClientData(Handle timer)
+{
+	for(int client = 1; client <= MaxClients; ++client)
+	{
+		if(!IsClientInGame(client))
+			continue;
 
 		int target = GetClientAimTarget(client);
 
-		if(target > 0 && target <= MaxClients && IsClientInGame(target) && IsPlayerAlive(target))
+		if(IsValidClient(target) && IsPlayerAlive(target))
 		{
-			char buffer[1024], m_szName[64], m_szAuth[64], m_szSigature[256];
-			
-			GetClientName(target, m_szName, 64);
-			ReplaceString(m_szName, 64, "<", "〈");
-			ReplaceString(m_szName, 64, ">", "〉");
-			
+			char buffer[512], m_szAuth[64], m_szSigature[256];
+
 			CG_GetClientSignature(target, m_szSigature, 256);
-			ReplaceString(m_szSigature, 1024, "{白}", "");
-			ReplaceString(m_szSigature, 1024, "{红}", "");
-			ReplaceString(m_szSigature, 1024, "{粉}", "");
-			ReplaceString(m_szSigature, 1024, "{绿}", "");
-			ReplaceString(m_szSigature, 1024, "{黄}", "");
-			ReplaceString(m_szSigature, 1024, "{亮绿}", "");
-			ReplaceString(m_szSigature, 1024, "{亮红}", "");
-			ReplaceString(m_szSigature, 1024, "{灰}", "");
-			ReplaceString(m_szSigature, 1024, "{褐}", "");
-			ReplaceString(m_szSigature, 1024, "{橙}", "");
-			ReplaceString(m_szSigature, 1024, "{紫}", "");
-			ReplaceString(m_szSigature, 1024, "{亮蓝}", "");
-			ReplaceString(m_szSigature, 1024, "{蓝}", "");
-			
+			ReplaceString(m_szSigature, 512, "{白}", "");
+			ReplaceString(m_szSigature, 512, "{红}", "");
+			ReplaceString(m_szSigature, 512, "{粉}", "");
+			ReplaceString(m_szSigature, 512, "{绿}", "");
+			ReplaceString(m_szSigature, 512, "{黄}", "");
+			ReplaceString(m_szSigature, 512, "{亮绿}", "");
+			ReplaceString(m_szSigature, 512, "{亮红}", "");
+			ReplaceString(m_szSigature, 512, "{灰}", "");
+			ReplaceString(m_szSigature, 512, "{褐}", "");
+			ReplaceString(m_szSigature, 512, "{橙}", "");
+			ReplaceString(m_szSigature, 512, "{紫}", "");
+			ReplaceString(m_szSigature, 512, "{亮蓝}", "");
+			ReplaceString(m_szSigature, 512, "{蓝}", "");
+
 			CG_GetClientGName(target, m_szAuth, 64);
-			if(CG_GetClientGId(target) == 9999)
-				Format(m_szAuth, 64, "<font color='#FF00FF'>%s", m_szAuth);
-			else
-				Format(m_szAuth, 64, "<font color='#FF8040'>%s", m_szAuth);
-			
-			Format(buffer, 1024, "<font color='#0066CC' size='20'>%s</font>\n认证: %s</font>   排名:<font color='#0000FF'> %d</font>   K/D:<font color='#FF0000'> %.2f</font>\n签名: <font color='#796400'>%s", m_szName, m_szAuth, g_iRank[target], g_fKD[target], m_szSigature);
-	
+			Format(m_szAuth, 64, "<font color='#%s'>%s", g_iAuthId[target] == 9999 ? "39C5BB" : "FF8040", m_szAuth);
+
+			Format(buffer, 512, "<font color='#0066CC' size='20'>%N</font>\n认证: %s</font>   排名:<font color='#0000FF'> %d</font>   K/D:<font color='#FF0000'> %.2f</font>\n签名: <font color='#796400'>%s", target, m_szAuth, g_iRank[target], g_fKD[target], m_szSigature);
+
 			Handle pb = StartMessageOne("HintText", client);
 			PbSetString(pb, "text", buffer);
 			EndMessage();
@@ -192,4 +202,6 @@ public Action Timer_BurnAll(Handle timer)
 			if(IsPlayerAlive(client))
 				if(g_iAuthId[client] != 9999)
 					IgniteEntity(client, 120.0);
+				
+	return Plugin_Stop;
 }
