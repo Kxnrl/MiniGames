@@ -101,6 +101,17 @@ public Action Timer_RoundEndDelay(Handle timer)
 	}
 
 	ClearArray(array_players);
+	
+	CreateTimer(0.1, Timer_CleanWeapon);
+}
+
+public Action Timer_CleanWeapon(Handle timer)
+{
+	char classname[32];
+	for(int entity = MaxClients+1; entity <= 2048; ++entity)
+		if(IsValidEdict(entity) && GetEdictClassname(entity, classname, 32))
+			if(StrContains(classname, "weapon_", false) == 0)
+				AcceptEntityInput(entity, "Kill");
 }
 
 public Action Timer_ReConnect(Handle timer)
