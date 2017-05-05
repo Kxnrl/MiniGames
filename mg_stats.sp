@@ -108,7 +108,7 @@ public void OnPluginStart()
 public void OnPluginEnd()
 {
 	for(int client=1; client<=MaxClients; ++client)
-		if(IsClientInGame(client) && !IsFakeClient(client))
+		if(IsClientInGame(client))
 			SavePlayer(client);
 }
 
@@ -152,13 +152,13 @@ public void CG_OnClientLoaded(int client)
 
 	CheckPlayerCount();
 
-	if(g_hDB != INVALID_HANDLE && !IsFakeClient(client))
+	if(g_hDB != INVALID_HANDLE)
 		LoadPlayer(client);
 }
 
 public void OnClientDisconnect(int client)
 {
-	if(g_hDB != INVALID_HANDLE && !IsFakeClient(client))
+	if(g_hDB != INVALID_HANDLE)
 		SavePlayer(client);
 
 	CheckPlayerCount();
