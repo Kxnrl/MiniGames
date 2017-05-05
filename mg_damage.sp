@@ -120,18 +120,14 @@ public Action Timer_Armor(Handle timer, int client)
 	if(!IsPlayerAlive(client))
 		return Plugin_Continue;
 
-	if(GetEntProp(client, Prop_Send, "m_ArmorValue") < 1)
-	{
+	if(!GetEntProp(client, Prop_Send, "m_ArmorValue"))
 		SetEntProp(client, Prop_Send, "m_ArmorValue", 10, 1);
-		SetEntProp(client, Prop_Send, "m_bHasHelmet", 1);
-		PrintToConsole(client, "Re Armor");
-		//RequestFrame(ResetArmorValue, client);
-	}
 	
-	return Plugin_Continue;
-}
+	if(!GetEntProp(client, Prop_Send, "m_bHasHelmet"))
+		SetEntProp(client, Prop_Send, "m_bHasHelmet", 1);
+	
+	if(GetEntityGravity(client) > 0.92)
+		SetEntityGravity(client, 0.92);
 
-stock void ResetArmorValue(int client)
-{
-	SetEntProp(client, Prop_Send, "m_ArmorValue", 0, 1);
+	return Plugin_Continue;
 }
