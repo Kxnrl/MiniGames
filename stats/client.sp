@@ -11,8 +11,10 @@ float g_fBhopSpeed;
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
 	if(!IsPlayerAlive(client))
-		return Plugin_Continue;	
+		return Plugin_Continue;
 	
+	Mutators_RunCmd(client, buttons, vel);
+
 	if(GetEntityFlags(client) & FL_ONGROUND)
 		g_bOnGround[client]=true;
 	else

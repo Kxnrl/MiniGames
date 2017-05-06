@@ -25,6 +25,7 @@ Handle g_tWarmup;
 #include "stats/cvars.sp"
 #include "stats/event.sp"
 #include "stats/stats.sp"
+#include "stats/mutas.sp"
 
 public Plugin myinfo = 
 {
@@ -38,6 +39,7 @@ public Plugin myinfo =
 public void OnPluginStart()
 {
 	ConVar_OnPluginStart();
+	Mutators_OnPluginStart();
 	Bets_OnPluginStart();
 
 	RegConsoleCmd("sm_rank", Command_Rank);
@@ -78,6 +80,7 @@ public void OnMapStart()
 	g_iHalo = PrecacheModel("materials/sprites/halo.vmt");
 
 	ConVar_OnMapStart();
+	Mutators_OnMapStart();
 
 	ClearTimer(g_tWarmup);
 	g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime")), Timer_Warmup);

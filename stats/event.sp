@@ -34,6 +34,7 @@ public void CG_OnRoundStart()
 {
 	Bets_OnRoundStart();
 	Client_OnRoundStart();
+	Mutators_OnRoundStart();
 }
 
 public void CG_OnRoundEnd(int winner)
@@ -41,6 +42,7 @@ public void CG_OnRoundEnd(int winner)
 	CreateTimer(10.0, Stats_OnRoundEnd, _, TIMER_FLAG_NO_MAPCHANGE);
 	Bets_OnRoundEnd(winner);
 	Client_OnRoundEnd();
+	Mutators_OnRoundEnd();
 }
 
 public void Event_WinPanel(Handle event, const char[] name, bool dontBroadcast)
