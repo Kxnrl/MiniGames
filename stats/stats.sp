@@ -185,7 +185,8 @@ void GetPlayerRank(int client)
 		g_iRank[client] = rank;
 
 	CG_GetClientSignature(client, g_szSignature[client], 256);
-	g_fKD[client] = (g_eStatistical[client][Kills]*1.0)/((g_eStatistical[client][Deaths]+1)*1.0);
+	g_fKDA[client] = (g_eStatistical[client][Kills]*1.0)/((g_eStatistical[client][Deaths]+1)*1.0);
+	g_fHSP[client] = float(g_eStatistical[client][Headshots]*100)/float((g_eStatistical[client][Kills]-g_eStatistical[client][Knife]-g_eStatistical[client][Taser])+1);
 
 	PrintWellcomeMessage(client);
 }
@@ -239,12 +240,13 @@ void PrintWellcomeMessage(int client)
 {
 	char AuthoirzedName[32], m_szMsg[512];
 	CG_GetClientGName(client, AuthoirzedName, 32);
-	Format(m_szMsg, 512, "%s \x04%N\x01进入了游戏 \x0B认证\x01[\x0C%s\x01]  \x01排名\x04%d  \x0CK/D\x04%.2f \x0C得分\x04%d  \x01签名: \x07%s", 
+	Format(m_szMsg, 512, "%s \x04%N\x01进入了游戏 \x0B认证\x01[\x0C%s\x01]  \x01排名\x04%d  \x0CKDA\x04%.2f  \x0CHSP\x04%.2f \x0C得分\x04%d  \x01签名: \x07%s", 
 							PREFIX, 
 							client, 
 							AuthoirzedName, 
 							g_iRank[client], 
-							g_fKD[client],
+							g_fKDA[client],
+							g_fHSP[client],
 							g_eStatistical[client][Score],
 							g_szSignature[client]
 							);
@@ -291,7 +293,7 @@ void Stats_OnClientDeath(int client, int attacker, int assister, bool headshot, 
 	g_eSession[client][Deaths]++;
 	g_eStatistical[client][Deaths]++;
 
-	g_fKD[client] = (g_eStatistical[client][Kills]*1.0)/((g_eStatistical[client][Deaths]+1)*1.0);
+	g_fKDA[client] = (g_eStatistical[client][Kills]*1.0)/((g_eStatistical[client][Deaths]+1)*1.0);
 
 	if(IsValidClient(assister))
 	{
@@ -336,15 +338,20 @@ void Stats_OnClientDeath(int client, int attacker, int assister, bool headshot, 
 		g_eSession[attacker][Headshots]++;
 		g_eStatistical[attacker][Score]++;
 		g_eStatistical[attacker][Headshots]++;
+		
+		g_fHSP[attacker] = float(g_eStatistical[attacker][Headshots]*100)/float((g_eStatistical[attacker][Kills]-g_eStatistical[attacker][Knife]-g_eStatistical[attacker][Taser])+1);
 	}
 	
-	g_fKD[attacker] = (g_eStatistical[attacker][Kills]*1.0)/((g_eStatistical[attacker][Deaths]+1)*1.0);
+	g_fKDA[attacker] = (g_eStatistical[attacker][Kills]*1.0)/((g_eStatistical[attacker][Deaths]+1)*1.0);
 }
 
 bool Stats_AllowScourgeClient(int client)
 {
 	float k = float(g_eSession[client][Kills]);
 	float d = float(g_eSession[client][Deaths]);
+	
+	if(k <= 10.0)
+		return false;
 
 	if(d == 0.0) d = 1.0;
 

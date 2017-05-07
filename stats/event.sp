@@ -6,6 +6,7 @@ public void CG_OnGlobalTimer()
 			continue;
 		
 		Client_SetClientTag(client);
+		Mutators_OnGlobalTimer(client);
 	}
 }
 
@@ -22,6 +23,7 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 	
 	Bets_CheckAllow();
 	Stats_OnClientDeath(client, attacker, assister, headshot, weapon);
+	Mutators_OnClientDeath(client);
 }
 
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)

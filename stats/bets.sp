@@ -298,8 +298,6 @@ public Action Timer_Beacon(Handle timer)
 		
 		if(!IsPlayerAlive(i))
 			continue;
-		
-		SetEntPropFloat(i, Prop_Send, "m_flDetectedByEnemySensorTime", 99999.0);
 
 		float fPos[3];
 		GetClientAbsOrigin(i, fPos);
@@ -323,6 +321,8 @@ public Action Timer_Beacon(Handle timer)
 		}
 		else
 		{
+			SetEntPropFloat(i, Prop_Send, "m_flDetectedByEnemySensorTime", 99999.0);
+
 			TE_SetupBeamRingPoint(fPos, 10.0, 750.0, g_iRing, g_iHalo, 0, 10, 0.6, 10.0, 0.5, {255, 75, 75, 255}, 5, 0);
 			TE_SendToAll();
 			EmitSoundToAllAny("maoling/mg/beacon.mp3", i);

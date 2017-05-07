@@ -5,7 +5,6 @@ bool g_bOnGround[MAXPLAYERS+1];
 
 int g_iTagType;
 Handle g_tBurn;
-bool g_bRandomTeam;
 float g_fBhopSpeed;
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
@@ -44,7 +43,6 @@ void SpeedCap(int client)
 			IsOnGround[client] = true;    
 			if(GetVectorLength(CurVelVec) > speedlimit)
 			{
-				IsOnGround[client] = true;
 				NormalizeVector(CurVelVec, CurVelVec);
 				ScaleVector(CurVelVec, speedlimit);
 				TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
@@ -63,7 +61,7 @@ void Client_SetClientTag(int client)
 	{
 		case 0: CG_GetClientGName(client, tag, 32);
 		case 1: {if(!g_iRank[client]) Format(tag, 32, "Top - NORANK", g_iRank[client]); else Format(tag, 32, "Top - %d", g_iRank[client]);}
-		case 2: Format(tag, 32, "K/D  %.2f", g_fKD[client]);
+		case 2: Format(tag, 32, "K/D  %.2f", g_fKDA[client]);
 		case 3: Client_GetRankName(client, tag, 32);
 	}
 
@@ -73,7 +71,7 @@ void Client_SetClientTag(int client)
 void Client_GetRankName(int client, char[] buffer, int maxLen)
 {
 	if(g_iRank[client] == 1)
-		FormatEx(buffer, maxLen, "绿帽王");
+		FormatEx(buffer, maxLen, "娱乐TOP1");
 	else if(g_iRank[client] == 2)
 		FormatEx(buffer, maxLen, "无敌挂逼");
 	else if(g_iRank[client] == 3)
@@ -108,7 +106,7 @@ public Action Client_CenterText(Handle timer)
 			CG_GetClientGName(target, m_szAuth, 64);
 			Format(m_szAuth, 64, "<font color='#%s'>%s", g_iAuth[target] == 9999 ? "39C5BB" : "FF8040", m_szAuth);
 
-			Format(buffer, 512, "<font color='#0066CC' size='20'>%N</font>\n认证: %s</font>   排名:<font color='#0000FF'> %d</font>   K/D:<font color='#FF0000'> %.2f</font>\n签名: <font color='#796400'>%s", target, m_szAuth, g_iRank[target], g_fKD[target], g_szSignature[client]);
+			Format(buffer, 512, "<font color='#0066CC' size='20'>%N</font>\n认证: %s</font>   排名:<font color='#0000FF'> %d</font>   K/D:<font color='#FF0000'> %.2f</font>\n签名: <font color='#796400'>%s", target, m_szAuth, g_iRank[target], g_fKDA[target], g_szSignature[target]);
 
 			Handle pb = StartMessageOne("HintText", client);
 			PbSetString(pb, "text", buffer);
@@ -150,7 +148,7 @@ void Client_SpawnPost(int client)
 }
 
 public Action Client_RandomTeam(Handle timer)
-{	
+{
 	ArrayList array_players = CreateArray();
 	
 	int teams[MAXPLAYERS+1];
@@ -197,9 +195,7 @@ public Action Client_RandomTeam(Handle timer)
 	}
 
 	CloseHandle(array_players);
-	
-	CreateTimer(0.1, Timer_CleanWeapon);
-	
+
 	return Plugin_Stop;
 }
 
@@ -211,15 +207,6 @@ int RandomArray(ArrayList array)
 		return -1;
 	
 	return GetRandomInt(0, x-1);
-}
-
-public Action Timer_CleanWeapon(Handle timer)
-{
-	char classname[32];
-	for(int entity = MaxClients+1; entity <= 2048; ++entity)
-		if(IsValidEdict(entity) && GetEdictClassname(entity, classname, 32))
-			if(StrContains(classname, "weapon_", false) == 0)
-				AcceptEntityInput(entity, "Kill");
 }
 
 void Client_OnRoundStart()
@@ -249,6 +236,6 @@ void Client_OnRoundEnd()
 		g_tBurn = INVALID_HANDLE;
 	}
 
-	if(g_bRandomTeam)
+	if(GetConVarBool(FindConVar("mg_randomteam")))
 		CreateTimer(2.0, Client_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
 }

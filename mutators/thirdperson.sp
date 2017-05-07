@@ -5,6 +5,7 @@ void ThirdPerson_Init()
 	PrintToChatAll(" \x02突变因子: \x07第三视角");
 	PrintToChatAll("本局你将无法使用第一人称视角");
 	CreateTimer(1.0, Timer_ThirdPerson, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	CG_ShowGameTextAll("突变因子: 第三视角\n本局你将无法使用第一人称视角", "10.0", "57 197 187", "-1.0", "-1.0");
 }
 
 public Action Timer_ThirdPerson(Handle timer)
@@ -38,6 +39,6 @@ void SetAllClientTP()
 		if(!IsClientInGame(client))
 			continue;
 		
-		ClientCommand(client, "thirdperson");
+		ClientCommand(client, IsPlayerAlive(client) ? "thirdperson" : "firstperson");
 	}
 }

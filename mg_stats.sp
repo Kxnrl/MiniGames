@@ -13,7 +13,8 @@
 int g_iRank[MAXPLAYERS+1];
 int g_iAuth[MAXPLAYERS+1];
 char g_szSignature[MAXPLAYERS+1][256];
-float g_fKD[MAXPLAYERS+1];
+float g_fKDA[MAXPLAYERS+1];
+float g_fHSP[MAXPLAYERS+1];
 
 char g_szBlockCmd[27][16] = {"kill", "explode", "coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", "needbackup", "sectorclear", "inposition", "reportingin","getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment"};
 
@@ -32,7 +33,7 @@ public Plugin myinfo =
 	name		= "MG Server Core",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "3.0 - 2017/05/06",
+	version		= "3.1.3 - 2017/05/07",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -102,9 +103,11 @@ public void CG_OnClientLoaded(int client)
 {
 	g_bLoaded[client] = false;
 	g_iRank[client] = 0;
-	g_fKD[client] = 0.0;
+	g_fKDA[client] = 0.0;
+	g_fHSP[client] = 0.0;
 	g_iBetPot[client] = 0;
 	g_iBetTeam[client] = 0;
+	g_bCamp[client] = false;
 	g_iAuth[client] = CG_GetClientGId(client);
 
 	g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
@@ -156,9 +159,9 @@ public Action Command_Rank(int client, int args)
 		return Plugin_Handled;
 
 	PrintToChat(client, "-------------------[\x04娱乐休闲数据统计\x01]-------------------");
-	PrintToChat(client, "\x01 \x04KDA: \x07%.2f  \x04HSP: \x07%.2f%%", g_fKD[client], float(g_eStatistical[client][Headshots]*100)/float(g_eStatistical[client][Kills]+1));
+	PrintToChat(client, "\x01 \x04KDA: \x07%.2f  \x04HSP: \x07%.2f%%", g_fKDA[client], g_fHSP[client]);
 	PrintToChat(client, "\x01 \x04杀敌: \x07%d  \x04死亡: \x07%d", g_eStatistical[client][Kills], g_eStatistical[client][Deaths]);
-	PrintToChat(client, "\x01 \x04爆头: \x07%d  \x04助攻: \x07%.2f", g_eStatistical[client][Headshots], g_eStatistical[client][Assists]);
+	PrintToChat(client, "\x01 \x04爆头: \x07%d  \x04助攻: \x07%f", g_eStatistical[client][Headshots], g_eStatistical[client][Assists]);
 	PrintToChat(client, "\x01 \x04电击: \x07%d  \x04刀杀: \x07%d", g_eStatistical[client][Taser], g_eStatistical[client][Knife]);
 	PrintToChat(client, "\x01 \x04局数: \x07%d  \x04存活: \x07%d", g_eStatistical[client][Round], g_eStatistical[client][Survival]);
 	PrintToChat(client, "\x01 \x04得分: \x07%d  \x04排名: \x07%d", g_eStatistical[client][Score], g_iRank[client]);

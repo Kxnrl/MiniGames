@@ -4,6 +4,7 @@ void Neurotoxin_Init()
 	PrintToChatAll(" \x02突变因子: \x07神经毒素");
 	PrintToChatAll("本局你将无法使用按键颠倒且视野嘿嘿嘿");
 	CreateTimer(1.0, Timer_Neurotoxin, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	CG_ShowGameTextAll("突变因子: 神经毒素\n本局你将无法使用按键颠倒且视野嘿嘿嘿", "10.0", "57 197 187", "-1.0", "-1.0");
 }
 
 public void Neurotoxin_RunCmd(int client, int &buttons, float vel[3])
