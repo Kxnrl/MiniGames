@@ -30,7 +30,7 @@ public void OnClientDisconnect(int client)
 		SDKUnhook(client, SDKHook_WeaponDropPost, OnWeaponDrop);
 	}
 }
-
+/*
 public void CG_OnClientSpawn(int client)
 {
 	if(CG_GetClientGId(client) == 9999)
@@ -46,7 +46,7 @@ public Action Timer_ClientModel(Handle timer, int client)
 		Store_ResetPlayerArms(client);
 	}
 }
-
+*/
 public void OnWeaponDrop(int client, int weapon)
 {
 	if(!IsValidEdict(weapon))
@@ -77,7 +77,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 		}
 		else if(StrEqual(entityclass, "inferno") || StrEqual(entityclass, "trigger_hurt"))
 		{
-			damage *= 0.50;
+			damage *= 0.35;
 			return Plugin_Changed;
 		}
 	}
@@ -125,7 +125,7 @@ public Action Timer_Armor(Handle timer, int client)
 	
 	if(!GetEntProp(client, Prop_Send, "m_bHasHelmet"))
 		SetEntProp(client, Prop_Send, "m_bHasHelmet", 1);
-	
+
 	if(GetEntityGravity(client) > 0.92)
 		SetEntityGravity(client, 0.92);
 
