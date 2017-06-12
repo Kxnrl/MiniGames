@@ -1,18 +1,18 @@
 #include <sdktools>
 #include <sdkhooks>
 #include <cg_core>
+#include <cstrike>
 
 #pragma newdecls required
 
 ConVar mg_restrictawp;
 ConVar mg_slaygaygun;
-//ConVar mg_dropweaponfix;
 ConVar mg_spawn_knife;
 ConVar mg_spawn_pistol;
 
 bool g_bRestrictAwp = false;
 bool g_bSlayGaygun = true;
-//bool g_bDropWeaponFix = true;
+bool g_bNeedFixArms = false;
 
 public Plugin myinfo =
 {
@@ -34,13 +34,11 @@ public void OnPluginStart()
 
 	mg_restrictawp = CreateConVar("mg_restrictawp", "0");
 	mg_slaygaygun = CreateConVar("mg_slaygaygun", "1");
-	//mg_dropweaponfix = CreateConVar("mg_dropweaponfix", "1");
 	mg_spawn_knife = CreateConVar("mg_spawn_knife", "0");
 	mg_spawn_pistol = CreateConVar("mg_spawn_pistol", "0");
 
 	HookConVarChange(mg_restrictawp, OnSettingChanged);
 	HookConVarChange(mg_slaygaygun, OnSettingChanged);
-	//HookConVarChange(mg_dropweaponfix, OnSettingChanged);
 
 	for(int i = 1; i <= MaxClients; ++i)
 		if(IsClientInGame(i))
@@ -56,7 +54,6 @@ public void OnPluginEnd()
 
 public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)
 {
-	//g_bDropWeaponFix = GetConVarBool(mg_dropweaponfix);
 	g_bSlayGaygun = GetConVarBool(mg_slaygaygun);
 	g_bRestrictAwp = GetConVarBool(mg_restrictawp);
 }
@@ -64,25 +61,17 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 public void OnClientPutInServer(int client)
 {
 	SDKHook(client, SDKHook_WeaponEquipPost, OnWeaponEquip);
-	//SDKHook(client, SDKHook_WeaponCanUse, OnWeaponCanUse);
 }
 
 public void OnClientDisconnect(int client)
 {
 	SDKUnhook(client, SDKHook_WeaponEquipPost, OnWeaponEquip);
-	//SDKUnhook(client, SDKHook_WeaponCanUse, OnWeaponCanUse);
 }
 
 public void OnMapStart()
 {
+	g_bNeedFixArms = false;
 	CreateTimer(3.0, Timer_CheckWarmup, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
-}
-
-public void OnConfigsExecuted()
-{
-	//g_bDropWeaponFix = GetConVarBool(mg_dropweaponfix);
-	g_bSlayGaygun = GetConVarBool(mg_slaygaygun);
-	g_bRestrictAwp = GetConVarBool(mg_restrictawp);
 }
 
 public Action Timer_CheckWarmup(Handle timer)
@@ -112,19 +101,10 @@ public Action Timer_CheckWarmup(Handle timer)
 	return Plugin_Continue;
 }
 
-public void CG_OnRoundEnd(int winner)
-{
-	int timeleft;
-	GetMapTimeLeft(timeleft);
-	if(timeleft < 10)
-		return;
-
-	CreateTimer(GetConVarFloat(FindConVar("mp_round_restart_delay"))-1.0, Timer_RoundEnd, _, TIMER_FLAG_NO_MAPCHANGE);
-}
-
 public void CG_OnClientSpawn(int client)
 {
-	RequestFrame(OnClientSpawn, client);
+	//RequestFrame(OnClientSpawn, client);
+	CreateTimer(0.1, OnClientSpawn, client);
 }
 
 public Action Timer_Slay(Handle timer, int userid)
@@ -147,16 +127,30 @@ public Action Timer_Slay2(Handle timer, int userid)
 	}
 }
 
-public void OnClientSpawn(int client)
+//public void OnClientSpawn(int client)
+public Action OnClientSpawn(Handle timer, int client)
 {
 	if(!IsClientInGame(client))
 		return;
 
 	if(!IsPlayerAlive(client))
 		return;
+	
+	SetEntProp(client, Prop_Send, "m_bHasHeavyArmor", 0);
+	SetEntProp(client, Prop_Send, "m_ArmorValue", 0, 1);
+	SetEntProp(client, Prop_Send, "m_bHasHelmet", 0);
 
-	if(mg_spawn_knife.BoolValue && GetPlayerWeaponSlot(client, 2) == -1)
-		GivePlayerItem(client, "weapon_knife");
+	if(GetPlayerWeaponSlot(client, 2) == -1)
+	{
+		if(mg_spawn_knife.BoolValue)
+			GivePlayerItem(client, "weapon_knife");
+		else if(g_bNeedFixArms)
+		{
+			int decoy = GivePlayerItem(client, "weapon_decoy");
+			//PrintToChat(client, "Give weapon_decoy [%d]", decoy);
+			CreateTimer(0.3, Timer_RemoveKnife, EntIndexToEntRef(decoy));
+		}
+	}
 
 	if(mg_spawn_pistol.BoolValue && GetPlayerWeaponSlot(client, 1) == -1)
 	{
@@ -168,27 +162,6 @@ public void OnClientSpawn(int client)
 	}
 }
 
-public Action Timer_RoundEnd(Handle timer)
-{
-	for(int client=1; client<=MaxClients; ++client)
-		if(IsClientInGame(client))
-		{
-			SetEntProp(client, Prop_Send, "m_bHasHeavyArmor", 0);
-			SetEntProp(client, Prop_Send, "m_ArmorValue", 0, 1);
-			SetEntProp(client, Prop_Send, "m_bHasHelmet", 0);
-		}
-}
-/*
-public Action OnWeaponCanUse(int client, int weapon)
-{
-	if(!g_bDropWeaponFix)
-		return Plugin_Continue;
-
-	RequestFrame(CheckWeaponEquip, weapon);
-
-	return Plugin_Continue;
-}
-*/
 public Action CS_OnBuyCommand(int client, const char[] weapon)
 {
 	if(CG_GetClientId(client) == 1)
@@ -293,4 +266,69 @@ public Action Cmd_GiveAWP(int client, int args)
 bool IsValidClient(int client)
 {
 	return (1 <= client <= MaxClients && IsClientInGame(client)) ? true : false;
+}
+
+public void OnConfigsExecuted()
+{
+	g_bSlayGaygun = GetConVarBool(mg_slaygaygun);
+	g_bRestrictAwp = GetConVarBool(mg_restrictawp);
+
+	char map[128];
+	GetCurrentMap(map, 128);
+	
+	char path[128];
+	Format(path, 128, "maps/%s.kv", map);
+	
+	Handle kv = CreateKeyValues(map);
+
+	FileToKeyValues(kv, path);
+	
+	if(KvJumpToKey(kv, "t_models", false))
+	{
+		if(KvGotoFirstSubKey(kv, false))
+		{
+			char kvalue[128];
+			KvGetSectionName(kv, kvalue, 128);
+			if(StrContains(kvalue, "tm_anarchist") != -1 || StrContains(kvalue, "ctm_sas") != -1 || StrContains(kvalue, "ctm_fbi") != -1 || StrContains(kvalue, "ctm_swat") != -1)
+			{
+				g_bNeedFixArms = true;
+				LogMessage("Found Kv -> %s", kvalue);
+			}
+		}
+	}
+	KvRewind(kv);
+
+	if(KvJumpToKey(kv, "ct_models", false))
+	{
+		if(KvGotoFirstSubKey(kv, false))
+		{
+			char kvalue[128];
+			KvGetSectionName(kv, kvalue, 128);
+			if(StrContains(kvalue, "tm_anarchist") != -1 || StrContains(kvalue, "ctm_sas") != -1 || StrContains(kvalue, "ctm_fbi") != -1 || StrContains(kvalue, "ctm_swat") != -1)
+			{
+				g_bNeedFixArms = true;
+				LogMessage("Found Kv -> %s", kvalue);
+			}
+		}
+	}
+	
+	LogMessage("Current Maps %s -> %s Need Fix Arms", map, !g_bNeedFixArms ? "NOT" : "");
+
+	CloseHandle(kv);
+}
+
+public Action Timer_RemoveKnife(Handle timer, int iRef)
+{
+	int knife = EntRefToEntIndex(iRef);
+	if(!IsValidEdict(knife))
+		return Plugin_Stop;
+	
+	int client = GetEntPropEnt(knife, Prop_Send, "m_hOwnerEntity");
+	
+	if(IsValidClient(client) && IsPlayerAlive(client))
+		CS_DropWeapon(client, knife, true, true);
+	
+	AcceptEntityInput(knife, "Kill");
+	
+	return Plugin_Stop;
 }
