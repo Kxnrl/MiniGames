@@ -5,7 +5,7 @@ public void CG_OnGlobalTimer()
 		if(!IsClientInGame(client))
 			continue;
 		
-		Client_SetClientTag(client);
+		//Client_SetClientTag(client);
 		Mutators_OnGlobalTimer(client);
 	}
 }

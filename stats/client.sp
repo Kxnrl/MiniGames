@@ -52,7 +52,7 @@ void SpeedCap(int client)
 	else
 		IsOnGround[client] = false;	
 }
-
+/*
 void Client_SetClientTag(int client)
 {
 	char tag[32];
@@ -67,7 +67,7 @@ void Client_SetClientTag(int client)
 
 	CS_SetClientClanTag(client, tag);
 }
-
+*/
 void Client_GetRankName(int client, char[] buffer, int maxLen)
 {
 	if(g_iRank[client] == 1)

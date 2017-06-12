@@ -175,7 +175,7 @@ void SetupBetting()
 		if(IsClientInGame(client) && !IsPlayerAlive(client))
 			ShowBettingMenu(client);
 
-	EmitSoundToAllAny("maoling/ninja/ninjawin.mp3", SOUND_FROM_WORLD, SNDCHAN_AUTO, SNDLEVEL_NORMAL, SND_NOFLAGS, 0.5);
+	//EmitSoundToAllAny("maoling/ninja/ninjawin.mp3", SOUND_FROM_WORLD, SNDCHAN_AUTO, SNDLEVEL_NORMAL, SND_NOFLAGS, 0.5);
 }
 
 void ShowBettingMenu(int client)

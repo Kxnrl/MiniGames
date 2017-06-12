@@ -73,9 +73,7 @@ public void OnMapStart()
 	CreateTimer(0.25, Client_CenterText, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 
 	PrecacheSoundAny("maoling/mg/beacon.mp3");
-	PrecacheSoundAny("maoling/ninja/ninjawin.mp3");
 	AddFileToDownloadsTable("sound/maoling/mg/beacon.mp3");
-	AddFileToDownloadsTable("sound/maoling/ninja/ninjawin.mp3");
 
 	g_iRing = PrecacheModel("materials/sprites/bomb_planted_ring.vmt");
 	g_iHalo = PrecacheModel("materials/sprites/halo.vmt");
@@ -99,7 +97,7 @@ public void OnMapEnd()
 	ClearTimer(g_tBurn);
 }
 
-public void CG_OnClientLoaded(int client)
+public void OnClientConnected(int client)
 {
 	g_bLoaded[client] = false;
 	g_iRank[client] = 0;
@@ -108,6 +106,17 @@ public void CG_OnClientLoaded(int client)
 	g_iBetPot[client] = 0;
 	g_iBetTeam[client] = 0;
 	g_bCamp[client] = false;
+	g_iRoundKill[client] = 0;
+	g_iRank[client] = 0;
+	g_iAuth[client] = 0;
+	g_bCamp[client] = false;
+	g_bSlap[client] = false;
+	g_iBetPot[client] = 0;
+	g_iBetTeam[client] = 0;
+}
+
+public void CG_OnClientLoaded(int client)
+{
 	g_iAuth[client] = CG_GetClientGId(client);
 
 	g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
