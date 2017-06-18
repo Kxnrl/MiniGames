@@ -33,7 +33,7 @@ public Plugin myinfo =
 	name		= "MG Server Core",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "3.1.3 - 2017/05/07",
+	version		= "3.1.4 - 2017/06/16",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -203,4 +203,13 @@ public Action Command_Bet(int client, int args)
 	ShowBettingMenu(client);
 
 	return Plugin_Handled;
+}
+
+void PrintToDeath(const char[] chat, any ...)
+{
+	char vm[256];
+	VFormat(vm, 256, chat, 2);
+	for(int client = 1; client <= MaxClients; ++client)
+		if(IsClientInGame(client) && !IsPlayerAlive(client))
+			PrintToChat(client, vm);
 }

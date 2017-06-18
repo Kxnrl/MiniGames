@@ -67,7 +67,7 @@ public int MenuHandler_BetSelectTeam(Handle menu, MenuAction action, int client,
 		g_iBetTeam[client] = StringToInt(info);
 
 		if(g_iBetTeam[client] > 1)
-			DisplayMenu(g_hGetMenu, client, 5);
+			DisplayMenu(g_hGetMenu, client, 8);
 	}
 	else if(action == MenuAction_Cancel)
 	{
@@ -116,13 +116,13 @@ public int MenuHandler_BetSelectPot(Handle menu, MenuAction action, int client, 
 		if(g_iBetTeam[client] == 2)
 		{
 			g_iBettingTotalTE += g_iBetPot[client];
-			PrintToChatAll("%s  \x10%N\x01已下注\x07恐怖分子\x01[\x04%d\x01信用点]|[奖金池:\x10%d信用点]", PREFIX, client, g_iBetPot[client], g_iBettingTotalTE);
+			PrintToDeath("%s  \x10%N\x01已下注\x07恐怖分子\x01[\x04%d\x01信用点]|[奖金池:\x10%d信用点]", PREFIX, client, g_iBetPot[client], g_iBettingTotalTE);
 		}
 
 		if(g_iBetTeam[client] == 3)
 		{
 			g_iBettingTotalCT += g_iBetPot[client];
-			PrintToChatAll("%s  \x10%N\x01已下注\x0B反恐精英\x01[\x04%d\x01信用点]|[奖金池:\x10%d信用点]", PREFIX, client, g_iBetPot[client], g_iBettingTotalCT);
+			PrintToDeath("%s  \x10%N\x01已下注\x0B反恐精英\x01[\x04%d\x01信用点]|[奖金池:\x10%d信用点]", PREFIX, client, g_iBetPot[client], g_iBettingTotalCT);
 		}
 	}
 	else if(action == MenuAction_Cancel)
@@ -160,7 +160,7 @@ void Bets_CheckAllow()
 	{
 		g_bBetting = true;
 		g_bTimeout = false;
-		CreateTimer(15.0, Timer_Timeout);
+		CreateTimer(20.0, Timer_Timeout);
 		CreateTimer(2.0, Timer_Beacon, _, TIMER_REPEAT);
 		SetupBetting();
 	}
@@ -210,7 +210,7 @@ void ShowBettingMenu(int client)
 		return;
 	}
 
-	DisplayMenu(g_hBetMenu, client, 10);
+	DisplayMenu(g_hBetMenu, client, 12);
 
 	PrintToChat(client, "%s  输入!bc可以重新打开菠菜菜单", PREFIX);
 }

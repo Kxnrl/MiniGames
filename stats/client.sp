@@ -67,7 +67,7 @@ void Client_SetClientTag(int client)
 
 	CS_SetClientClanTag(client, tag);
 }
-*/
+
 void Client_GetRankName(int client, char[] buffer, int maxLen)
 {
 	if(g_iRank[client] == 1)
@@ -89,7 +89,7 @@ void Client_GetRankName(int client, char[] buffer, int maxLen)
 	else
 		FormatEx(buffer, maxLen, "娱乐萌新");
 }
-
+*/
 public Action Client_CenterText(Handle timer)
 {
 	for(int client = 1; client <= MaxClients; ++client)
@@ -140,8 +140,16 @@ void Client_SpawnPost(int client)
 	
 	if(g_iRoundKill[client] >= 8 || Stats_AllowScourgeClient(client))
 	{
-		ForcePlayerSuicide(client);
-		tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,被雷神劈死了...", PREFIX, client);
+		if(GetRandomInt(1, 100) > 50)
+		{
+			ForcePlayerSuicide(client);
+			tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,被雷神劈死了...", PREFIX, client);
+		}
+		else
+		{
+			SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 99999.0);
+			tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,强制被透视...", PREFIX, client);
+		}
 	}
 
 	g_iRoundKill[client] = 0;
