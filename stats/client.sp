@@ -11,8 +11,11 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	if(!IsPlayerAlive(client))
 		return Plugin_Continue;
-	
+
 	Mutators_RunCmd(client, buttons, vel);
+	
+	if(!g_bRealBHop)
+		return Plugin_Continue;
 
 	if(GetEntityFlags(client) & FL_ONGROUND)
 		g_bOnGround[client]=true;

@@ -7,6 +7,7 @@ Handle CVAR_TE_SECONDARY;
 Handle CVAR_BHOPSPEED;
 Handle CVAR_BUNNYHOP;
 Handle CVAR_AUTOJUMP;
+Handle CVAR_BHOPTYPE;
 
 void ConVar_OnPluginStart()
 {
@@ -18,8 +19,9 @@ void ConVar_OnPluginStart()
 	CVAR_TE_SECONDARY = FindConVar("mp_t_default_secondary");
 	CVAR_AUTOJUMP = FindConVar("sv_autobunnyhopping");
 	CVAR_BUNNYHOP = FindConVar("sv_enablebunnyhopping");
-	CVAR_BHOPSPEED = CreateConVar("mg_bhopspeed", "250.0", "bhop sped limit", _, true, -1.0, true, 3500.0);
-	
+	CVAR_BHOPSPEED = CreateConVar("mg_bhopspeed", "250.0", "bhop speed limit", _, true, 200.0, true, 3500.0);
+	CVAR_BHOPTYPE = CreateConVar("mg_bhop_limit_advanced", "1", "bhop speed limit type", _, true, 0.0, true, 1.0);
+
 	CreateConVar("mg_randomteam", "1", "scrable team", _, true, 0.0, true, 1.0);
 	CreateConVar("mg_autoburn", "1", "burn all client", _, true, 0.0, true, 1.0);
 	CreateConVar("mg_burndelay", "120.0", "burn delay after round start", _, true, 60.0, true, 600.0);
@@ -73,6 +75,7 @@ void LockConVar()
 	SetConVarString(CVAR_TE_PRIMARY, "", true, false);
 	SetConVarString(CVAR_TE_SECONDARY, "", true, false);
 	SetConVarInt(CVAR_AUTOJUMP, 1);
-	SetConVarInt(CVAR_BUNNYHOP, 1);
 	g_fBhopSpeed = GetConVarFloat(CVAR_BHOPSPEED);
+	g_bRealBHop = GetConVarBool(CVAR_BHOPTYPE);
+	SetConVarInt(CVAR_BUNNYHOP, g_bRealBHop ? 1 : 0);
 }

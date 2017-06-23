@@ -16,6 +16,8 @@ char g_szSignature[MAXPLAYERS+1][256];
 float g_fKDA[MAXPLAYERS+1];
 float g_fHSP[MAXPLAYERS+1];
 
+bool g_bRealBHop;
+
 char g_szBlockCmd[27][16] = {"kill", "explode", "coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", "needbackup", "sectorclear", "inposition", "reportingin","getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment"};
 
 Handle g_hDatabase;
@@ -33,7 +35,7 @@ public Plugin myinfo =
 	name		= "MG Server Core",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "3.1.4 - 2017/06/16",
+	version		= "3.2 - 2017/06/23",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
