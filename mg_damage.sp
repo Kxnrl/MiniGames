@@ -30,23 +30,7 @@ public void OnClientDisconnect(int client)
 		SDKUnhook(client, SDKHook_WeaponDropPost, OnWeaponDrop);
 	}
 }
-/*
-public void CG_OnClientSpawn(int client)
-{
-	if(CG_GetClientGId(client) == 9999)
-		CreateTimer(3.0, Timer_ClientModel, client);
-}
 
-public Action Timer_ClientModel(Handle timer, int client)
-{
-	if(IsClientInGame(client) && CG_GetClientGId(client) == 9999 && IsPlayerAlive(client))
-	{
-		SetEntityModel(client, "models/player/custom_player/maoling/vocaloid/hatsune_miku/cybertech/miku.mdl");
-		SetEntPropString(client, Prop_Send, "m_szArmsModel", "models/player/custom_player/maoling/vocaloid/hatsune_miku/cybertech/miku_arms.mdl");
-		Store_ResetPlayerArms(client);
-	}
-}
-*/
 public void OnWeaponDrop(int client, int weapon)
 {
 	if(!IsValidEdict(weapon))
@@ -70,12 +54,7 @@ public Action OnTakeDamage(int client, int &attacker, int &inflictor, float &dam
 	{
 		char entityclass[32];
 		GetEdictClassname(inflictor, entityclass, 32);
-		if(StrEqual(entityclass, "hegrenade_projectile"))
-		{
-			damage *= 0.35;
-			return Plugin_Changed;
-		}
-		else if(StrEqual(entityclass, "inferno") || StrEqual(entityclass, "trigger_hurt"))
+		if(StrEqual(entityclass, "hegrenade_projectile") || StrEqual(entityclass, "inferno") || StrEqual(entityclass, "trigger_hurt"))
 		{
 			damage *= 0.35;
 			return Plugin_Changed;
