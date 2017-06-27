@@ -67,7 +67,7 @@ public void OnPluginEnd()
 
 public void OnMapStart()
 {
-	g_hDatabase = CG_GetGameDatabase();
+	g_hDatabase = CG_DatabaseGetGames();
 	if(g_hDatabase == INVALID_HANDLE)
 		CreateTimer(1.0, Timer_ReConnect);
 
@@ -89,7 +89,7 @@ public void OnMapStart()
 
 public void CG_OnServerLoaded()
 {
-	g_hDatabase = CG_GetGameDatabase();
+	g_hDatabase = CG_DatabaseGetGames();
 	if(g_hDatabase == INVALID_HANDLE)
 		CreateTimer(1.0, Timer_ReConnect);
 }
@@ -119,7 +119,7 @@ public void OnClientConnected(int client)
 
 public void CG_OnClientLoaded(int client)
 {
-	g_iAuth[client] = CG_GetClientGId(client);
+	g_iAuth[client] = CG_ClientGetGId(client);
 
 	g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
 
@@ -137,7 +137,7 @@ public void OnClientDisconnect(int client)
 
 public Action Timer_ReConnect(Handle timer)
 {
-	g_hDatabase = CG_GetGameDatabase();
+	g_hDatabase = CG_DatabaseGetGames();
 	if(g_hDatabase == INVALID_HANDLE)
 		CreateTimer(1.0, Timer_ReConnect);
 

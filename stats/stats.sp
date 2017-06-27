@@ -184,7 +184,7 @@ void GetPlayerRank(int client)
 	if(rank > 0)
 		g_iRank[client] = rank;
 
-	CG_GetClientSignature(client, g_szSignature[client], 256);
+	CG_ClientGetSignature(client, g_szSignature[client], 256);
 	g_fKDA[client] = (g_eStatistical[client][Kills]*1.0)/((g_eStatistical[client][Deaths]+1)*1.0);
 	g_fHSP[client] = float(g_eStatistical[client][Headshots]*100)/float((g_eStatistical[client][Kills]-g_eStatistical[client][Knife]-g_eStatistical[client][Taser])+1);
 
@@ -239,7 +239,7 @@ public void SQL_SaveCallback(Handle owner, Handle hndl, const char[] error, Hand
 void PrintWellcomeMessage(int client)
 {
 	char AuthoirzedName[32], m_szMsg[512];
-	CG_GetClientGName(client, AuthoirzedName, 32);
+	CG_ClientGetGroupName(client, AuthoirzedName, 32);
 	Format(m_szMsg, 512, "%s \x04%N\x01进入了游戏 \x0B认证\x01[\x0C%s\x01]  \x01排名\x04%d  \x0CKDA\x04%.2f  \x0CHSP\x04%.2f \x0C得分\x04%d  \x01签名: \x07%s", 
 							PREFIX, 
 							client, 

@@ -62,7 +62,7 @@ void Client_SetClientTag(int client)
 	
 	switch(g_iTagType)
 	{
-		case 0: CG_GetClientGName(client, tag, 32);
+		case 0: CG_ClientGetGroupName(client, tag, 32);
 		case 1: {if(!g_iRank[client]) Format(tag, 32, "Top - NORANK", g_iRank[client]); else Format(tag, 32, "Top - %d", g_iRank[client]);}
 		case 2: Format(tag, 32, "K/D  %.2f", g_fKDA[client]);
 		case 3: Client_GetRankName(client, tag, 32);
@@ -106,7 +106,7 @@ public Action Client_CenterText(Handle timer)
 		{
 			char buffer[512], m_szAuth[64];
 
-			CG_GetClientGName(target, m_szAuth, 64);
+			CG_ClientGetGroupName(target, m_szAuth, 64);
 			Format(m_szAuth, 64, "<font color='#%s'>%s", g_iAuth[target] == 9999 ? "39C5BB" : "FF8040", m_szAuth);
 
 			Format(buffer, 512, "<font color='#0066CC' size='20'>%N</font>\n认证: %s</font>   排名:<font color='#0000FF'> %d</font>   K/D:<font color='#FF0000'> %.2f</font>\n签名: <font color='#796400'>%s", target, m_szAuth, g_iRank[target], g_fKDA[target], g_szSignature[target]);

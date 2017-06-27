@@ -110,7 +110,7 @@ public void CG_OnClientSpawn(int client)
 public Action Timer_Slay(Handle timer, int userid)
 {
 	int client = GetClientOfUserId(userid);
-	if(IsValidClient(client) && CG_GetClientId(client) != 1)
+	if(IsValidClient(client) && CG_ClientGetPId(client) != 1)
 	{
 		ForcePlayerSuicide(client);
 		PrintToChatAll("[\x04MG\x01]  \x0B%N\x01使用\x09连狙\x01时遭遇天谴", client);
@@ -164,7 +164,7 @@ public Action OnClientSpawn(Handle timer, int client)
 
 public Action CS_OnBuyCommand(int client, const char[] weapon)
 {
-	if(CG_GetClientId(client) == 1)
+	if(CG_ClientGetPId(client) == 1)
 		return Plugin_Continue;
 	
 	if(StrContains(weapon, "flash", false) == -1)

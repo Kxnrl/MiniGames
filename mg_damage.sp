@@ -14,7 +14,7 @@ public Plugin myinfo =
 
 public void CG_OnClientLoaded(int client)
 {
-	if(CG_GetClientGId(client) == 9999)
+	if(CG_ClientGetGId(client) == 9999)
 	{
 		CreateTimer(0.5, Timer_Armor, client, TIMER_REPEAT);
 		SDKHook(client, SDKHook_OnTakeDamage, OnTakeDamage);
@@ -24,7 +24,7 @@ public void CG_OnClientLoaded(int client)
 
 public void OnClientDisconnect(int client)
 {
-	if(CG_GetClientGId(client) == 9999)
+	if(CG_ClientGetGId(client) == 9999)
 	{
 		SDKUnhook(client, SDKHook_OnTakeDamage, OnTakeDamage);
 		SDKUnhook(client, SDKHook_WeaponDropPost, OnWeaponDrop);
