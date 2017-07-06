@@ -35,7 +35,7 @@ public Plugin myinfo =
 	name		= "MG Server Core",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "3.2 - 2017/06/23",
+	version		= "3.3 - 2017/07/06",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -192,7 +192,8 @@ public Action Command_Top(int client, int args)
 
 public int MenuHandler_MenuTopPlayers(Handle menu, MenuAction action, int param1, int param2)
 {
-	
+	if(action == MenuAction_End)
+        CloseHandle(menu);
 }
 
 public Action Command_BlockCmd(int client, const char[] command, int args)

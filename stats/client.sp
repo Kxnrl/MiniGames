@@ -163,6 +163,7 @@ public Action Client_RandomTeam(Handle timer)
 	ArrayList array_players = CreateArray();
 	
 	int teams[MAXPLAYERS+1];
+    int waifu[MAXPLAYERS+1];
 
 	for(int x = 1; x <= MaxClients; ++x)
 		if(IsClientInGame(x))
@@ -171,38 +172,64 @@ public Action Client_RandomTeam(Handle timer)
 			if(teams[x] <= 1)
 				continue;
 			PushArrayCell(array_players, x);
+            waifu[x] = CG_CouplesGetPartnerIndex(x);
 		}
 
-
-	int client, number, team, counts = RoundToNearest(GetArraySize(array_players)*0.5);
+	char buffer[128];
+	int client, target, number, tindex, team, counts = RoundToNearest(GetArraySize(array_players)*0.5);
 	while((number = RandomArray(array_players)) != -1)
 	{
 		client = GetArrayCell(array_players, number);
+        RemoveFromArray(array_players, number);
 
-		char buffer[128];
-		if(counts > 0)
-		{
-			team = 2;
-			counts--;
-			Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
-		}
-		else
-		{
-			team = 3;
-			Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
-		}
+        target = waifu[client];
+        if(waifu[client] > 0 && (tindex = FindValueInArray(array_players, waifu[client])) != -1)
+        {
+            RemoveFromArray(array_players, tindex);
 
-		if(IsPlayerAlive(client))
-			CS_SwitchTeam(client, team);
-		else
-			ChangeClientTeam(client, team);
+            if(counts > 1)
+            {
+                counts -= 2;
+                CS_SwitchTeam(client, 2);
+                CS_SwitchTeam(target, 2);
+                Format(buffer, 128, "当前地图已经开启随机组队\n 你和你老婆已被移动到 <font color='#FF0000' size='20'>恐怖分子");
+            }
+            else
+            {
+                CS_SwitchTeam(client, 3);
+                CS_SwitchTeam(target, 3);
+                Format(buffer, 128, "当前地图已经开启随机组队\n 你和你老婆已被移动到 <font color='#0066CC' size='20'>反恐精英");
+            }
+
+            if(teams[target] != team)
+                PrintCenterText(target, buffer);
+            else
+                Store_ResetPlayerArms(target);
+        }
+        else
+        {
+            if(counts > 0)
+            {
+                counts--;
+                CS_SwitchTeam(client, 2);
+                Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
+            }
+            else
+            {
+                CS_SwitchTeam(client, 3);
+                Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
+            }
+        }
 
 		if(teams[client] != team)
 			PrintCenterText(client, buffer);
 		else
-			Store_ResetPlayerArms(client);
-
-		RemoveFromArray(array_players, number);
+            Store_ResetPlayerArms(client);
+        
+        if(target < -1)
+            PrintToChat(client, "[\x0ECP\x01]   你没有老婆,不能享受CP的随机组队优选");
+        else if(target == -1)
+            PrintToChat(client, "[\x0ECP\x01]   你老婆离线,不能享受CP的随机组队优选");
 	}
 
 	CloseHandle(array_players);
