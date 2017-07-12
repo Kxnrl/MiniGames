@@ -107,6 +107,12 @@ public void CG_OnClientSpawn(int client)
 	CreateTimer(0.1, OnClientSpawn, client);
 }
 
+public void CG_OnRoundEnd(int winner)
+{
+    if(g_bNeedFixArms)
+        CreateTimer(11.5, Timer_ClearWeapon);
+}
+
 public Action Timer_Slay(Handle timer, int userid)
 {
 	int client = GetClientOfUserId(userid);
@@ -331,4 +337,22 @@ public Action Timer_RemoveKnife(Handle timer, int iRef)
 	AcceptEntityInput(knife, "Kill");
 	
 	return Plugin_Stop;
+}
+
+public Action Timer_ClearWeapon(Handle timer)
+{
+    for(int weapon = MaxClients+1; weapon <= 2048; ++weapon)
+    {
+        if(!IsValidEdict(weapon))
+            continue;
+        
+        int client = GetEntPropEnt(weapon, Prop_Send, "m_hOwnerEntity");
+	
+        if(IsValidClient(client) && IsPlayerAlive(client))
+            CS_DropWeapon(client, weapon, true, true);
+
+        AcceptEntityInput(weapon, "Kill");
+    }
+    
+    return Plugin_Stop;
 }
