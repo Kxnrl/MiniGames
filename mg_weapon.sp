@@ -341,11 +341,18 @@ public Action Timer_RemoveKnife(Handle timer, int iRef)
 
 public Action Timer_ClearWeapon(Handle timer)
 {
+    char classname[32];
     for(int weapon = MaxClients+1; weapon <= 2048; ++weapon)
     {
         if(!IsValidEdict(weapon))
             continue;
         
+        if(!GetEdictClassname(weapon, classname, 32))
+            continue;
+        
+        if(StrContains(classname, "weapon_") != 0)
+            continue;
+
         int client = GetEntPropEnt(weapon, Prop_Send, "m_hOwnerEntity");
 	
         if(IsValidClient(client) && IsPlayerAlive(client))
