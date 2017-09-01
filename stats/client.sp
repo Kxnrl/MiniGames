@@ -143,16 +143,16 @@ void Client_SpawnPost(int client)
 	
 	if(g_iRoundKill[client] >= 8 || Stats_AllowScourgeClient(client))
 	{
-		if(GetRandomInt(1, 100) > 50)
-		{
-			ForcePlayerSuicide(client);
-			tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,被雷神劈死了...", PREFIX, client);
-		}
-		else
-		{
+		//if(GetRandomInt(1, 100) > 50)
+		//{
+			//ForcePlayerSuicide(client);
+		//	tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,被雷神劈死了...", PREFIX, client);
+		//}
+		//else
+		//{
 			SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 99999.0);
 			tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,强制被透视...", PREFIX, client);
-		}
+		//}
 	}
 
 	g_iRoundKill[client] = 0;
