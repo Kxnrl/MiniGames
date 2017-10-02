@@ -11,6 +11,7 @@ enum Mutators
 	Game_Jump
 }
 
+bool g_bMuta;
 bool g_bCamp[MAXPLAYERS+1];
 bool g_bSlap[MAXPLAYERS+1];
 Mutators g_Mutators = Game_None;
@@ -30,20 +31,24 @@ void Mutators_OnPluginStart()
 	g_cvarMutators = CreateConVar("mg_mutators", "1", "enable mutators", _, true, 0.0, true, 1.0);
 
 	RegAdminCmd("sm_mutators", Command_Mutators, ADMFLAG_ROOT);
+    RegAdminCmd("sm_muta", Command_Muta, ADMFLAG_ROOT);
 }
 
 void Mutators_OnMapStart()
 {
-	
+	g_bMuta = false;
 }
 
 void Mutators_OnRoundStart()
 {
 	g_Mutators = Game_None;
+    
+    if(!g_bMuta)
+        return;
 
 	if(!GetConVarBool(g_cvarMutators))
 		return;
-	
+
 	if(GetRandomInt(0, 10000) > 1000)
 		return;
 
@@ -86,11 +91,19 @@ public void Mutators_RunCmd(int client, int &buttons, float vel[3])
 	Neurotoxin_RunCmd(client, buttons, vel);
 }
 
+public Action Command_Muta(int client, int args)
+{
+    g_bMuta = !g_bMuta;
+    PrintToChatAll(" \x0FMutators is %s", g_bMuta ? "\x04Enabled" : "\x02Disabled");
+    return Plugin_Handled;
+}
+
 public Action Command_Mutators(int client, int args)
 {
 	PrintToChatAll(" \x02突变因子正在重组基因...");
 	CG_ShowGameTextAll("突变因子正在重组基因...", "5.0", "57 197 187", "-1.0", "-1.0");
 	CreateTimer(5.0, Timer_RandomMutator, _, TIMER_FLAG_NO_MAPCHANGE);
+    return Plugin_Handled;
 }
 
 void Mutators_OnClientDeath(int client)

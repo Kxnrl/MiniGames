@@ -351,5 +351,24 @@ void Bets_OnRoundEnd(int winner)
 	g_bRoundEnding = true;
 	
 	if(g_bBetting)
-		SettlementBetting(winner);
+    {
+        SettlementBetting(winner);
+        
+        int players = Bets_GetFinalWinner();
+        if(UTIL_GetRandomInt(1, 100) > 85)
+        {
+            CG_GiveClientPatch(players, view_as<Patch_Type>(UTIL_GetRandomInt(0, 4)));
+            PrintToChatAll("%s \x0C%N\x04残局1V1胜利获得了1片钥匙碎片", PF_HD, players);
+        }
+        else if(players != 0)
+            PrintToChat(players, "%s 嗨呀,你个非洲人,这次居然没掉落碎片", PF_HD);
+    }
+}
+
+int Bets_GetFinalWinner()
+{
+    for(int i = 1; i <= MaxClients; ++i)
+        if(IsClientInGame(i) && IsPlayerAlive(i))
+            return i;
+    return 0;
 }

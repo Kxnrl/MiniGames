@@ -4,12 +4,16 @@
 #include <store>
 #include <emitsoundany>
 #include <cg_core>
+#include <sdkhooks>
+#include <huodong>
 
 #pragma newdecls required
 
 #define PREFIX "[\x0CCG\x01]  "
 #define PREFIX_STORE "\x01 \x04[Store]  "
 
+int cs_player_manager = -1;
+int g_iLvls[MAXPLAYERS+1];
 int g_iRank[MAXPLAYERS+1];
 int g_iAuth[MAXPLAYERS+1];
 char g_szSignature[MAXPLAYERS+1][256];
@@ -35,7 +39,7 @@ public Plugin myinfo =
 	name		= "MG Server Core",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "3.3 - 2017/07/06",
+	version		= "3.4.2 - 2017/10/02",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -56,6 +60,7 @@ public void OnPluginStart()
 
 	HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
 	HookEvent("cs_win_panel_match", Event_WinPanel, EventHookMode_Post);
+    HookEvent("announce_phase_end", Event_AnnouncePhaseEnd, EventHookMode_Post);
 }
 
 public void OnPluginEnd()
@@ -70,9 +75,16 @@ public void OnMapStart()
 	g_hDatabase = CG_DatabaseGetGames();
 	if(g_hDatabase == INVALID_HANDLE)
 		CreateTimer(1.0, Timer_ReConnect);
+    
+    cs_player_manager = FindEntityByClassname(MaxClients+1, "cs_player_manager");
+	if(cs_player_manager != -1)
+    {
+        GameRules_SetProp("m_bIsValveDS", 1, 0, 0, true);
+        SDKHookEx(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
+    }
 
 	BuildRankCache();
-	CreateTimer(0.25, Client_CenterText, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+	//CreateTimer(0.25, Client_CenterText, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 
 	PrecacheSoundAny("maoling/mg/beacon.mp3");
 	AddFileToDownloadsTable("sound/maoling/mg/beacon.mp3");
@@ -97,12 +109,17 @@ public void CG_OnServerLoaded()
 public void OnMapEnd()
 {
 	ClearTimer(g_tBurn);
+    
+    if(cs_player_manager != -1)
+    {
+        SDKUnhook(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
+        cs_player_manager = -1;
+    }
 }
 
 public void OnClientConnected(int client)
 {
 	g_bLoaded[client] = false;
-	g_iRank[client] = 0;
 	g_fKDA[client] = 0.0;
 	g_fHSP[client] = 0.0;
 	g_iBetPot[client] = 0;
@@ -132,6 +149,7 @@ public void OnClientDisconnect(int client)
 	if(g_hDatabase != INVALID_HANDLE)
 		SavePlayer(client);
 
+    g_iLvls[client] = 0;
 	g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
 }
 
@@ -214,4 +232,16 @@ void PrintToDeath(const char[] chat, any ...)
 	for(int client = 1; client <= MaxClients; ++client)
 		if(IsClientInGame(client) && !IsPlayerAlive(client))
 			PrintToChat(client, vm);
+}
+
+void UTIL_Scoreboard(int client, int buttons)
+{
+    if(!(buttons & IN_SCORE))
+        return;
+    
+    if(GetEntProp(client, Prop_Data, "m_nOldButtons") & IN_SCORE)
+        return;
+
+    if(StartMessageOne("ServerRankRevealAll", client) != INVALID_HANDLE)
+        EndMessage();
 }

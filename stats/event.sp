@@ -53,3 +53,18 @@ public void Event_WinPanel(Handle event, const char[] name, bool dontBroadcast)
 		if(IsClientInGame(client))
 			SavePlayer(client);
 }
+
+public void Event_AnnouncePhaseEnd(Handle event, const char[] name, bool dontBroadcast)
+{
+	if(StartMessageAll("ServerRankRevealAll") != INVALID_HANDLE)
+		EndMessage();
+}
+
+public void Hook_OnThinkPost(int iEnt)
+{
+	static int Offset = -1;
+	if(Offset == -1)
+		Offset = FindSendPropInfo("CCSPlayerResource", "m_iCompetitiveRanking");
+
+	SetEntDataArray(iEnt, Offset, g_iLvls, MAXPLAYERS+1, _, true);
+}

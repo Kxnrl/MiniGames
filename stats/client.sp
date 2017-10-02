@@ -9,6 +9,8 @@ float g_fBhopSpeed;
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
+    UTIL_Scoreboard(client, buttons);
+    
 	if(!IsPlayerAlive(client))
 		return Plugin_Continue;
 
@@ -55,44 +57,7 @@ void SpeedCap(int client)
 	else
 		IsOnGround[client] = false;	
 }
-/*
-void Client_SetClientTag(int client)
-{
-	char tag[32];
-	
-	switch(g_iTagType)
-	{
-		case 0: CG_ClientGetGroupName(client, tag, 32);
-		case 1: {if(!g_iRank[client]) Format(tag, 32, "Top - NORANK", g_iRank[client]); else Format(tag, 32, "Top - %d", g_iRank[client]);}
-		case 2: Format(tag, 32, "K/D  %.2f", g_fKDA[client]);
-		case 3: Client_GetRankName(client, tag, 32);
-	}
 
-	CS_SetClientClanTag(client, tag);
-}
-
-void Client_GetRankName(int client, char[] buffer, int maxLen)
-{
-	if(g_iRank[client] == 1)
-		FormatEx(buffer, maxLen, "娱乐TOP1");
-	else if(g_iRank[client] == 2)
-		FormatEx(buffer, maxLen, "无敌挂逼");
-	else if(g_iRank[client] == 3)
-		FormatEx(buffer, maxLen, "刷分Dog");
-	else if(20 >= g_iRank[client] > 3)
-		FormatEx(buffer, maxLen, "进阶挂壁");
-	else if(50 >= g_iRank[client] > 20)
-		FormatEx(buffer, maxLen, "娱乐老司机");
-	else if(100 >= g_iRank[client] > 50)
-		FormatEx(buffer, maxLen, "灵车司机");
-	else if(500 >= g_iRank[client] > 100)
-		FormatEx(buffer, maxLen, "初获驾照");
-	else if(g_iRank[client] == 0)
-		FormatEx(buffer, maxLen, "初来乍到");
-	else
-		FormatEx(buffer, maxLen, "娱乐萌新");
-}
-*/
 public Action Client_CenterText(Handle timer)
 {
 	for(int client = 1; client <= MaxClients; ++client)
@@ -143,16 +108,8 @@ void Client_SpawnPost(int client)
 	
 	if(g_iRoundKill[client] >= 8 || Stats_AllowScourgeClient(client))
 	{
-		//if(GetRandomInt(1, 100) > 50)
-		//{
-			//ForcePlayerSuicide(client);
-		//	tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,被雷神劈死了...", PREFIX, client);
-		//}
-		//else
-		//{
-			SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 99999.0);
-			tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,强制被透视...", PREFIX, client);
-		//}
+		SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 99999.0);
+		tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,强制被透视...", PREFIX, client);
 	}
 
 	g_iRoundKill[client] = 0;
