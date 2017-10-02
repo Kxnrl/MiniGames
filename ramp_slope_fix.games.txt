@@ -1,0 +1,107 @@
+"Games"
+{
+	"csgo"
+	{
+		"Addresses"
+		{
+			"PlayerDidntMove"
+			{
+				"windows"
+				{
+					"signature" "CGameMovement::TryPlayerMove_PlayerDidntMove"
+				}
+				"linux"
+				{
+					"signature" "CGameMovement::TryPlayerMove_PlayerDidntMove"
+				}
+			}
+			"OppositeDirection"
+			{
+				"windows"
+				{
+					"signature" "CGameMovement::TryPlayerMove_OppositeDirection"
+				}
+				"linux"
+				{
+					"signature" "CGameMovement::TryPlayerMove_OppositeDirection"
+				}
+			}
+			"g_pGameMovement"
+			{
+				"windows"
+				{
+					"signature"	"CPhysicsPushedEntities::SpeculativelyCheckPush"
+					"read"	"9"
+				}
+				"linux"
+				{
+					"signature"	"CPhysicsPushedEntities::SpeculativelyCheckPush"
+					"read"	"16"
+				}
+			}
+		}
+		
+		"Signatures"
+		{
+			// Search for "Player.Swim" -> 3 functions down in the vtable.
+			"CGameMovement::TryPlayerMove_PlayerDidntMove"
+			{
+				"library"	"server"
+				"windows"	"\xF6\xC4\x44\x7A\x2A\x8B\x47\x08\xF3\x0F\x10\x05\x2A\x2A\x2A\x2A\xF3\x0F"
+				"linux"		"\xF3\x0F\x10\x8D\xAC\xFE\xFF\xFF\x0F\x2F\xC8\x75\x2A\x8B\x15"
+			}
+			"CGameMovement::TryPlayerMove_OppositeDirection"
+			{
+				"library"	"server"
+				"windows"	"\xE9\x2A\x2A\x2A\x2A\xF3\x0F\x10\x05\x2A\x2A\x2A\x2A\xF3\x0F\x10\x35"
+				"linux"		"\xF3\x0F\x58\xCA\x0F\x2F\xC1\x73\x44"
+			}
+			// "Fixing player blocking train via gamemovement!\n"
+			"CPhysicsPushedEntities::SpeculativelyCheckPush"
+			{
+				"library"	"server"
+				"windows"	"\xFF\xD0\xFF\x36\x33\xC9\x84\xC0\xA1\x2A\x2A\x2A\x2A\x0F\x45\xCB"
+				"linux"	"\x8D\x45\xA0\x89\x1C\x24\x89\x44\x24\x04\xE8\x2A\x2A\x2A\x2A\xA1\x2A\x2A\x2A\x2A\x8B\x00"
+			}
+		}
+		"Offsets"
+		{
+			"PlayerDidntMove_Offset"
+			{
+				"windows"	"8"
+				"linux"	"13"
+			}
+			"PlayerDidntMove_PatchSize"
+			{
+				"windows"	"39"
+				"linux"	"27"
+			}
+			"PlayerDidntMove_Replacement"
+			{
+				"windows"	"144" // 0x90 nop
+				"linux"	"144" // 0x90 nop
+			}
+			"OppositeDirection_Offset"
+			{
+				"windows"	"21"
+				"linux"	"8"
+			}
+			"OppositeDirection_PatchSize"
+			{
+				"windows"	"31"
+				"linux"	"1"
+			}
+			"OppositeDirection_Replacement"
+			{
+				"windows"	"144" // 0x90   nop
+				// The jump to patch is included in the end of the signature to make sure it breaks if the function changes.
+				"linux"	"95" // 0x73 0x5F   jnb 0x5F
+			}
+			"CGameMovement::PlayerRoughLandingEffects"
+			{
+				"windows"	"55"
+				"linux"	"56"
+			}
+		}
+	}
+}
