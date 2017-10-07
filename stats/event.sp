@@ -6,7 +6,7 @@ public void CG_OnGlobalTimer()
 			continue;
 		
 		//Client_SetClientTag(client);
-		Mutators_OnGlobalTimer(client);
+		//Mutators_OnGlobalTimer(client);
 	}
 }
 
@@ -23,7 +23,7 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
 	
 	Bets_CheckAllow();
 	Stats_OnClientDeath(client, attacker, assister, headshot, weapon);
-	Mutators_OnClientDeath(client);
+	//Mutators_OnClientDeath(client);
 }
 
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
@@ -34,9 +34,10 @@ public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontB
 
 public void CG_OnRoundStart()
 {
+    Button_OnRoundStart();
 	Bets_OnRoundStart();
 	Client_OnRoundStart();
-	Mutators_OnRoundStart();
+	//Mutators_OnRoundStart();
 }
 
 public void CG_OnRoundEnd(int winner)
@@ -44,7 +45,7 @@ public void CG_OnRoundEnd(int winner)
 	CreateTimer(10.0, Stats_OnRoundEnd, _, TIMER_FLAG_NO_MAPCHANGE);
 	Bets_OnRoundEnd(winner);
 	Client_OnRoundEnd();
-	Mutators_OnRoundEnd();
+	//Mutators_OnRoundEnd();
 }
 
 public void Event_WinPanel(Handle event, const char[] name, bool dontBroadcast)

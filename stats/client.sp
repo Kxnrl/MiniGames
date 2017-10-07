@@ -3,7 +3,6 @@
 int g_iRoundKill[MAXPLAYERS+1];
 bool g_bOnGround[MAXPLAYERS+1];
 
-int g_iTagType;
 Handle g_tBurn;
 float g_fBhopSpeed;
 
@@ -14,7 +13,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 	if(!IsPlayerAlive(client))
 		return Plugin_Continue;
 
-	Mutators_RunCmd(client, buttons, vel);
+	//Mutators_RunCmd(client, buttons, vel);
 	
 	if(!g_bRealBHop)
 		return Plugin_Continue;
@@ -58,31 +57,6 @@ void SpeedCap(int client)
 		IsOnGround[client] = false;	
 }
 
-public Action Client_CenterText(Handle timer)
-{
-	for(int client = 1; client <= MaxClients; ++client)
-	{
-		if(!IsClientInGame(client))
-			continue;
-
-		int target = GetClientAimTarget(client);
-
-		if(IsValidClient(target) && IsPlayerAlive(target))
-		{
-			char buffer[512], m_szAuth[64];
-
-			CG_ClientGetGroupName(target, m_szAuth, 64);
-			Format(m_szAuth, 64, "<font color='#%s'>%s", g_iAuth[target] == 9999 ? "39C5BB" : "FF8040", m_szAuth);
-
-			Format(buffer, 512, "<font color='#0066CC' size='20'>%N</font>\n认证: %s</font>   排名:<font color='#0000FF'> %d</font>   K/D:<font color='#FF0000'> %.2f</font>\n签名: <font color='#796400'>%s", target, m_szAuth, g_iRank[target], g_fKDA[target], g_szSignature[target]);
-
-			Handle pb = StartMessageOne("HintText", client);
-			PbSetString(pb, "text", buffer);
-			EndMessage();
-		}
-	}
-}
-
 public Action Client_BurnAll(Handle timer)
 {
 	g_tBurn = INVALID_HANDLE;
@@ -101,15 +75,18 @@ void Client_SpawnPost(int client)
 		return;
 	
 	SetEntProp(client, Prop_Send, "m_iHideHUD", HIDE_RADAR);
+    SetEntProp(client, Prop_Send, "m_iAccount", 10000);
 	SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 0.0);
 	
 	if(!IsPlayerAlive(client) || g_iAuth[client] == 9999)
 		return;
 	
-	if(g_iRoundKill[client] >= 8 || Stats_AllowScourgeClient(client))
+	if(Client_Bepunished(client) || Stats_AllowScourgeClient(client))
 	{
+        SetEntityHealth(client, 50);
+        SetEntProp(client, Prop_Data, "m_iMaxHealth", 50, 4, 0);
 		SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 99999.0);
-		tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,强制被透视...", PREFIX, client);
+		tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,遭受天谴,强制被透视...", PREFIX, client);
 	}
 
 	g_iRoundKill[client] = 0;
@@ -204,10 +181,15 @@ int RandomArray(ArrayList array)
 	return GetRandomInt(0, x-1);
 }
 
+bool Client_Bepunished(int client)
+{
+    int req = GetTeamClientCount(GetClientTeam(client))/2;
+    if(req < 4) req = 4;
+    return (g_iRoundKill[client] >= req);
+}
+
 void Client_OnRoundStart()
 {
-	g_iTagType = (g_iTagType == 3) ? 0 : g_iTagType+1;
-
 	if(GetConVarBool(FindConVar("mg_autoburn")))
 	{
 		ClearTimer(g_tBurn);

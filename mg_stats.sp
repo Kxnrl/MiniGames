@@ -28,25 +28,27 @@ Handle g_hDatabase;
 Handle g_tWarmup;
 
 #include "stats/bets.sp"
+#include "stats/button.sp"
 #include "stats/client.sp"
 #include "stats/cvars.sp"
 #include "stats/event.sp"
 #include "stats/stats.sp"
-#include "stats/mutas.sp"
+//#include "stats/mutas.sp"
 
 public Plugin myinfo = 
 {
 	name		= "MG Server Core",
 	author		= "Kyle",
 	description	= "Ex",
-	version		= "3.4.2 - 2017/10/02",
+	version		= "3.5 - 2017/10/07",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
 public void OnPluginStart()
 {
+    Button_OnPluginStart();
 	ConVar_OnPluginStart();
-	Mutators_OnPluginStart();
+	//Mutators_OnPluginStart();
 	Bets_OnPluginStart();
 
 	RegConsoleCmd("sm_rank", Command_Rank);
@@ -84,7 +86,6 @@ public void OnMapStart()
     }
 
 	BuildRankCache();
-	//CreateTimer(0.25, Client_CenterText, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 
 	PrecacheSoundAny("maoling/mg/beacon.mp3");
 	AddFileToDownloadsTable("sound/maoling/mg/beacon.mp3");
@@ -92,8 +93,9 @@ public void OnMapStart()
 	g_iRing = PrecacheModel("materials/sprites/bomb_planted_ring.vmt");
 	g_iHalo = PrecacheModel("materials/sprites/halo.vmt");
 
+    Button_OnMapStart();
 	ConVar_OnMapStart();
-	Mutators_OnMapStart();
+	//Mutators_OnMapStart();
 
 	ClearTimer(g_tWarmup);
 	g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime")), Timer_Warmup);
@@ -124,12 +126,11 @@ public void OnClientConnected(int client)
 	g_fHSP[client] = 0.0;
 	g_iBetPot[client] = 0;
 	g_iBetTeam[client] = 0;
-	g_bCamp[client] = false;
 	g_iRoundKill[client] = 0;
 	g_iRank[client] = 0;
 	g_iAuth[client] = 0;
-	g_bCamp[client] = false;
-	g_bSlap[client] = false;
+	//g_bCamp[client] = false;
+	//g_bSlap[client] = false;
 	g_iBetPot[client] = 0;
 	g_iBetTeam[client] = 0;
 }

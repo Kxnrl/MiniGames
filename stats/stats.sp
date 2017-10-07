@@ -93,6 +93,9 @@ public void SQL_RankCallback(Handle owner, Handle hndl, const char[] error, any 
 
 void LoadPlayer(int client)
 {
+    if(IsFakeClient(client))
+        return;
+    
 	g_eSession[client][Kills] = 0;
 	g_eSession[client][Deaths] = 0;
 	g_eSession[client][Assists] = 0;
@@ -489,7 +492,7 @@ bool Stats_AllowScourgeClient(int client)
 
 	if(d == 0.0) d = 1.0;
 
-	if(k/d >= 4.0)
+	if(k/d >= 5.0)
 		return true;
 	
 	return false;
