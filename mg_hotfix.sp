@@ -1,4 +1,5 @@
 #include <sdktools>
+#include <sdkhooks>
 #include <cstrike>
 #include <cg_core>
 
@@ -48,26 +49,36 @@ public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] 
 {
 	SetConVarInt(phys_pushscale, 900);
 	SetConVarInt(sv_infinite_ammo, 0);
-	SetConVarInt(cs_enable_player_physics_box, (football) ? 1 : 0);
+    SetConVarInt(phys_timescale, 1);
+	SetConVarInt(cs_enable_player_physics_box, football ? 1 : 0);
 }
 
-public Action OnClientSayCommand(int client, const char[] command, const char[] sArgs)
+public void OnEntityCreated(int entity, const char[] classname)
 {
-	if(client)
-		return Plugin_Continue;
+    if(football)
+        return;
 
-	if( StrContains(sArgs, "football", false) != -1 ||
-		StrContains(sArgs, "KILLER BALLS", false) != -1)
-	{
-		football = true;
+    if(strcmp(classname, "prop_physics_override") == 0 || strcmp(classname, "prop_physics") == 0)
+        SDKHook(entity, SDKHook_SpawnPost, OnEntitySpawned);
+}
+
+public void OnEntitySpawned(int entity)
+{
+    if(football)
+        return;
+
+    SDKUnhook(entity, SDKHook_SpawnPost, OnEntitySpawned);
+
+    char model[128];
+    GetEntPropString(entity, Prop_Data, "m_ModelName", model, 128);
+    if(strcmp(model, "models/forlix/soccer/soccerball.mdl") == 0)
+    {
+        football = true;
 		SetConVarInt(phys_timescale, 1);
 		SetConVarInt(cs_enable_player_physics_box, 1);
-		CreateTimer(3.0, Timer_RespawnPlayer);
+		CreateTimer(0.0, Timer_RespawnPlayer);
 		SetAllMoveNone();
-		PrintToChatAll("[\x04DEBUG\x01]  Finding Physics Engine...");
-	}
-
-	return Plugin_Continue;
+    }
 }
 
 public Action Timer_RespawnPlayer(Handle timer)
@@ -130,7 +141,7 @@ public Action Timer_CleanWeapon(Handle timer)
 	{
 		if(!IsValidEdict(x))
 			continue;
-		
+
 		char classname[32];
 		GetEdictClassname(x, classname, 32);
 		if(StrContains(classname, "weapon_") != 0)
