@@ -366,11 +366,11 @@ void Bets_OnRoundEnd(int winner)
         */
     }
 }
-
+/*
 int Bets_GetFinalWinner()
 {
     for(int i = 1; i <= MaxClients; ++i)
         if(IsClientInGame(i) && IsPlayerAlive(i))
             return i;
     return 0;
-}
+}*/

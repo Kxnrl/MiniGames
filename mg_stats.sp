@@ -40,7 +40,7 @@ public Plugin myinfo =
     name        = "MG Server Core",
     author      = "Kyle",
     description = "Ex",
-    version     = "3.5 - 2017/10/09",
+    version     = "3.6 - 2017/11/05",
     url         = "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -191,7 +191,7 @@ public Action Command_Rank(int client, int args)
     PrintToChat(client, "-------------------[\x04娱乐休闲数据统计\x01]-------------------");
     PrintToChat(client, "\x01 \x04KDA: \x07%.2f  \x04HSP: \x07%.2f%%", g_fKDA[client], g_fHSP[client]);
     PrintToChat(client, "\x01 \x04杀敌: \x07%d  \x04死亡: \x07%d", g_eStatistical[client][Kills], g_eStatistical[client][Deaths]);
-    PrintToChat(client, "\x01 \x04爆头: \x07%d  \x04助攻: \x07%f", g_eStatistical[client][Headshots], g_eStatistical[client][Assists]);
+    PrintToChat(client, "\x01 \x04爆头: \x07%d  \x04助攻: \x07%d", g_eStatistical[client][Headshots], g_eStatistical[client][Assists]);
     PrintToChat(client, "\x01 \x04电击: \x07%d  \x04刀杀: \x07%d", g_eStatistical[client][Taser], g_eStatistical[client][Knife]);
     PrintToChat(client, "\x01 \x04局数: \x07%d  \x04存活: \x07%d", g_eStatistical[client][Round], g_eStatistical[client][Survival]);
     PrintToChat(client, "\x01 \x04得分: \x07%d  \x04排名: \x07%d", g_eStatistical[client][Score], g_iRank[client]);

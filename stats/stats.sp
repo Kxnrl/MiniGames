@@ -37,7 +37,7 @@ void BuildRankCache()
     }
 
     char m_szQuery[128];
-    Format(m_szQuery, 128, "SELECT `steamid`,`name`,`kills`,`deaths`,`score` FROM `rank_mg` WHERE `score` >= 0 ORDER BY `score` DESC;");
+    Format(m_szQuery, 128, "SELECT `pid`,`name`,`kills`,`deaths`,`score` FROM `rank_mg` WHERE `score` >= 0 ORDER BY `score` DESC;");
     SQL_TQuery(g_hDatabase, SQL_RankCallback, m_szQuery);
 }
 
@@ -57,7 +57,7 @@ public void SQL_RankCallback(Handle owner, Handle hndl, const char[] error, any 
 
     if(SQL_GetRowCount(hndl))
     {
-        char auth[32], name[32], menu[128];
+        char name[32], menu[128];
         int iKill, iDeath, iScore;
         
         if(g_hTopMenu != INVALID_HANDLE)
@@ -72,9 +72,9 @@ public void SQL_RankCallback(Handle owner, Handle hndl, const char[] error, any 
         while(SQL_FetchRow(hndl))
         {
             index++;
-            SQL_FetchString(hndl, 0, auth, 32);
+            int pid = SQL_FetchInt(hndl, 0);
             SQL_FetchString(hndl, 1, name, 32);
-            PushArrayString(g_RankArray, auth);
+            PushArrayCell(g_RankArray, pid);
     
             if(index > 50)
                 continue;
@@ -118,9 +118,8 @@ void LoadPlayer(int client)
     g_eStatistical[client][Score] = 0;
     g_eStatistical[client][Onlines] = 0;
 
-    char m_szAuth[32], m_szQuery[512];
-    GetClientAuthId(client, AuthId_Steam2, m_szAuth, 32, true);
-    Format(m_szQuery, 128, "SELECT * FROM `rank_mg` WHERE steamid='%s';", m_szAuth);
+    char m_szQuery[512];
+    Format(m_szQuery, 128, "SELECT * FROM `rank_mg` WHERE pid='%d';", CG_ClientGetPId(client));
     SQL_TQuery(g_hDatabase, SQL_LoadCallback, m_szQuery, GetClientUserId(client));
 }
 
@@ -156,9 +155,8 @@ public void SQL_LoadCallback(Handle owner, Handle hndl, const char[] error, int 
     }
     else
     {
-        char m_szAuth[32], m_szQuery[128];
-        GetClientAuthId(client, AuthId_Steam2, m_szAuth, 32, true);
-        Format(m_szQuery, 128, "INSERT INTO `rank_mg` (steamid) VALUES ('%s')", m_szAuth);
+        char m_szQuery[128];
+        Format(m_szQuery, 128, "INSERT INTO `rank_mg` (pid) VALUES ('%d')", CG_ClientGetPId(client));
         SQL_TQuery(g_hDatabase, SQL_InsertCallback , m_szQuery, GetClientUserId(client));
     }
 }
@@ -181,9 +179,7 @@ public void SQL_InsertCallback(Handle owner, Handle hndl, const char[] error, in
 
 void GetPlayerRank(int client)
 {
-    char steamid[32];
-    GetClientAuthId(client, AuthId_Steam2, steamid, 32, true);
-    int rank = FindStringInArray(g_RankArray, steamid);
+    int rank = FindValueInArray(g_RankArray, CG_ClientGetPId(client));
     if(rank > 0)
         g_iRank[client] = rank;
     else
@@ -307,7 +303,7 @@ void SavePlayer(int client)
     SQL_EscapeString(g_hDatabase, m_szName, m_szEname, 64);
     GetClientAuthId(client, AuthId_Steam2, m_szAuth, 32, true);
 
-    Format(m_szQuery, 512, "UPDATE `rank_mg` SET name='%s', kills=kills+%d, deaths=deaths+%d, assists=assists+%d, headshots=headshots+%d, taser=taser+%d, knife=knife+%d, survival=survival+%d, round=round+%d, score=score+%d, onlines=onlines+%d WHERE steamid='%s';",
+    Format(m_szQuery, 512, "UPDATE `rank_mg` SET name='%s', kills=kills+%d, deaths=deaths+%d, assists=assists+%d, headshots=headshots+%d, taser=taser+%d, knife=knife+%d, survival=survival+%d, round=round+%d, score=score+%d, onlines=onlines+%d WHERE pid='%d';",
                             m_szEname,
                             g_eSession[client][Kills],
                             g_eSession[client][Deaths],
@@ -319,7 +315,7 @@ void SavePlayer(int client)
                             g_eSession[client][Round],
                             g_eSession[client][Score],
                             GetTime() - g_eSession[client][Onlines],
-                            m_szAuth);
+                            CG_ClientGetPId(client));
 
     Handle pack = CreateDataPack();
     WritePackString(pack, m_szQuery);
