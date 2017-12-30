@@ -1,10 +1,18 @@
+#if defined _CG_CORE_INCLUDED
+    #endinput
+#endif
+
 #define _CG_CORE_INCLUDED
 
 public SharedPlugin __pl_core = 
 {
-	name = "csgogamers",
+	name = "core",
 	file = "core.smx",
-	required = 1,
+#if defined REQUIRE_PLUGIN
+	required = 1
+#else
+	required = 0
+#endif
 };
 
 /*
@@ -94,10 +102,11 @@ forward void CG_OnClientDeath(int client, int attacker, int assister, bool heads
  * @param client        The Index of client.
  * @param attacker      The Index of attacker.
  * @param damage        The Damage done to health.
+ * @param health        The remaning health.
  * @param hitgroup      The Hitgroup that was damaged.
  * @param weapon        The weapon name attacker used.
  */
-forward void  CG_OnClientHurted(int client, int attacker, int damage, int hitgroup, const char[] weapon);
+forward void  CG_OnClientHurted(int client, int attacker, int damage, int health, int hitgroup, const char[] weapon);
 
 /*
  * Called when event "player_team" was called.
@@ -199,6 +208,16 @@ native void CG_DatabaseSaveForum(const char[] QueryString);
 native int CG_GetServerId();
 
 /*
+ * Retrieve Variables via KEY.
+ *
+ * @param key           The key of variable.
+ * @param buffer        The Buffer to store variable.
+ * @param maxLen        The length of string buffer.
+ * @return              True on success, false otherwise.
+ */
+native bool CG_GetVariable(const char[] key, char[] buffer, int maxLen);
+
+/*
  * Display a game_text HUD to clients.
  *
  * @param message       The message to display.                 ("Kyle is fucking handsome" etc.)
@@ -244,7 +263,7 @@ native bool CG_ShowGameTextToClient(const char[] message, const char[] holdtime,
  * @param height        The height of client`s resolution.
  * @param url           The url to open.
  */
-native bool CG_ShowNormalMotd(int client, int width, int height, char[] url);
+native bool CG_ShowNormalMotd(int client, int width, int height, const char[] url);
 
 /*
  * Display a hidden motd panel to client.
@@ -252,7 +271,7 @@ native bool CG_ShowNormalMotd(int client, int width, int height, char[] url);
  * @param client        The Index of client.
  * @param url           The url to open.
  */
-native bool CG_ShowHiddenMotd(int client, char[] url);
+native bool CG_ShowHiddenMotd(int client, const char[] url);
 
 /*
  * Remove motd panel from a client.

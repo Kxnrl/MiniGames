@@ -62,7 +62,7 @@ public void CG_OnRoundStart()
 {
     g_aEntityIndex.Clear();
     g_aEntityTouch.Clear();
-    
+
     if(mp_teammates_are_enemies.IntValue == 1)
         mp_teammates_are_enemies.SetInt(0);
 }

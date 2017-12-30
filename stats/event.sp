@@ -22,6 +22,7 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
         return;
     
     Bets_CheckAllow();
+    Client_ClearGreenHat(client);
     Stats_OnClientDeath(client, attacker, assister, headshot, weapon);
     //Mutators_OnClientDeath(client);
 }

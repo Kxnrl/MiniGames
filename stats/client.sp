@@ -1,5 +1,6 @@
 #define HIDE_RADAR 1 << 12
 
+int g_iRefIcon[MAXPLAYERS+1] = {INVALID_ENT_REFERENCE, ...};
 int g_iRoundKill[MAXPLAYERS+1];
 bool g_bOnGround[MAXPLAYERS+1];
 
@@ -77,6 +78,8 @@ void Client_SpawnPost(int client)
     SetEntProp(client, Prop_Send, "m_iHideHUD", HIDE_RADAR);
     SetEntProp(client, Prop_Send, "m_iAccount", 10000);
     SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 0.0);
+    
+    Client_CreateGreenHat(client);
     
     if(!IsPlayerAlive(client) || g_iAuth[client] == 9999)
         return;
@@ -212,7 +215,60 @@ void Client_OnRoundEnd()
         KillTimer(g_tBurn);
         g_tBurn = INVALID_HANDLE;
     }
+    
+    for(int client = 1; client <= MaxClients; ++client)
+        if(IsClientInGame(client))
+            if(IsPlayerAlive(client))
+                Client_ClearGreenHat(client);
 
     if(GetConVarBool(FindConVar("mg_randomteam")))
         CreateTimer(2.0, Client_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
+}
+
+void Client_CreateGreenHat(int client)
+{
+    float fOrigin[3];
+    GetClientAbsOrigin(client, fOrigin);                
+    fOrigin[2] = fOrigin[2] + 88.5;
+
+    int iEnt = CreateEntityByName("env_sprite");
+
+    DispatchKeyValue(iEnt, "model", "materials/maoling/sprites/ze/dalao.vmt");
+    DispatchKeyValue(iEnt, "classname", "env_sprite");
+    DispatchKeyValue(iEnt, "spawnflags", "1");
+    DispatchKeyValue(iEnt, "scale", "0.01");
+    DispatchKeyValue(iEnt, "rendermode", "1");
+    DispatchKeyValue(iEnt, "rendercolor", "255 255 255");
+    DispatchSpawn(iEnt);
+    TeleportEntity(iEnt, fOrigin, NULL_VECTOR, NULL_VECTOR);
+    
+    SetVariantString("!activator");
+    AcceptEntityInput(iEnt, "SetParent", client, iEnt);
+
+    g_iRefIcon[client] = EntIndexToEntRef(iEnt);
+    
+    SDKHookEx(iEnt, SDKHook_SetTransmit, Hook_SetTransmit);
+}
+
+void Client_ClearGreenHat(int client)
+{
+    if(g_iRefIcon[client] != INVALID_ENT_REFERENCE)
+    {
+        int iEnt = EntRefToEntIndex(g_iRefIcon[client]);
+        if(IsValidEdict(iEnt))
+        {
+            SDKUnhook(iEnt, SDKHook_SetTransmit, Hook_SetTransmit);
+            AcceptEntityInput(iEnt, "Kill");
+        }
+    }
+
+    g_iRefIcon[client] = INVALID_ENT_REFERENCE;
+}
+
+public Action Hook_SetTransmit(int ent, int client)
+{
+    if(g_iAuth[client] == 9999 || !IsPlayerAlive(client))
+        return Plugin_Continue;
+
+    return Plugin_Handled;
 }

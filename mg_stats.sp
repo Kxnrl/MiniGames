@@ -40,7 +40,7 @@ public Plugin myinfo =
     name        = "MG Server Core",
     author      = "Kyle",
     description = "Ex",
-    version     = "3.6 - 2017/11/05",
+    version     = "3.7 - 2017/12/31",
     url         = "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -88,6 +88,7 @@ public void OnMapStart()
     BuildRankCache();
 
     PrecacheSoundAny("maoling/mg/beacon.mp3");
+    PrepareIconMaterials("maoling/sprites/ze/dalao");
     AddFileToDownloadsTable("sound/maoling/mg/beacon.mp3");
 
     g_iRing = PrecacheModel("materials/sprites/bomb_planted_ring.vmt");
@@ -245,4 +246,21 @@ void UTIL_Scoreboard(int client, int buttons)
 
     if(StartMessageOne("ServerRankRevealAll", client) != INVALID_HANDLE)
         EndMessage();
+}
+
+void PrepareIconMaterials(const char[] icon)
+{
+    char path[256];
+    
+    Format(path, 256, "%s.vmt", icon);
+    PrecacheModel(path, true);
+    
+    Format(path, 256, "materials/%s.vmt", icon);
+    AddFileToDownloadsTable(path);
+
+    Format(path, 256, "%s.vtf", icon);
+    PrecacheModel(path, true);
+
+    Format(path, 256, "materials/%s.vtf", icon);
+    AddFileToDownloadsTable(path);
 }
