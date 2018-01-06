@@ -185,7 +185,8 @@ void GetPlayerRank(int client)
     else
         g_iRank[client] = GetArraySize(g_RankArray);
     
-    float tips = float(g_iRank[client])/float(GetArraySize(g_RankArray));
+    //float tips = float(g_iRank[client])/float(GetArraySize(g_RankArray));
+    /*
     if(tips < 0.001)
     {
         g_iLvls[client] = 18;
@@ -272,6 +273,102 @@ void GetPlayerRank(int client)
         CG_HUDFormatClientTag(client, "娱乐萌新");
     }
     else if(tips < 0.995)
+    {
+        g_iLvls[client] = 1;
+        CG_HUDFormatClientTag(client, "娱乐萌新");
+    }
+    else
+    {
+        g_iLvls[client] = 0;
+        CG_HUDFormatClientTag(client, "娱乐萌新");
+    }
+    */
+    if(g_eStatistical[client][Score] >= 204800)
+    {
+        g_iLvls[client] = 18;
+        CG_HUDFormatClientTag(client, "秋名山车神");
+    }
+    else if(g_eStatistical[client][Score] >= 153600)
+    {
+        g_iLvls[client] = 17;
+        CG_HUDFormatClientTag(client, "老司机Ⅲ");
+    }
+    else if(g_eStatistical[client][Score] >= 120000)
+    {
+        g_iLvls[client] = 16;
+        CG_HUDFormatClientTag(client, "老司机Ⅱ");
+    }
+    else if(g_eStatistical[client][Score] >= 86400)
+    {
+        g_iLvls[client] = 15;
+        CG_HUDFormatClientTag(client, "老司机Ⅰ");
+    }
+    else if(g_eStatistical[client][Score] >= 64800)
+    {
+        g_iLvls[client] = 14;
+        CG_HUDFormatClientTag(client, "灵车司机");
+    }
+    else if(g_eStatistical[client][Score] >= 51200)
+    {
+        g_iLvls[client] = 13;
+        CG_HUDFormatClientTag(client, "新手上路");
+    }
+    else if(g_eStatistical[client][Score] >= 38400)
+    {
+        g_iLvls[client] = 12;
+        CG_HUDFormatClientTag(client, "初获驾照");
+    }
+    else if(g_eStatistical[client][Score] >= 25600)
+    {
+        g_iLvls[client] = 11;
+        CG_HUDFormatClientTag(client, "驾校学徒");
+    }
+    else if(g_eStatistical[client][Score] >= 12800)
+    {
+        g_iLvls[client] = 10;
+        CG_HUDFormatClientTag(client, "初来乍到");
+    }
+    else if(g_eStatistical[client][Score] >= 6400)
+    {
+        g_iLvls[client] = 9;
+        CG_HUDFormatClientTag(client, "初来乍到");
+    }
+    else if(g_eStatistical[client][Score] >= 3200)
+    {
+        g_iLvls[client] = 8;
+        CG_HUDFormatClientTag(client, "初来乍到");
+    }
+    else if(g_eStatistical[client][Score] >= 1600)
+    {
+        g_iLvls[client] = 7;
+        CG_HUDFormatClientTag(client, "初来乍到");
+    }
+    else if(g_eStatistical[client][Score] >= 800)
+    {
+        g_iLvls[client] = 6;
+        CG_HUDFormatClientTag(client, "初来乍到");
+    }
+    else if(g_eStatistical[client][Score] >= 400)
+    {
+        g_iLvls[client] = 5;
+        CG_HUDFormatClientTag(client, "娱乐萌新");
+    }
+    else if(g_eStatistical[client][Score] >= 200)
+    {
+        g_iLvls[client] = 4;
+        CG_HUDFormatClientTag(client, "娱乐萌新");
+    }
+    else if(g_eStatistical[client][Score] >= 100)
+    {
+        g_iLvls[client] = 3;
+        CG_HUDFormatClientTag(client, "娱乐萌新");
+    }
+    else if(g_eStatistical[client][Score] >= 50)
+    {
+        g_iLvls[client] = 2;
+        CG_HUDFormatClientTag(client, "娱乐萌新");
+    }
+    else if(g_eStatistical[client][Score] >= 25)
     {
         g_iLvls[client] = 1;
         CG_HUDFormatClientTag(client, "娱乐萌新");

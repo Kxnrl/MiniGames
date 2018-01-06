@@ -27,6 +27,17 @@ public void CG_OnClientDeath(int client, int attacker, int assister, bool headsh
     //Mutators_OnClientDeath(client);
 }
 
+public void CG_OnClientHurted(int client, int attacker, int damage, int health, int hitgroup, const char[] weapon)
+{
+    if(!IsValidClient(attacker))
+        return;
+
+    char log[256];
+    FormatEx(log, 256, "%N damaged to %N with %s [dmg %d] [hit %s]", attacker, client, weapon, damage, g_szHitGroup[hitgroup]);
+    PrintToConsole(client, log);
+    PrintToConsole(attacker, log);
+}
+
 public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
 {
     SetEventBroadcast(event, true);

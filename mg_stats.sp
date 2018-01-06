@@ -23,6 +23,7 @@ float g_fHSP[MAXPLAYERS+1];
 bool g_bRealBHop;
 
 char g_szBlockCmd[27][16] = {"kill", "explode", "coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", "needbackup", "sectorclear", "inposition", "reportingin","getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment"};
+char g_szHitGroup[8][16] = {"Body", "Head", "Chest", "Stomach", "LeftHand", "RightHand", "LeftLeg", "RightLeg"};
 
 Handle g_hDatabase;
 Handle g_tWarmup;
@@ -40,7 +41,7 @@ public Plugin myinfo =
     name        = "MG Server Core",
     author      = "Kyle",
     description = "Ex",
-    version     = "3.7 - 2017/12/31",
+    version     = "4.0 - 2018/1/1",
     url         = "http://steamcommunity.com/id/_xQy_/"
 };
 
