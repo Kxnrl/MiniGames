@@ -1,50 +1,42 @@
-Handle CAVR_CT_MELEE
-Handle CVAR_CT_PRIMARY;
-Handle CVAR_CT_SECONDARY;
-Handle CAVR_TE_MELEE
-Handle CVAR_TE_PRIMARY;
-Handle CVAR_TE_SECONDARY;
-Handle CVAR_BHOPSPEED;
-Handle CVAR_BUNNYHOP;
-Handle CVAR_AUTOJUMP;
-Handle CVAR_BHOPTYPE;
-Handle CVAR_AUTOBHOP;
-
 void ConVar_OnPluginStart()
 {
-    CAVR_CT_MELEE = FindConVar("mp_ct_default_melee");
-    CVAR_CT_PRIMARY = FindConVar("mp_ct_default_primary");
-    CVAR_CT_SECONDARY = FindConVar("mp_ct_default_secondary");
-    CAVR_TE_MELEE = FindConVar("mp_t_default_melee");
-    CVAR_TE_PRIMARY = FindConVar("mp_t_default_melee");
-    CVAR_TE_SECONDARY = FindConVar("mp_t_default_secondary");
-    CVAR_AUTOJUMP = FindConVar("sv_autobunnyhopping");
-    CVAR_BUNNYHOP = FindConVar("sv_enablebunnyhopping");
-    CVAR_BHOPSPEED = CreateConVar("mg_bhopspeed", "250.0", "bhop speed limit", _, true, 200.0, true, 3500.0);
-    CVAR_BHOPTYPE = CreateConVar("mg_bhop_limit_advanced", "1", "bhop speed limit type", _, true, 0.0, true, 1.0);
-    CVAR_AUTOBHOP = CreateConVar("mg_autobhop", "1", "enable auto jump", _, true, 0.0, true, 1.0);
+    mg_restrictawp = CreateConVar("mg_restrictawp", "0", "", _, true, 0.0, true, 1.0);
+    mg_slaygaygun = CreateConVar("mg_slaygaygun", "1", "", _, true, 0.0, true, 1.0);
+    mg_spawn_knife = CreateConVar("mg_spawn_knife", "0", "", _, true, 0.0, true, 1.0);
+    mg_spawn_pistol = CreateConVar("mg_spawn_pistol", "0", "", _, true, 0.0, true, 1.0);
+    mg_spawn_kevlar = CreateConVar("mg_spawn_kevlar", "0", "", _, true, 0.0, true, 100.0);
+    mg_spawn_helmet = CreateConVar("mg_spawn_helmet", "0", "", _, true, 0.0, true, 1.0);
 
-    CreateConVar("mg_randomteam", "1", "scrable team", _, true, 0.0, true, 1.0);
-    CreateConVar("mg_autoburn", "1", "burn all client", _, true, 0.0, true, 1.0);
-    CreateConVar("mg_burndelay", "120.0", "burn delay after round start", _, true, 60.0, true, 600.0);
+    mp_ct_default_melee = FindConVar("mp_ct_default_melee");
+    mp_ct_default_primary = FindConVar("mp_ct_default_primary");
+    mp_ct_default_secondary = FindConVar("mp_ct_default_secondary");
+    mp_t_default_melee = FindConVar("mp_t_default_melee");
+    mp_t_default_primary = FindConVar("mp_t_default_primary");
+    mp_t_default_secondary = FindConVar("mp_t_default_secondary");
+    sv_autobunnyhopping = FindConVar("sv_autobunnyhopping");
+    sv_enablebunnyhopping = FindConVar("sv_enablebunnyhopping");
+    mg_bhopspeed = CreateConVar("mg_bhopspeed", "250.0", "bhop speed limit", _, true, 200.0, true, 3500.0);
 
-    HookConVarChange(CAVR_CT_MELEE, OnSettingChanged);
-    HookConVarChange(CVAR_CT_PRIMARY, OnSettingChanged);
-    HookConVarChange(CVAR_CT_SECONDARY, OnSettingChanged);
-    HookConVarChange(CAVR_TE_MELEE, OnSettingChanged);
-    HookConVarChange(CVAR_TE_PRIMARY, OnSettingChanged);
-    HookConVarChange(CVAR_TE_SECONDARY, OnSettingChanged);
-    HookConVarChange(CVAR_BHOPSPEED, OnSettingChanged);
-    HookConVarChange(CVAR_AUTOJUMP, OnSettingChanged);
-    HookConVarChange(CVAR_BUNNYHOP, OnSettingChanged);
+    mg_randomteam = CreateConVar("mg_randomteam", "1", "scrable team", _, true, 0.0, true, 1.0);
+    mg_wallhack_delay = CreateConVar("mg_wallhack_delay", "150.0", "how many seconds wallhack all after round start", _, true, 60.0, true, 600.0);
+
+    HookConVarChange(mp_ct_default_melee, OnSettingChanged);
+    HookConVarChange(mp_ct_default_primary, OnSettingChanged);
+    HookConVarChange(mp_ct_default_secondary, OnSettingChanged);
+    HookConVarChange(mp_t_default_melee, OnSettingChanged);
+    HookConVarChange(mp_t_default_primary, OnSettingChanged);
+    HookConVarChange(mp_t_default_secondary, OnSettingChanged);
+    HookConVarChange(mg_bhopspeed, OnSettingChanged);
+    HookConVarChange(sv_autobunnyhopping, OnSettingChanged);
+    HookConVarChange(sv_enablebunnyhopping, OnSettingChanged);
     
-    AutoExecConfig(true, "mg_core");
+    AutoExecConfig(true, "minigames");
 }
 
 void ConVar_OnMapStart()
 {
     LockConVar();
-    SetConVarString(FindConVar("sv_tags"), "CG,MG,MiniGames,MultiGames,Store,Talent", false, false);
+    SetConVarString(FindConVar("sv_tags"), "MG,MiniGames,MultiGames,Shop,Talent", false, false);
 }
 
 public void OnConfigsExecuted()
@@ -52,32 +44,30 @@ public void OnConfigsExecuted()
     LockConVar();
 }
 
-public void OnSettingChanged(Handle convar, const char[] oldValue, const char[] newValue)
+public void OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
     LockConVar();
 }
 
 void LockConVar()
 {
-    SetConVarInt(FindConVar("sv_damage_print_enable"), 0);
-    SetConVarInt(FindConVar("sv_staminamax"), 0);
-    SetConVarInt(FindConVar("sv_staminajumpcost"), 0);
-    SetConVarInt(FindConVar("sv_staminalandcost"), 0);
-    SetConVarInt(FindConVar("sv_staminarecoveryrate"), 0);
-    SetConVarInt(FindConVar("sv_airaccelerate"), 9999);
-    SetConVarInt(FindConVar("sv_accelerate_use_weapon_speed"), 0);
-    SetConVarInt(FindConVar("sv_maxvelocity"), 3500);
-    SetConVarInt(FindConVar("sv_full_alltalk"), 1);
-    SetConVarInt(FindConVar("mp_limitteams"), 2);
-    SetConVarInt(FindConVar("mp_autoteambalance"), 1);
-    SetConVarString(CAVR_CT_MELEE, "", true, false);
-    SetConVarString(CVAR_CT_PRIMARY, "", true, false);
-    SetConVarString(CVAR_CT_SECONDARY, "", true, false);
-    SetConVarString(CAVR_TE_MELEE, "", true, false);
-    SetConVarString(CVAR_TE_PRIMARY, "", true, false);
-    SetConVarString(CVAR_TE_SECONDARY, "", true, false);
-    SetConVarInt(CVAR_AUTOJUMP, GetConVarInt(CVAR_AUTOBHOP));
-    g_fBhopSpeed = GetConVarFloat(CVAR_BHOPSPEED);
-    g_bRealBHop = GetConVarBool(CVAR_BHOPTYPE);
-    SetConVarInt(CVAR_BUNNYHOP, g_bRealBHop ? 1 : 0);
+    FindConVar("phys_pushscale").SetInt(5);
+    FindConVar("phys_timescale").SetInt(1);
+    FindConVar("sv_damage_print_enable").SetInt(0);
+    FindConVar("sv_staminamax").SetInt(0);
+    FindConVar("sv_staminajumpcost").SetInt(0);
+    FindConVar("sv_staminalandcost").SetInt(0);
+    FindConVar("sv_staminarecoveryrate").SetInt(0);
+    FindConVar("sv_airaccelerate").SetInt(9999);
+    FindConVar("sv_accelerate_use_weapon_speed").SetInt(0);
+    FindConVar("sv_maxvelocity").SetInt(3500);
+    FindConVar("sv_full_alltalk").SetInt(1);
+    FindConVar("mp_limitteams").SetInt(2);
+    FindConVar("mp_autoteambalance").SetInt(1);
+    mp_ct_default_melee.SetString("", true, false);
+    mp_ct_default_primary.SetString("", true, false);
+    mp_ct_default_secondary.SetString("", true, false);
+    mp_t_default_melee.SetString("", true, false);
+    mp_t_default_primary.SetString("", true, false);
+    mp_t_default_secondary.SetString("", true, false);
 }

@@ -1,32 +1,18 @@
 #include <cstrike>
 #include <clientprefs>
 #include <maoling>
-#include <store>
 #include <emitsoundany>
-#include <cg_core>
 #include <sdkhooks>
-//#include <huodong>
+
+#include <MagicGirl.NET>
+#include <MagicGirl/user>
+#include <MagicGirl/shop>
+#include "stats/global.h"
 
 #pragma newdecls required
 
-#define PREFIX "[\x0CCG\x01]  "
-#define PREFIX_STORE "\x01 \x04[Store]  "
-
-int cs_player_manager = -1;
-int g_iLvls[MAXPLAYERS+1];
-int g_iRank[MAXPLAYERS+1];
-int g_iAuth[MAXPLAYERS+1];
-char g_szSignature[MAXPLAYERS+1][256];
-float g_fKDA[MAXPLAYERS+1];
-float g_fHSP[MAXPLAYERS+1];
-
-bool g_bRealBHop;
-
-char g_szBlockCmd[27][16] = {"kill", "explode", "coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", "needbackup", "sectorclear", "inposition", "reportingin","getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment"};
-char g_szHitGroup[8][16] = {"Body", "Head", "Chest", "Stomach", "LeftHand", "RightHand", "LeftLeg", "RightLeg"};
-
-Handle g_hDatabase;
-Handle g_tWarmup;
+#define PREFIX "[\x04MG\x01]  "
+#define PREFIX_STORE "[\x04Shop\x01]  "
 
 #include "stats/bets.sp"
 #include "stats/button.sp"
@@ -34,22 +20,20 @@ Handle g_tWarmup;
 #include "stats/cvars.sp"
 #include "stats/event.sp"
 #include "stats/stats.sp"
-//#include "stats/mutas.sp"
 
 public Plugin myinfo = 
 {
-    name        = "MG Server Core",
+    name        = "MiniGames",
     author      = "Kyle",
     description = "Ex",
-    version     = "4.0 - 2018/1/1",
-    url         = "http://steamcommunity.com/id/_xQy_/"
+    version     = "4.0 - 2018/02/05",
+    url         = "https://steamcommunity.com/id/Kxnrl/"
 };
 
 public void OnPluginStart()
 {
     Button_OnPluginStart();
     ConVar_OnPluginStart();
-    //Mutators_OnPluginStart();
     Bets_OnPluginStart();
 
     RegConsoleCmd("sm_rank", Command_Rank);
@@ -60,10 +44,19 @@ public void OnPluginStart()
 
     for(int x; x < 27; ++x)
         AddCommandListener(Command_BlockCmd, g_szBlockCmd[x]);
+    
+    HookEventEx("round_start", Event_RoundStart, EventHookMode_Post);
+    HookEventEx("round_end", Event_RoundEnd, EventHookMode_Post);
+    
+    HookEventEx("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
+    HookEventEx("player_death", Event_PlayerDeath, EventHookMode_Post);
+    HookEventEx("player_hurt",  Event_PlayerHurts, EventHookMode_Post);
 
-    HookEvent("player_disconnect", Event_PlayerDisconnect, EventHookMode_Pre);
-    HookEvent("cs_win_panel_match", Event_WinPanel, EventHookMode_Post);
-    HookEvent("announce_phase_end", Event_AnnouncePhaseEnd, EventHookMode_Post);
+    HookEventEx("player_team", Event_dontBroadcast, EventHookMode_Pre);
+    HookEventEx("player_disconnect", Event_dontBroadcast, EventHookMode_Pre);
+    
+    HookEventEx("cs_win_panel_match", Event_WinPanel, EventHookMode_Post);
+    HookEventEx("announce_phase_end", Event_AnnouncePhaseEnd, EventHookMode_Post);
 }
 
 public void OnPluginEnd()
@@ -75,21 +68,17 @@ public void OnPluginEnd()
 
 public void OnMapStart()
 {
-    g_hDatabase = CG_DatabaseGetGames();
+    g_hDatabase = MG_MySQL_GetDatabase();
     if(g_hDatabase == INVALID_HANDLE)
         CreateTimer(1.0, Timer_ReConnect);
     
     cs_player_manager = FindEntityByClassname(MaxClients+1, "cs_player_manager");
     if(cs_player_manager != -1)
-    {
-        GameRules_SetProp("m_bIsValveDS", 1, 0, 0, true);
         SDKHookEx(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
-    }
 
     BuildRankCache();
 
     PrecacheSoundAny("maoling/mg/beacon.mp3");
-    PrepareIconMaterials("maoling/sprites/ze/dalao");
     AddFileToDownloadsTable("sound/maoling/mg/beacon.mp3");
 
     g_iRing = PrecacheModel("materials/sprites/bomb_planted_ring.vmt");
@@ -97,22 +86,22 @@ public void OnMapStart()
 
     Button_OnMapStart();
     ConVar_OnMapStart();
-    //Mutators_OnMapStart();
 
     ClearTimer(g_tWarmup);
     g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime")), Timer_Warmup);
+    CreateTimer(1.0, Timer_CheckWeapon, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public void CG_OnServerLoaded()
+public void MG_MySQL_OnConnected(Database db)
 {
-    g_hDatabase = CG_DatabaseGetGames();
-    if(g_hDatabase == INVALID_HANDLE)
-        CreateTimer(1.0, Timer_ReConnect);
+    g_hDatabase = db;
 }
 
 public void OnMapEnd()
 {
-    ClearTimer(g_tBurn);
+    ClearTimer(g_tWallHack);
+    
+    g_smPunishList.Clear();
     
     if(cs_player_manager != -1)
     {
@@ -130,17 +119,18 @@ public void OnClientConnected(int client)
     g_iBetTeam[client] = 0;
     g_iRoundKill[client] = 0;
     g_iRank[client] = 0;
-    g_iAuth[client] = 0;
-    //g_bCamp[client] = false;
-    //g_bSlap[client] = false;
     g_iBetPot[client] = 0;
     g_iBetTeam[client] = 0;
 }
 
-public void CG_OnClientLoaded(int client)
+public void OnClientPutInServer(int client)
 {
-    g_iAuth[client] = CG_ClientGetGId(client);
+    SDKHook(client, SDKHook_WeaponEquipPost, OnWeaponEquip);
+    IntToString(GetSteamAccountID(client), g_szAccount[client], 32);
+}
 
+public void OnClientDataChecked(int client)
+{
     g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
 
     if(g_hDatabase != INVALID_HANDLE)
@@ -149,16 +139,69 @@ public void CG_OnClientLoaded(int client)
 
 public void OnClientDisconnect(int client)
 {
+    if(!IsClientInGame(client))
+        return;
+
     if(g_hDatabase != INVALID_HANDLE)
         SavePlayer(client);
 
     g_iLvls[client] = 0;
     g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
+    SDKUnhook(client, SDKHook_WeaponEquipPost, OnWeaponEquip);
+    
+    if(g_bPunished[client])
+    {
+        int count = 0;
+        g_smPunishList.GetValue(g_szAccount[client], count);
+        g_smPunishList.SetValue(g_szAccount[client], ++count, true);
+        g_bPunished[client] = false;
+    }
+}
+
+public Action CS_OnBuyCommand(int client, const char[] weapon)
+{
+    if(strcmp(weapon, "scar20") == 0 || strcmp(weapon, "g3sg1") == 0)
+    {
+        RequestFrame(Frame_SlayGaygun, client);
+        return Plugin_Handled;
+    }
+
+    return Plugin_Continue;
+}
+
+void Frame_SlayGaygun(int client)
+{
+    if(IsValidClient(client))
+    {
+        ForcePlayerSuicide(client);
+        PrintToChatAll("[\x04MG\x01]  \x0B%N\x01使用\x09连狙\x01时遭遇天谴", client);
+    }
+}
+
+public void OnWeaponEquip(int client, int weapon)
+{
+    if(!IsValidEdict(weapon))
+        return;
+
+    char classname[32];
+    GetEdictClassname(weapon, classname, 32);
+
+    if(mg_restrictawp.BoolValue && StrEqual(classname, "weapon_awp"))
+    {
+        PrintToChat(client, "[\x04MG\x01]  \x07当前地图限制Awp的使用");
+        AcceptEntityInput(weapon, "Kill");
+    }
+
+    if(mg_slaygaygun.BoolValue && (StrEqual(classname, "weapon_scar20") || StrEqual(classname, "weapon_g3sg1")))
+    {
+        AcceptEntityInput(weapon, "Kill");
+        RequestFrame(Frame_SlayGaygun, client);
+    }
 }
 
 public Action Timer_ReConnect(Handle timer)
 {
-    g_hDatabase = CG_DatabaseGetGames();
+    g_hDatabase = MG_MySQL_GetDatabase();
     if(g_hDatabase == INVALID_HANDLE)
         CreateTimer(1.0, Timer_ReConnect);
 
@@ -249,19 +292,29 @@ void UTIL_Scoreboard(int client, int buttons)
         EndMessage();
 }
 
-void PrepareIconMaterials(const char[] icon)
+public Action Timer_CheckWeapon(Handle timer)
 {
-    char path[256];
-    
-    Format(path, 256, "%s.vmt", icon);
-    PrecacheModel(path, true);
-    
-    Format(path, 256, "materials/%s.vmt", icon);
-    AddFileToDownloadsTable(path);
+    if(GameRules_GetProp("m_bWarmupPeriod") != 1)
+        return Plugin_Stop;
 
-    Format(path, 256, "%s.vtf", icon);
-    PrecacheModel(path, true);
+    for(int x = MaxClients+1; x <= 2048; ++x)
+    {
+        if(!IsValidEdict(x))
+            continue;
+        
+        char classname[32];
+        GetEdictClassname(x, classname, 32);
+        if(StrContains(classname, "weapon_") != 0)
+            continue;
+    
+        if(GetEntProp(x, Prop_Send, "m_hPrevOwner") <= 0)
+            continue;
 
-    Format(path, 256, "materials/%s.vtf", icon);
-    AddFileToDownloadsTable(path);
+        if(GetEntPropEnt(x, Prop_Send, "m_hOwnerEntity") > 0)
+            continue;
+
+        AcceptEntityInput(x, "Kill");
+    }
+
+    return Plugin_Continue;
 }

@@ -1,11 +1,3 @@
-#define HIDE_RADAR 1 << 12
-
-int g_iRefIcon[MAXPLAYERS+1] = {INVALID_ENT_REFERENCE, ...};
-int g_iRoundKill[MAXPLAYERS+1];
-bool g_bOnGround[MAXPLAYERS+1];
-
-Handle g_tBurn;
-float g_fBhopSpeed;
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
@@ -14,9 +6,7 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
     if(!IsPlayerAlive(client))
         return Plugin_Continue;
 
-    //Mutators_RunCmd(client, buttons, vel);
-    
-    if(!g_bRealBHop)
+    if(!sv_enablebunnyhopping.BoolValue)
         return Plugin_Continue;
 
     if(GetEntityFlags(client) & FL_ONGROUND)
@@ -40,10 +30,7 @@ void SpeedCap(int client)
             float CurVelVec[3];
             GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
             
-            float speedlimit = g_fBhopSpeed;
-
-            if(g_iAuth[client] == 9999)
-                speedlimit *= 1.15;
+            float speedlimit = mg_bhopspeed.FloatValue;
 
             IsOnGround[client] = true;    
             if(GetVectorLength(CurVelVec) > speedlimit)
@@ -58,41 +45,54 @@ void SpeedCap(int client)
         IsOnGround[client] = false;    
 }
 
-public Action Client_BurnAll(Handle timer)
-{
-    g_tBurn = INVALID_HANDLE;
-    for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client))
-            if(IsPlayerAlive(client))
-                if(g_iAuth[client] != 9999)
-                    IgniteEntity(client, 120.0);
-                
-    return Plugin_Stop;
-}
-
-void Client_SpawnPost(int client)
+public Action Client_SpawnPost(Handle timer, int client)
 {
     if(!IsValidClient(client))
-        return;
-    
+        return Plugin_Stop;
+
     SetEntProp(client, Prop_Send, "m_iHideHUD", HIDE_RADAR);
     SetEntProp(client, Prop_Send, "m_iAccount", 10000);
     SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 0.0);
     
-    Client_CreateGreenHat(client);
+    g_bPunished[client] = false;
+
+    if(!IsPlayerAlive(client))
+        return Plugin_Stop;
     
-    if(!IsPlayerAlive(client) || g_iAuth[client] == 9999)
-        return;
-    
-    if(Client_Bepunished(client) || Stats_AllowScourgeClient(client))
+    SetEntProp(client, Prop_Send, "m_bHasHeavyArmor", 0);
+    SetEntProp(client, Prop_Send, "m_ArmorValue", mg_spawn_kevlar.IntValue, 1);
+    SetEntProp(client, Prop_Send, "m_bHasHelmet", mg_spawn_helmet.IntValue);
+
+    if(mg_spawn_knife.BoolValue  && GetPlayerWeaponSlot(client, 2) == -1)
+        GivePlayerItem(client, "weapon_knife");
+
+    if(mg_spawn_pistol.BoolValue && GetPlayerWeaponSlot(client, 1) == -1)
     {
-        SetEntityHealth(client, 50);
-        SetEntProp(client, Prop_Data, "m_iMaxHealth", 50, 4, 0);
-        SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 99999.0);
-        tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,遭受天谴,强制被透视...", PREFIX, client);
+        if(GetClientTeam(client) == 2)
+            GivePlayerItem(client, "weapon_glock");
+
+        if(GetClientTeam(client) == 3)
+            GivePlayerItem(client, "weapon_hkp2000");
+    }
+
+    if(MG_Users_UserIdentity(client) == 1)
+        return Plugin_Stop;
+
+    int count = 0;
+    g_smPunishList.GetValue(g_szAccount[client], count);
+    if(Client_Bepunished(client) || Stats_AllowScourgeClient(client) || count > 0)
+    {
+        g_bPunished[client] = true;
+        SetEntityHealth(client, 30);
+        SetEntProp(client, Prop_Data, "m_iMaxHealth", 30, 4, 0);
+        tPrintToChatAll("%s  \x07%N\x04因为屠虐萌新,遭受天谴", PREFIX, client);
+        if(--count > 0)
+            g_smPunishList.SetValue(g_szAccount[client], count, true);
     }
 
     g_iRoundKill[client] = 0;
+    
+    return Plugin_Stop;
 }
 
 public Action Client_RandomTeam(Handle timer)
@@ -109,7 +109,7 @@ public Action Client_RandomTeam(Handle timer)
             if(teams[x] <= 1)
                 continue;
             PushArrayCell(array_players, x);
-            waifu[x] = CG_CouplesGetPartnerIndex(x);
+            waifu[x] = -2; //CG_CouplesGetPartnerIndex(x);
         }
 
     char buffer[128];
@@ -140,8 +140,6 @@ public Action Client_RandomTeam(Handle timer)
 
             if(teams[target] != team)
                 PrintCenterText(target, buffer);
-            else
-                Store_ResetPlayerArms(target);
         }
         else
         {
@@ -160,13 +158,11 @@ public Action Client_RandomTeam(Handle timer)
 
         if(teams[client] != team)
             PrintCenterText(client, buffer);
-        else
-            Store_ResetPlayerArms(client);
-        
-        if(target < -1)
-            PrintToChat(client, "[\x0ECP\x01]   你没有老婆,不能享受CP的随机组队优选");
-        else if(target == -1)
-            PrintToChat(client, "[\x0ECP\x01]   你老婆离线,不能享受CP的随机组队优选");
+
+        //if(target < -1)
+        //    PrintToChat(client, "[\x0ECP\x01]   你没有老婆,不能享受CP的随机组队优选");
+        //else if(target == -1)
+        //    PrintToChat(client, "[\x0ECP\x01]   你老婆离线,不能享受CP的随机组队优选");
     }
 
     CloseHandle(array_players);
@@ -187,88 +183,34 @@ int RandomArray(ArrayList array)
 bool Client_Bepunished(int client)
 {
     int req = GetTeamClientCount(GetClientTeam(client))/2;
-    if(req < 4) req = 4;
+    if(req < 5) req = 5;
     return (g_iRoundKill[client] >= req);
 }
 
 void Client_OnRoundStart()
 {
-    if(GetConVarBool(FindConVar("mg_autoburn")))
-    {
-        ClearTimer(g_tBurn);
-        g_tBurn = CreateTimer(GetConVarFloat(FindConVar("mg_burndelay")), Client_BurnAll);
-    }
+    if(g_smPunishList == null)
+        g_smPunishList = new StringMap();
+
+    ClearTimer(g_tWallHack);
+    g_tWallHack = CreateTimer(mg_wallhack_delay.FloatValue, Timer_Wallhack);
+}
+
+public Action Timer_Wallhack(Handle timer)
+{
+    g_tWallHack = INVALID_HANDLE;
+    for(int client = 1; client <= MaxClients; ++client)
+        if(IsClientInGame(client) && IsPlayerAlive(client) && MG_Users_UserIdentity(client) != 1)
+            SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 9999999.0);
+    return Plugin_Stop;
 }
 
 void Client_OnRoundEnd()
 {
-    if(g_tBurn == INVALID_HANDLE)
-    {
-        for(int client = 1; client <= MaxClients; ++client)
-            if(IsClientInGame(client))
-                if(IsPlayerAlive(client))
-                    if(g_iAuth[client] != 9999)
-                        ExtinguishEntity(client);
-    }
-    else
-    {
-        KillTimer(g_tBurn);
-        g_tBurn = INVALID_HANDLE;
-    }
-    
-    for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client))
-            if(IsPlayerAlive(client))
-                Client_ClearGreenHat(client);
+    if(g_tWallHack != INVALID_HANDLE)
+        KillTimer(g_tWallHack);
+    g_tWallHack = INVALID_HANDLE;
 
-    if(GetConVarBool(FindConVar("mg_randomteam")))
+    if(mg_randomteam.BoolValue)
         CreateTimer(2.0, Client_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
-}
-
-void Client_CreateGreenHat(int client)
-{
-    float fOrigin[3];
-    GetClientAbsOrigin(client, fOrigin);                
-    fOrigin[2] = fOrigin[2] + 88.5;
-
-    int iEnt = CreateEntityByName("env_sprite");
-
-    DispatchKeyValue(iEnt, "model", "materials/maoling/sprites/ze/dalao.vmt");
-    DispatchKeyValue(iEnt, "classname", "env_sprite");
-    DispatchKeyValue(iEnt, "spawnflags", "1");
-    DispatchKeyValue(iEnt, "scale", "0.01");
-    DispatchKeyValue(iEnt, "rendermode", "1");
-    DispatchKeyValue(iEnt, "rendercolor", "255 255 255");
-    DispatchSpawn(iEnt);
-    TeleportEntity(iEnt, fOrigin, NULL_VECTOR, NULL_VECTOR);
-    
-    SetVariantString("!activator");
-    AcceptEntityInput(iEnt, "SetParent", client, iEnt);
-
-    g_iRefIcon[client] = EntIndexToEntRef(iEnt);
-    
-    SDKHookEx(iEnt, SDKHook_SetTransmit, Hook_SetTransmit);
-}
-
-void Client_ClearGreenHat(int client)
-{
-    if(g_iRefIcon[client] != INVALID_ENT_REFERENCE)
-    {
-        int iEnt = EntRefToEntIndex(g_iRefIcon[client]);
-        if(IsValidEdict(iEnt))
-        {
-            SDKUnhook(iEnt, SDKHook_SetTransmit, Hook_SetTransmit);
-            AcceptEntityInput(iEnt, "Kill");
-        }
-    }
-
-    g_iRefIcon[client] = INVALID_ENT_REFERENCE;
-}
-
-public Action Hook_SetTransmit(int ent, int client)
-{
-    if(g_iAuth[client] == 9999 || !IsPlayerAlive(client))
-        return Plugin_Continue;
-
-    return Plugin_Handled;
 }

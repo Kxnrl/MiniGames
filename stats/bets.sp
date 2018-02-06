@@ -1,19 +1,3 @@
-// Beacon model
-int g_iRing;
-int g_iHalo;
-
-int g_iBettingTotalCT;
-int g_iBettingTotalTE;
-
-bool g_bBetting;
-bool g_bTimeout;
-bool g_bRoundEnding;
-
-int g_iBetPot[MAXPLAYERS+1];
-int g_iBetTeam[MAXPLAYERS+1];
-
-Handle g_hBetMenu;
-Handle g_hGetMenu;
 
 void Bets_OnPluginStart()
 {
@@ -31,12 +15,12 @@ void Bets_OnPluginStart()
     SetMenuTitleEx(g_hGetMenu, "[MG]   菠菜\n 现在请你选择下注金额 \n ");
     SetMenuExitBackButton(g_hGetMenu, true)
     SetMenuExitButton(g_hGetMenu, true);
-    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "200", "200 信用点");
-    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "300", "300 信用点");
-    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "500", "500 信用点");
-    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "1000", "1000 信用点");
-    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "5000", "5000 信用点");
-    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "10000", "10000 信用点");
+    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "200", "200 G");
+    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "300", "300 G");
+    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "500", "500 G");
+    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "1000", "1000 G");
+    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "5000", "5000 G");
+    AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "10000", "10000 G");
 }
 
 public int MenuHandler_BetSelectTeam(Handle menu, MenuAction action, int client, int itemNum) 
@@ -103,7 +87,7 @@ public int MenuHandler_BetSelectPot(Handle menu, MenuAction action, int client, 
         
         int icredits = StringToInt(info);
         
-        if(Store_GetClientCredits(client) > icredits)
+        if(MG_Shop_GetClientMoney(client) > icredits)
             g_iBetPot[client] = icredits
         else
         {
@@ -111,18 +95,18 @@ public int MenuHandler_BetSelectPot(Handle menu, MenuAction action, int client, 
             return;
         }
 
-        Store_SetClientCredits(client, Store_GetClientCredits(client)-g_iBetPot[client], "MG-Bet下注");
+        MG_Shop_ClientCostMoney(client, g_iBetPot[client], "MG-Bet下注");
         
         if(g_iBetTeam[client] == 2)
         {
             g_iBettingTotalTE += g_iBetPot[client];
-            PrintToDeath("%s  \x10%N\x01已下注\x07恐怖分子\x01[\x04%d\x01信用点]|[奖金池:\x10%d信用点]", PREFIX, client, g_iBetPot[client], g_iBettingTotalTE);
+            PrintToDeath("%s  \x10%N\x01已下注\x07恐怖分子\x01[\x04%d\x01G]|[奖金池:\x10%dG]", PREFIX, client, g_iBetPot[client], g_iBettingTotalTE);
         }
 
         if(g_iBetTeam[client] == 3)
         {
             g_iBettingTotalCT += g_iBetPot[client];
-            PrintToDeath("%s  \x10%N\x01已下注\x0B反恐精英\x01[\x04%d\x01信用点]|[奖金池:\x10%d信用点]", PREFIX, client, g_iBetPot[client], g_iBettingTotalCT);
+            PrintToDeath("%s  \x10%N\x01已下注\x0B反恐精英\x01[\x04%d\x01G]|[奖金池:\x10%dG]", PREFIX, client, g_iBetPot[client], g_iBettingTotalCT);
         }
     }
     else if(action == MenuAction_Cancel)
@@ -192,9 +176,9 @@ void ShowBettingMenu(int client)
         return;
     }
 
-    if(Store_GetClientCredits(client) <= 2000)
+    if(MG_Shop_GetClientMoney(client) <= 2000)
     {
-        PrintToChat(client, "%s  你的信用点不足2000", PREFIX);
+        PrintToChat(client, "%s  你的G不足2000", PREFIX);
         return;
     }
     
@@ -222,7 +206,7 @@ void SettlementBetting(int winner)
         for(int i = 1; i <= MaxClients; ++i)
         {
             if(IsClientInGame(i) && g_iBetPot[i])
-                Store_SetClientCredits(i, Store_GetClientCredits(i)+g_iBetPot[i], "MG-菠菜-结算退还");
+                MG_Shop_ClientEarnMoney(i, g_iBetPot[i], "MG-菠菜-结算退还");
             g_iBetPot[i] = 0;
             g_iBetTeam[i] = 0;
         }
@@ -232,7 +216,7 @@ void SettlementBetting(int winner)
         g_iBettingTotalCT = 0;
         g_iBettingTotalTE = 0;
     
-        PrintToChatAll("%s  \x10本局菠菜无效,信用点已返还", PREFIX);
+        PrintToChatAll("%s  \x10本局菠菜无效,G已返还", PREFIX);
 
         return;
     }
@@ -260,8 +244,8 @@ void SettlementBetting(int winner)
             {
                 m_fMultiplier = float(g_iBetPot[i])/float(vol);
                 icredits = g_iBetPot[i]+RoundToFloor(totalcredits*m_fMultiplier);
-                Store_SetClientCredits(i, Store_GetClientCredits(i)+icredits, "MG-菠菜-结算");
-                PrintToChat(i, "%s \x10你菠菜赢得了\x04 %d 信用点", PREFIX_STORE, icredits);
+                MG_Shop_ClientEarnMoney(i, icredits, "MG-菠菜-结算");
+                PrintToChat(i, "%s \x10你菠菜赢得了\x04 %d G", PREFIX_STORE, icredits);
                 
                 if(icredits > maxcredits)
                 {
@@ -270,7 +254,7 @@ void SettlementBetting(int winner)
                 }
             }
             else
-                PrintToChat(i, "%s \x10你菠菜输了\x04 %d 信用点", PREFIX_STORE, g_iBetPot[i]);
+                PrintToChat(i, "%s \x10你菠菜输了\x04 %d G", PREFIX_STORE, g_iBetPot[i]);
 
             g_iBetPot[i] = 0;
             g_iBetTeam[i] = 0;
@@ -278,7 +262,7 @@ void SettlementBetting(int winner)
     }
 
     if(IsValidClient(maxclient) && maxcredits > 0)
-        PrintToChatAll("%s  \x10本次菠菜\x04%N\x10吃了猫屎,赢得了\x04 %d 信用点", PREFIX, maxclient, maxcredits);
+        PrintToChatAll("%s  \x10本次菠菜\x04%N\x10吃了猫屎,赢得了\x04 %d G", PREFIX, maxclient, maxcredits);
     
     g_bBetting = false;
 
@@ -303,7 +287,7 @@ public Action Timer_Beacon(Handle timer)
         GetClientAbsOrigin(i, fPos);
         fPos[2] += 8;
 
-        if(g_iAuth[i] == 9999)
+        if(MG_Users_UserIdentity(i) == 1)
         {
             int[] Clients = new int[MaxClients];
             int index = 0;
@@ -353,24 +337,5 @@ void Bets_OnRoundEnd(int winner)
     if(g_bBetting)
     {
         SettlementBetting(winner);
-        
-        /*
-        int players = Bets_GetFinalWinner();
-        if(UTIL_GetRandomInt(1, 100) > 85)
-        {
-            CG_GiveClientPatch(players, view_as<Patch_Type>(UTIL_GetRandomInt(0, 4)));
-            PrintToChatAll("%s \x0C%N\x04残局1V1胜利获得了1片钥匙碎片", PF_HD, players);
-        }
-        else if(players != 0)
-            PrintToChat(players, "%s 嗨呀,你个非洲人,这次居然没掉落碎片", PF_HD);
-        */
     }
 }
-/*
-int Bets_GetFinalWinner()
-{
-    for(int i = 1; i <= MaxClients; ++i)
-        if(IsClientInGame(i) && IsPlayerAlive(i))
-            return i;
-    return 0;
-}*/

@@ -1,34 +1,38 @@
-public void CG_OnGlobalTimer()
+public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
 {
-    for(int client = 1; client <= MaxClients; ++client)
-    {
-        if(!IsClientInGame(client))
-            continue;
-        
-        //Client_SetClientTag(client);
-        //Mutators_OnGlobalTimer(client);
-    }
-}
-
-public void CG_OnClientSpawn(int client)
-{
+    int client = GetClientOfUserId(event.GetInt("userid"));
     Stats_OnClientSpawn(client);
-    RequestFrame(Client_SpawnPost, client);
+    CreateTimer(0.1, Client_SpawnPost, client)
 }
 
-public void CG_OnClientDeath(int client, int attacker, int assister, bool headshot, const char[] weapon)
+public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
     if(g_tWarmup != INVALID_HANDLE)
         return;
     
+    int client = GetClientOfUserId(event.GetInt("userid"));
+    int attacker = GetClientOfUserId(event.GetInt("attacker"));
+    int assister = GetClientOfUserId(event.GetInt("assister"));
+    bool headshot = event.GetBool("headshot");
+    char weapon[32];
+    event.GetString("weapon", weapon, 32, "");
+    
     Bets_CheckAllow();
-    Client_ClearGreenHat(client);
     Stats_OnClientDeath(client, attacker, assister, headshot, weapon);
-    //Mutators_OnClientDeath(client);
 }
 
-public void CG_OnClientHurted(int client, int attacker, int damage, int health, int hitgroup, const char[] weapon)
+public void Event_PlayerHurts(Event event, const char[] name, bool dontBroadcast)
 {
+    if(g_tWarmup != INVALID_HANDLE)
+        return;
+
+    int client = GetClientOfUserId(event.GetInt("userid"));
+    int attacker = GetClientOfUserId(event.GetInt("attacker"));
+    int damage = event.GetInt("dmg_health");
+    int hitgroup = event.GetInt("hitgroup");
+    char weapon[32];
+    event.GetString("weapon", weapon, 32, "");
+    
     if(!IsValidClient(attacker))
         return;
 
@@ -38,36 +42,36 @@ public void CG_OnClientHurted(int client, int attacker, int damage, int health, 
     PrintToConsole(attacker, log);
 }
 
-public Action Event_PlayerDisconnect(Handle event, const char[] name, bool dontBroadcast)
+public Action Event_dontBroadcast(Event event, const char[] name, bool dontBroadcast)
 {
     SetEventBroadcast(event, true);
     return Plugin_Changed;
 }
 
-public void CG_OnRoundStart()
+public void Event_RoundStart(Event event, const char[] name, bool dontBroadcast)
 {
     Button_OnRoundStart();
     Bets_OnRoundStart();
     Client_OnRoundStart();
-    //Mutators_OnRoundStart();
 }
 
-public void CG_OnRoundEnd(int winner)
+public void Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 {
+    int winner = event.GetInt("winner");
+    
     CreateTimer(10.0, Stats_OnRoundEnd, _, TIMER_FLAG_NO_MAPCHANGE);
     Bets_OnRoundEnd(winner);
     Client_OnRoundEnd();
-    //Mutators_OnRoundEnd();
 }
 
-public void Event_WinPanel(Handle event, const char[] name, bool dontBroadcast)
+public void Event_WinPanel(Event event, const char[] name, bool dontBroadcast)
 {
     for(int client = 1; client <= MaxClients; ++client)
         if(IsClientInGame(client))
             SavePlayer(client);
 }
 
-public void Event_AnnouncePhaseEnd(Handle event, const char[] name, bool dontBroadcast)
+public void Event_AnnouncePhaseEnd(Event event, const char[] name, bool dontBroadcast)
 {
     if(StartMessageAll("ServerRankRevealAll") != INVALID_HANDLE)
         EndMessage();

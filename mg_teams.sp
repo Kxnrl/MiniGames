@@ -67,7 +67,6 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
 	{
 		if(newteam <= TEAM_SPECTATE)
 		{
-			newteam = TEAM_SPECTATE;
 			ChangeClientTeam(client, TEAM_SPECTATE);
 			return Plugin_Handled;
 		}

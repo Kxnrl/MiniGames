@@ -1,4 +1,4 @@
-ArrayList g_aButtonArray;
+
 
 void Button_OnPluginStart()
 {
@@ -31,7 +31,7 @@ public void Button_OnButtonPressed(const char[] output, int caller, int client, 
 
     char name[32];
     GetEntPropString(caller, Prop_Data, "m_iName", name, 32)
-    PrintToChatAll("[\x0CCG\x01]   \x04%N\x01按下了[\x04按钮%04d\x01(\x10%s\x01)]", client, caller, name);
+    PrintToChatAll("[\x04MG\x01]   \x04%N\x01按下了[\x04按钮%04d\x01(\x10%s\x01)]", client, caller, name);
 }
 
 public Action Button_OnButtonUse(int button, int activator, int caller, UseType type, float value)

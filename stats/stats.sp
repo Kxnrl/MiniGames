@@ -1,26 +1,4 @@
-enum STAT_TYPES
-{
-    Kills,
-    Deaths,
-    Assists,
-    Headshots,
-    Taser,
-    Knife,
-    Survival,
-    Round,
-    Score,
-    Onlines
-}
 
-STAT_TYPES g_eStatistical[MAXPLAYERS+1][STAT_TYPES];
-STAT_TYPES g_eSession[MAXPLAYERS+1][STAT_TYPES];
-
-Handle g_RankArray;
-Handle g_hTopMenu;
-
-bool g_bTracking;
-
-bool g_bLoaded[MAXPLAYERS+1];
 
 void BuildRankCache()
 {
@@ -119,7 +97,7 @@ void LoadPlayer(int client)
     g_eStatistical[client][Onlines] = 0;
 
     char m_szQuery[512];
-    Format(m_szQuery, 128, "SELECT * FROM `rank_mg` WHERE pid='%d';", CG_ClientGetPId(client));
+    Format(m_szQuery, 128, "SELECT * FROM `rank_mg` WHERE pid='%d';", MG_Users_UserIdentity(client));
     SQL_TQuery(g_hDatabase, SQL_LoadCallback, m_szQuery, GetClientUserId(client));
 }
 
@@ -156,7 +134,7 @@ public void SQL_LoadCallback(Handle owner, Handle hndl, const char[] error, int 
     else
     {
         char m_szQuery[128];
-        Format(m_szQuery, 128, "INSERT INTO `rank_mg` (pid) VALUES ('%d')", CG_ClientGetPId(client));
+        Format(m_szQuery, 128, "INSERT INTO `rank_mg` (pid) VALUES ('%d')", MG_Users_UserIdentity(client));
         SQL_TQuery(g_hDatabase, SQL_InsertCallback , m_szQuery, GetClientUserId(client));
     }
 }
@@ -179,215 +157,93 @@ public void SQL_InsertCallback(Handle owner, Handle hndl, const char[] error, in
 
 void GetPlayerRank(int client)
 {
-    int rank = FindValueInArray(g_RankArray, CG_ClientGetPId(client));
+    int rank = FindValueInArray(g_RankArray, MG_Users_UserIdentity(client));
     if(rank > 0)
         g_iRank[client] = rank;
     else
         g_iRank[client] = GetArraySize(g_RankArray);
-    
-    //float tips = float(g_iRank[client])/float(GetArraySize(g_RankArray));
-    /*
-    if(tips < 0.001)
-    {
-        g_iLvls[client] = 18;
-        CG_HUDFormatClientTag(client, "秋名山车神");
-    }
-    else if(tips < 0.005)
-    {
-        g_iLvls[client] = 17;
-        CG_HUDFormatClientTag(client, "老司机Ⅲ");
-    }
-    else if(tips < 0.015)
-    {
-        g_iLvls[client] = 16;
-        CG_HUDFormatClientTag(client, "老司机Ⅱ");
-    }
-    else if(tips < 0.030)
-    {
-        g_iLvls[client] = 15;
-        CG_HUDFormatClientTag(client, "老司机Ⅰ");
-    }
-    else if(tips < 0.050)
-    {
-        g_iLvls[client] = 14;
-        CG_HUDFormatClientTag(client, "灵车司机");
-    }
-    else if(tips < 0.075)
-    {
-        g_iLvls[client] = 13;
-        CG_HUDFormatClientTag(client, "新手上路");
-    }
-    else if(tips < 0.105)
-    {
-        g_iLvls[client] = 12;
-        CG_HUDFormatClientTag(client, "初获驾照");
-    }
-    else if(tips < 0.140)
-    {
-        g_iLvls[client] = 11;
-        CG_HUDFormatClientTag(client, "驾校学徒");
-    }
-    else if(tips < 0.180)
-    {
-        g_iLvls[client] = 10;
-        CG_HUDFormatClientTag(client, "初来乍到");
-    }
-    else if(tips < 0.225)
-    {
-        g_iLvls[client] = 9;
-        CG_HUDFormatClientTag(client, "初来乍到");
-    }
-    else if(tips < 0.275)
-    {
-        g_iLvls[client] = 8;
-        CG_HUDFormatClientTag(client, "初来乍到");
-    }
-    else if(tips < 0.335)
-    {
-        g_iLvls[client] = 7;
-        CG_HUDFormatClientTag(client, "初来乍到");
-    }
-    else if(tips < 0.395)
-    {
-        g_iLvls[client] = 6;
-        CG_HUDFormatClientTag(client, "初来乍到");
-    }
-    else if(tips < 0.495)
-    {
-        g_iLvls[client] = 5;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
-    }
-    else if(tips < 0.605)
-    {
-        g_iLvls[client] = 4;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
-    }
-    else if(tips < 0.725)
-    {
-        g_iLvls[client] = 3;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
-    }
-    else if(tips < 0.855)
-    {
-        g_iLvls[client] = 2;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
-    }
-    else if(tips < 0.995)
-    {
-        g_iLvls[client] = 1;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
-    }
-    else
-    {
-        g_iLvls[client] = 0;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
-    }
-    */
+
     if(g_eStatistical[client][Score] >= 204800)
     {
         g_iLvls[client] = 18;
-        CG_HUDFormatClientTag(client, "秋名山车神");
     }
     else if(g_eStatistical[client][Score] >= 153600)
     {
         g_iLvls[client] = 17;
-        CG_HUDFormatClientTag(client, "老司机Ⅲ");
     }
     else if(g_eStatistical[client][Score] >= 120000)
     {
         g_iLvls[client] = 16;
-        CG_HUDFormatClientTag(client, "老司机Ⅱ");
     }
     else if(g_eStatistical[client][Score] >= 86400)
     {
         g_iLvls[client] = 15;
-        CG_HUDFormatClientTag(client, "老司机Ⅰ");
     }
     else if(g_eStatistical[client][Score] >= 64800)
     {
         g_iLvls[client] = 14;
-        CG_HUDFormatClientTag(client, "灵车司机");
     }
     else if(g_eStatistical[client][Score] >= 51200)
     {
         g_iLvls[client] = 13;
-        CG_HUDFormatClientTag(client, "新手上路");
     }
     else if(g_eStatistical[client][Score] >= 38400)
     {
         g_iLvls[client] = 12;
-        CG_HUDFormatClientTag(client, "初获驾照");
     }
     else if(g_eStatistical[client][Score] >= 25600)
     {
         g_iLvls[client] = 11;
-        CG_HUDFormatClientTag(client, "驾校学徒");
     }
     else if(g_eStatistical[client][Score] >= 12800)
     {
         g_iLvls[client] = 10;
-        CG_HUDFormatClientTag(client, "初来乍到");
     }
     else if(g_eStatistical[client][Score] >= 6400)
     {
         g_iLvls[client] = 9;
-        CG_HUDFormatClientTag(client, "初来乍到");
     }
     else if(g_eStatistical[client][Score] >= 3200)
     {
         g_iLvls[client] = 8;
-        CG_HUDFormatClientTag(client, "初来乍到");
     }
     else if(g_eStatistical[client][Score] >= 1600)
     {
         g_iLvls[client] = 7;
-        CG_HUDFormatClientTag(client, "初来乍到");
     }
     else if(g_eStatistical[client][Score] >= 800)
     {
         g_iLvls[client] = 6;
-        CG_HUDFormatClientTag(client, "初来乍到");
     }
     else if(g_eStatistical[client][Score] >= 400)
     {
         g_iLvls[client] = 5;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
     }
     else if(g_eStatistical[client][Score] >= 200)
     {
         g_iLvls[client] = 4;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
     }
     else if(g_eStatistical[client][Score] >= 100)
     {
         g_iLvls[client] = 3;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
     }
     else if(g_eStatistical[client][Score] >= 50)
     {
         g_iLvls[client] = 2;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
     }
     else if(g_eStatistical[client][Score] >= 25)
     {
         g_iLvls[client] = 1;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
     }
     else
     {
         g_iLvls[client] = 0;
-        CG_HUDFormatClientTag(client, "娱乐萌新");
     }
 
-    CG_ClientGetSignature(client, g_szSignature[client], 256);
     g_fKDA[client] = (g_eStatistical[client][Kills]*1.0)/((g_eStatistical[client][Deaths]+1)*1.0);
     g_fHSP[client] = float(g_eStatistical[client][Headshots]*100)/float((g_eStatistical[client][Kills]-g_eStatistical[client][Knife]-g_eStatistical[client][Taser])+1);
     
     PrintWellcomeMessage(client);
-    
-    char msg[128];
-    FormatEx(msg, 128, "排名: %d\n杀亡: %.2f\n爆头: %.2f%%\n得分: %d", g_iRank[client], g_fKDA[client], g_fHSP[client], g_eStatistical[client][Score]);
-    CG_HUDFormatClientMsg(client, msg);
 }
 
 void SavePlayer(int client)
@@ -412,7 +268,7 @@ void SavePlayer(int client)
                             g_eSession[client][Round],
                             g_eSession[client][Score],
                             GetTime() - g_eSession[client][Onlines],
-                            CG_ClientGetPId(client));
+                            MG_Users_UserIdentity(client));
 
     Handle pack = CreateDataPack();
     WritePackString(pack, m_szQuery);
@@ -437,51 +293,17 @@ public void SQL_SaveCallback(Handle owner, Handle hndl, const char[] error, Hand
 
 void PrintWellcomeMessage(int client)
 {
-    char AuthoirzedName[32], m_szMsg[512];
-    CG_ClientGetGroupName(client, AuthoirzedName, 32);
-    Format(m_szMsg, 512, "%s \x04%N\x01进入了游戏 \x0B认证\x01[\x0C%s\x01]  \x01排名\x04%d  \x0CKDA\x04%.2f  \x0CHSP\x04%.2f \x0C得分\x04%d  \x01签名: \x07%s", 
+    char m_szMsg[512];
+    FormatEx(m_szMsg, 512, "%s \x04%N\x01进入了游戏  \x01排名\x04%d  \x0CKDA\x04%.2f  \x0CHSP\x04%.2f \x0C得分\x04%d", 
                             PREFIX, 
                             client, 
-                            AuthoirzedName, 
                             g_iRank[client], 
                             g_fKDA[client],
                             g_fHSP[client],
-                            g_eStatistical[client][Score],
-                            g_szSignature[client]
+                            g_eStatistical[client][Score]
                             );
 
-    ReplaceString(m_szMsg, 512, "{白}", "\x01");
-    ReplaceString(m_szMsg, 512, "{红}", "\x02");
-    ReplaceString(m_szMsg, 512, "{粉}", "\x03");
-    ReplaceString(m_szMsg, 512, "{绿}", "\x04");
-    ReplaceString(m_szMsg, 512, "{黄}", "\x05");
-    ReplaceString(m_szMsg, 512, "{亮绿}", "\x06");
-    ReplaceString(m_szMsg, 512, "{亮红}", "\x07");
-    ReplaceString(m_szMsg, 512, "{灰}", "\x08");
-    ReplaceString(m_szMsg, 512, "{褐}", "\x09");
-    ReplaceString(m_szMsg, 512, "{橙}", "\x10");
-    ReplaceString(m_szMsg, 512, "{紫}", "\x0E");
-    ReplaceString(m_szMsg, 512, "{亮蓝}", "\x0B");
-    ReplaceString(m_szMsg, 512, "{蓝}", "\x0C");
-
-    ReplaceString(g_szSignature[client], 256, "{白}", "");
-    ReplaceString(g_szSignature[client], 256, "{红}", "");
-    ReplaceString(g_szSignature[client], 256, "{粉}", "");
-    ReplaceString(g_szSignature[client], 256, "{绿}", "");
-    ReplaceString(g_szSignature[client], 256, "{黄}", "");
-    ReplaceString(g_szSignature[client], 256, "{亮绿}", "");
-    ReplaceString(g_szSignature[client], 256, "{亮红}", "");
-    ReplaceString(g_szSignature[client], 256, "{灰}", "");
-    ReplaceString(g_szSignature[client], 256, "{褐}", "");
-    ReplaceString(g_szSignature[client], 256, "{橙}", "");
-    ReplaceString(g_szSignature[client], 256, "{紫}", "");
-    ReplaceString(g_szSignature[client], 256, "{亮蓝}", "");
-    ReplaceString(g_szSignature[client], 256, "{蓝}", "");
-
-    if(!g_iRank[client])
-        PrintToChatAll("%s 欢迎萌新\x04%N\x01来到CG娱乐休闲服务器", PREFIX, client);
-    else
-        PrintToChatAll(m_szMsg);
+    PrintToChatAll(m_szMsg);
 }
 
 void Stats_OnClientDeath(int client, int attacker, int assister, bool headshot, const char[] weapon)
@@ -512,8 +334,8 @@ void Stats_OnClientDeath(int client, int attacker, int assister, bool headshot, 
 
     if(StrContains(weapon, "negev", false) == -1 && StrContains(weapon, "m249", false) == -1 && StrContains(weapon, "p90", false) == -1 && StrContains(weapon, "hegrenade", false) == -1)
     {
-        Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+2, "MG-击杀玩家");
-        PrintToChat(attacker, "%s \x10你击杀\x07 %N \x10获得了\x04 1 信用点", PREFIX_STORE, client);
+        MG_Shop_ClientEarnMoney(attacker, 2, "MG-击杀玩家");
+        PrintToChat(attacker, "%s \x10你击杀\x07 %N \x10获得了\x04 1 G", PREFIX_STORE, client);
     }
 
     if(StrContains(weapon, "knife", false) != -1)
@@ -529,30 +351,8 @@ void Stats_OnClientDeath(int client, int attacker, int assister, bool headshot, 
         g_eSession[attacker][Score] += 2;
         g_eStatistical[attacker][Taser] += 1;
         g_eStatistical[attacker][Score] += 2;
-        
-        /*
-        if(UTIL_GetRandomInt(1, 100) > 95)
-        {
-            CG_GiveClientPatch(attacker, view_as<Patch_Type>(UTIL_GetRandomInt(0, 4)));
-            PrintToChatAll("%s \x0C%N\x04使用电鸡枪杀敌获得了1片钥匙碎片", PF_HD, attacker);
-        }
-        else
-            PrintToChat(attacker, "%s 嗨呀,你个非洲人,这次居然没掉落碎片", PF_HD);
-        */
     }
-    else if(StrContains(weapon, "smoke", false) != -1 || StrContains(weapon, "decoy", false) != -1)
-    {
-        /*
-        if(UTIL_GetRandomInt(1, 100) > 90)
-        {
-            CG_GiveClientPatch(attacker, view_as<Patch_Type>(UTIL_GetRandomInt(0, 4)));
-            PrintToChatAll("%s \x0C%N\x04使用电鸡枪杀敌获得了1片钥匙碎片", PF_HD, attacker);
-        }
-        else
-            PrintToChat(attacker, "%s 嗨呀,你个非洲人,这次居然没掉落碎片", PF_HD);
-        */
-    }
-    
+
     if(headshot)
     {
         g_eSession[attacker][Score]++;
@@ -561,24 +361,9 @@ void Stats_OnClientDeath(int client, int attacker, int assister, bool headshot, 
         g_eStatistical[attacker][Headshots]++;
         
         g_fHSP[attacker] = float(g_eStatistical[attacker][Headshots]*100)/float((g_eStatistical[attacker][Kills]-g_eStatistical[attacker][Knife]-g_eStatistical[attacker][Taser])+1);
-    
-        /*
-        if(UTIL_GetRandomInt(1, 100) > 85)
-        {
-            int credits = UTIL_GetRandomInt(15, 30);
-            Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+credits, "MG活动爆头");
-            PrintToChatAll("%s \x0C%N\x04爆头杀敌获得了\x10%d信用点", PF_HD, attacker, credits);
-        }
-        else
-            PrintToChat(attacker, "%s 嗨呀,你个非洲人,这次居然得信用点", PF_HD);
-        */
     }
 
     g_fKDA[attacker] = (g_eStatistical[attacker][Kills]*1.0)/((g_eStatistical[attacker][Deaths]+1)*1.0);
-    
-    char msg[128];
-    FormatEx(msg, 128, "排名: %d\n杀亡: %.2f\n爆头: %.2f%%\n得分: %d", g_iRank[attacker], g_fKDA[attacker], g_fHSP[attacker], g_eStatistical[attacker][Score]);
-    CG_HUDFormatClientMsg(attacker, msg);
 }
 
 bool Stats_AllowScourgeClient(int client)
@@ -591,10 +376,7 @@ bool Stats_AllowScourgeClient(int client)
 
     if(d == 0.0) d = 1.0;
 
-    if(k/d >= 5.0)
-        return true;
-    
-    return false;
+    return (k/d > 5.0);
 }
 
 void Stats_OnClientSpawn(int client)
