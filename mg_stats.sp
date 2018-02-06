@@ -26,7 +26,7 @@ public Plugin myinfo =
     name        = "MiniGames",
     author      = "Kyle",
     description = "Ex",
-    version     = "4.0 - 2018/02/05",
+    version     = "4.0 - 2018/02/06",
     url         = "https://steamcommunity.com/id/Kxnrl/"
 };
 
@@ -90,6 +90,24 @@ public void OnMapStart()
     ClearTimer(g_tWarmup);
     g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime")), Timer_Warmup);
     CreateTimer(1.0, Timer_CheckWeapon, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+}
+
+public void OnAutoConfigsBuffered()
+{
+    char mapconfig[256];
+
+    GetCurrentMap(mapconfig, 256);
+    LogMessage("Searching %s.cfg", mapconfig);
+    Format(mapconfig, 256, "sourcemod/map-configs/%s.cfg", mapconfig);
+
+    char path[256];
+    Format(path, 256, "cfg/%s", mapconfig);
+
+    if(!FileExists(path))
+        return;
+
+    ServerCommand("exec %s", mapconfig);
+    LogMessage("Executed %s", mapconfig);
 }
 
 public void MG_MySQL_OnConnected(Database db)
