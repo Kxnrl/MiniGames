@@ -32,6 +32,8 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
+    g_smPunishList = new StringMap();
+
     Button_OnPluginStart();
     ConVar_OnPluginStart();
     Bets_OnPluginStart();
@@ -68,10 +70,12 @@ public void OnPluginEnd()
 
 public void OnMapStart()
 {
+    g_smPunishList.Clear();
+
     g_hDatabase = MG_MySQL_GetDatabase();
     if(g_hDatabase == INVALID_HANDLE)
         CreateTimer(1.0, Timer_ReConnect);
-    
+
     cs_player_manager = FindEntityByClassname(MaxClients+1, "cs_player_manager");
     if(cs_player_manager != -1)
         SDKHookEx(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
@@ -118,9 +122,7 @@ public void MG_MySQL_OnConnected(Database db)
 public void OnMapEnd()
 {
     ClearTimer(g_tWallHack);
-    
-    g_smPunishList.Clear();
-    
+
     if(cs_player_manager != -1)
     {
         SDKUnhook(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);

@@ -189,9 +189,6 @@ bool Client_Bepunished(int client)
 
 void Client_OnRoundStart()
 {
-    if(g_smPunishList == null)
-        g_smPunishList = new StringMap();
-
     ClearTimer(g_tWallHack);
     g_tWallHack = CreateTimer(mg_wallhack_delay.FloatValue, Timer_Wallhack);
 }
