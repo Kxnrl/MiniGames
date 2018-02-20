@@ -59,6 +59,11 @@ public void OnPluginStart()
     
     HookEventEx("cs_win_panel_match", Event_WinPanel, EventHookMode_Post);
     HookEventEx("announce_phase_end", Event_AnnouncePhaseEnd, EventHookMode_Post);
+    
+    char error[256];
+    g_hDatabase = SQL_Connect("default", false, error, 256);
+    if(g_hDatabase == null)
+        SetFailState("Connect to database Error. -> %s", error);
 }
 
 public void OnPluginEnd()
@@ -72,15 +77,9 @@ public void OnMapStart()
 {
     g_smPunishList.Clear();
 
-    g_hDatabase = MG_MySQL_GetDatabase();
-    if(g_hDatabase == INVALID_HANDLE)
-        CreateTimer(1.0, Timer_ReConnect);
-
     cs_player_manager = FindEntityByClassname(MaxClients+1, "cs_player_manager");
     if(cs_player_manager != -1)
         SDKHookEx(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
-
-    BuildRankCache();
 
     PrecacheSoundAny("maoling/mg/beacon.mp3");
     AddFileToDownloadsTable("sound/maoling/mg/beacon.mp3");
@@ -114,9 +113,10 @@ public void OnAutoConfigsBuffered()
     LogMessage("Executed %s", mapconfig);
 }
 
-public void MG_MySQL_OnConnected(Database db)
+public void OnConfigsExecuted()
 {
-    g_hDatabase = db;
+    LockConVar();
+    BuildRankCache();
 }
 
 public void OnMapEnd()
@@ -217,15 +217,6 @@ public void OnWeaponEquip(int client, int weapon)
         AcceptEntityInput(weapon, "Kill");
         RequestFrame(Frame_SlayGaygun, client);
     }
-}
-
-public Action Timer_ReConnect(Handle timer)
-{
-    g_hDatabase = MG_MySQL_GetDatabase();
-    if(g_hDatabase == INVALID_HANDLE)
-        CreateTimer(1.0, Timer_ReConnect);
-
-    return Plugin_Stop;
 }
 
 public Action Timer_Warmup(Handle timer)

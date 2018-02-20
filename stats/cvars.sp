@@ -39,11 +39,6 @@ void ConVar_OnMapStart()
     SetConVarString(FindConVar("sv_tags"), "MG,MiniGames,MultiGames,Shop,Talent", false, false);
 }
 
-public void OnConfigsExecuted()
-{
-    LockConVar();
-}
-
 public void OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
     LockConVar();

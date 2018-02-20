@@ -216,7 +216,7 @@ void SettlementBetting(int winner)
         g_iBettingTotalCT = 0;
         g_iBettingTotalTE = 0;
     
-        PrintToChatAll("%s  \x10本局菠菜无效,G已返还", PREFIX);
+        PrintToChatAll("%s  \x10本局菠菜无效,已返还赌资", PREFIX);
 
         return;
     }
