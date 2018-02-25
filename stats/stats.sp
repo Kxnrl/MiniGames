@@ -2,6 +2,8 @@
 
 void BuildRankCache()
 {
+    PrintToServer("Build Rank Cacahe ...");
+    
     if(g_RankArray == INVALID_HANDLE)
         g_RankArray = CreateArray(ByteCountToCells(32));
 
@@ -15,8 +17,8 @@ void BuildRankCache()
     }
 
     char m_szQuery[128];
-    Format(m_szQuery, 128, "SELECT `pid`,`name`,`kills`,`deaths`,`score` FROM `rank_mg` WHERE `score` >= 0 ORDER BY `score` DESC;");
-    SQL_TQuery(g_hDatabase, SQL_RankCallback, m_szQuery);
+    FormatEx(m_szQuery, 128, "SELECT `pid`,`name`,`kills`,`deaths`,`score` FROM `rank_mg` WHERE `score` >= 0 ORDER BY `score` DESC;");
+    g_hDatabase.Query(SQL_RankCallback, m_szQuery);
 }
 
 public Action Timer_RebuildCache(Handle timer)
@@ -25,45 +27,47 @@ public Action Timer_RebuildCache(Handle timer)
     return Plugin_Stop;
 }
 
-public void SQL_RankCallback(Handle owner, Handle hndl, const char[] error, any unuse)
+public void SQL_RankCallback(Database db, DBResultSet results, const char[] error, any unuse)
 {
-    if(hndl == INVALID_HANDLE)
+    PrintToServer("SQL_RankCallback ...");
+
+    if(results == null)
     {
         LogError("[MG-Stats] Build Rank cache failed: %s", error);
         return;
     }
 
-    if(SQL_GetRowCount(hndl))
+    if(results.RowCount > 0)
     {
         char name[32], menu[128];
         int iKill, iDeath, iScore;
         
         if(g_hTopMenu != INVALID_HANDLE)
             CloseHandle(g_hTopMenu);
-        
+
         g_hTopMenu = CreateMenu(MenuHandler_MenuTopPlayers);
         SetMenuTitleEx(g_hTopMenu, "[MG] Top - 50");
         SetMenuExitButton(g_hTopMenu, true);
         SetMenuExitBackButton(g_hTopMenu, false);
 
         int index;
-        while(SQL_FetchRow(hndl))
+        while(results.FetchRow())
         {
             index++;
-            int pid = SQL_FetchInt(hndl, 0);
-            SQL_FetchString(hndl, 1, name, 32);
+            int pid = results.FetchInt(0);
+            results.FetchString(1, name, 32);
             PushArrayCell(g_RankArray, pid);
     
             if(index > 50)
                 continue;
 
-            iKill = SQL_FetchInt(hndl, 2);
-            iDeath = SQL_FetchInt(hndl, 3);
-            iScore = SQL_FetchInt(hndl, 4);
+            iKill = results.FetchInt(2);
+            iDeath = results.FetchInt(3);
+            iScore = results.FetchInt(4);
             float KD = (float(iKill) / float(iDeath));
             if(index < 10)
-                Format(menu, 128, "#  %d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
-            else Format(menu, 128, "#%d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
+                FormatEx(menu, 128, "#  %d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
+            else FormatEx(menu, 128, "#%d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
             AddMenuItemEx(g_hTopMenu, ITEMDRAW_DISABLED, "", menu);
         }
     }
@@ -98,55 +102,55 @@ void LoadPlayer(int client)
 
     char m_szQuery[512];
     Format(m_szQuery, 128, "SELECT * FROM `rank_mg` WHERE pid='%d';", MG_Users_UserIdentity(client));
-    SQL_TQuery(g_hDatabase, SQL_LoadCallback, m_szQuery, GetClientUserId(client));
+    g_hDatabase.Query(SQL_LoadCallback, m_szQuery, GetClientUserId(client));
 }
 
-public void SQL_LoadCallback(Handle owner, Handle hndl, const char[] error, int userid)
+public void SQL_LoadCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
     
     if(!IsValidClient(client))
         return;
 
-    if(hndl == INVALID_HANDLE)
+    if(results == null)
     {
         LogError("[MG-Stats] Load %N Failed: %s", client, error);
         return;
     }
 
-    if(SQL_FetchRow(hndl))
+    if(results.FetchRow())
     {
         g_bLoaded[client] = true;
 
-        g_eStatistical[client][Kills] = SQL_FetchInt(hndl, 2);
-        g_eStatistical[client][Deaths] = SQL_FetchInt(hndl, 3);
-        g_eStatistical[client][Assists] = SQL_FetchInt(hndl, 4);
-        g_eStatistical[client][Headshots] = SQL_FetchInt(hndl, 5);
-        g_eStatistical[client][Taser] = SQL_FetchInt(hndl, 6);
-        g_eStatistical[client][Knife] = SQL_FetchInt(hndl, 7);
-        g_eStatistical[client][Survival] = SQL_FetchInt(hndl, 8);
-        g_eStatistical[client][Round] = SQL_FetchInt(hndl, 9);
-        g_eStatistical[client][Score] = SQL_FetchInt(hndl, 10);
-        g_eStatistical[client][Onlines] = SQL_FetchInt(hndl, 11);
+        g_eStatistical[client][Kills] = results.FetchInt(2);
+        g_eStatistical[client][Deaths] = results.FetchInt(3);
+        g_eStatistical[client][Assists] = results.FetchInt(4);
+        g_eStatistical[client][Headshots] = results.FetchInt(5);
+        g_eStatistical[client][Taser] = results.FetchInt(6);
+        g_eStatistical[client][Knife] = results.FetchInt(7);
+        g_eStatistical[client][Survival] = results.FetchInt(8);
+        g_eStatistical[client][Round] = results.FetchInt(9);
+        g_eStatistical[client][Score] = results.FetchInt(10);
+        g_eStatistical[client][Onlines] = results.FetchInt(11);
 
         GetPlayerRank(client);
     }
     else
     {
         char m_szQuery[128];
-        Format(m_szQuery, 128, "INSERT INTO `rank_mg` (pid) VALUES ('%d')", MG_Users_UserIdentity(client));
-        SQL_TQuery(g_hDatabase, SQL_InsertCallback , m_szQuery, GetClientUserId(client));
+        FormatEx(m_szQuery, 128, "INSERT INTO `rank_mg` (pid) VALUES ('%d')", MG_Users_UserIdentity(client));
+        g_hDatabase.Query(SQL_InsertCallback , m_szQuery, GetClientUserId(client));
     }
 }
 
-public void SQL_InsertCallback(Handle owner, Handle hndl, const char[] error, int userid)
+public void SQL_InsertCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
 
     if(!IsValidClient(client))
         return;
 
-    if(hndl == INVALID_HANDLE)
+    if(results == null)
     {    
         LogError("[MG-Stats] INSERT %N Failed: %s", client, error);
         return;
@@ -273,14 +277,14 @@ void SavePlayer(int client)
     Handle pack = CreateDataPack();
     WritePackString(pack, m_szQuery);
     ResetPack(pack);
-    SQL_TQuery(g_hDatabase, SQL_SaveCallback, m_szQuery, pack);
+    g_hDatabase.Query(SQL_SaveCallback, m_szQuery, pack);
 
     g_bLoaded[client] = false;
 }
 
-public void SQL_SaveCallback(Handle owner, Handle hndl, const char[] error, Handle pack)
+public void SQL_SaveCallback(Database owner, DBResultSet results, const char[] error, Handle pack)
 {
-    if(hndl == INVALID_HANDLE)
+    if(results == null)
     {
         char m_szQuery[512];
         ReadPackString(pack, m_szQuery, 512);
