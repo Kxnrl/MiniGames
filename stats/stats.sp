@@ -10,15 +10,13 @@ void BuildRankCache()
     ClearArray(g_RankArray);
     PushArrayString(g_RankArray, "This is First Line in Array");
     
-    if(g_hDatabase == INVALID_HANDLE)
+    if(g_hDatabase == null)
     {
         CreateTimer(5.0, Timer_RebuildCache, _, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
 
-    char m_szQuery[128];
-    FormatEx(m_szQuery, 128, "SELECT `pid`,`name`,`kills`,`deaths`,`score` FROM `rank_mg` WHERE `score` >= 0 ORDER BY `score` DESC;");
-    g_hDatabase.Query(SQL_RankCallback, m_szQuery);
+    g_hDatabase.Query(SQL_RankCallback, "SELECT `pid`,`name`,`kills`,`deaths`,`score` FROM `rank_mg` WHERE `score` >= 0 ORDER BY `score` DESC;");
 }
 
 public Action Timer_RebuildCache(Handle timer)

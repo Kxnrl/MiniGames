@@ -64,6 +64,8 @@ public void OnPluginStart()
     g_hDatabase = SQL_Connect("default", false, error, 256);
     if(g_hDatabase == null)
         SetFailState("Connect to database Error. -> %s", error);
+    else
+        g_hDatabase.SetCharset("utf8");
 }
 
 public void OnPluginEnd()
@@ -152,9 +154,7 @@ public void OnClientPutInServer(int client)
 public void OnClientDataChecked(int client)
 {
     g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
-
-    if(g_hDatabase != INVALID_HANDLE)
-        LoadPlayer(client);
+    LoadPlayer(client);
 }
 
 public void OnClientDisconnect(int client)
@@ -162,8 +162,7 @@ public void OnClientDisconnect(int client)
     if(!IsClientInGame(client))
         return;
 
-    if(g_hDatabase != INVALID_HANDLE)
-        SavePlayer(client);
+    SavePlayer(client);
 
     g_iLvls[client] = 0;
     g_bTracking = (GetClientCount(true) >= 6) ?  true : false;

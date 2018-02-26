@@ -209,5 +209,5 @@ void Client_OnRoundEnd()
     g_tWallHack = INVALID_HANDLE;
 
     if(mg_randomteam.BoolValue)
-        CreateTimer(2.0, Client_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
+        CreateTimer(3.0, Client_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
 }
