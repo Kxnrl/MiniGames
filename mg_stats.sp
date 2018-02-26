@@ -77,6 +77,8 @@ public void OnPluginEnd()
 
 public void OnMapStart()
 {
+    BuildRankCache();
+
     g_smPunishList.Clear();
 
     cs_player_manager = FindEntityByClassname(MaxClients+1, "cs_player_manager");
@@ -118,7 +120,6 @@ public void OnAutoConfigsBuffered()
 public void OnConfigsExecuted()
 {
     LockConVar();
-    BuildRankCache();
 }
 
 public void OnMapEnd()
@@ -147,7 +148,8 @@ public void OnClientConnected(int client)
 
 public void OnClientPutInServer(int client)
 {
-    SDKHook(client, SDKHook_WeaponEquipPost, OnWeaponEquip);
+    SDKHook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
+    
     IntToString(GetSteamAccountID(client), g_szAccount[client], 32);
 }
 
@@ -166,7 +168,7 @@ public void OnClientDisconnect(int client)
 
     g_iLvls[client] = 0;
     g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
-    SDKUnhook(client, SDKHook_WeaponEquipPost, OnWeaponEquip);
+    SDKUnhook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
     
     if(g_bPunished[client])
     {
@@ -197,25 +199,57 @@ void Frame_SlayGaygun(int client)
     }
 }
 
-public void OnWeaponEquip(int client, int weapon)
+public void Hook_OnPostWeaponEquip(int client, int weapon)
 {
     if(!IsValidEdict(weapon))
         return;
+    
+    Handle pack = CreateDataPack();
+    WritePackCell(pack, client);
+    WritePackCell(pack, EntIndexToEntRef(weapon));
+    RequestFrame(Frame_OnEquipPost, pack);
+}
+
+void Frame_OnEquipPost(Handle pack)
+{
+    ResetPack(pack);
+    int client = ReadPackCell(pack);
+    int weapon = EntRefToEntIndex(ReadPackCell(pack));
+    CloseHandle(pack);
+
+    if(!IsValidEdict(weapon))
+        return;
+    
+    int index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
+    if(42 < index < 50 || index == 0)
+        return;
 
     char classname[32];
-    GetEdictClassname(weapon, classname, 32);
+    GetWeaponClassname(weapon, index, classname, 32);
 
     if(mg_restrictawp.BoolValue && StrEqual(classname, "weapon_awp"))
     {
         PrintToChat(client, "[\x04MG\x01]  \x07当前地图限制Awp的使用");
         AcceptEntityInput(weapon, "Kill");
+        return;
     }
 
     if(mg_slaygaygun.BoolValue && (StrEqual(classname, "weapon_scar20") || StrEqual(classname, "weapon_g3sg1")))
     {
         AcceptEntityInput(weapon, "Kill");
         RequestFrame(Frame_SlayGaygun, client);
+        return;
     }
+
+    if(StrContains(classname, "knife", false) != -1 || StrContains(classname, "healthshot", false) != -1 || StrContains(classname, "taser", false) != -1)
+        return;
+
+    int amtype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
+
+    if(amtype == -1)
+        return;
+
+    SetEntProp(client, Prop_Send, "m_iAmmo", 233, _, amtype);
 }
 
 public Action Timer_Warmup(Handle timer)
@@ -327,4 +361,16 @@ public Action Timer_CheckWeapon(Handle timer)
     }
 
     return Plugin_Continue;
+}
+
+void GetWeaponClassname(int weapon, int index, char[] classname, int maxLen)
+{
+    GetEdictClassname(weapon, classname, maxLen);
+    switch(index)
+    {
+        case 60: strcopy(classname, maxLen, "weapon_m4a1_silencer");
+        case 61: strcopy(classname, maxLen, "weapon_usp_silencer");
+        case 63: strcopy(classname, maxLen, "weapon_cz75a");
+        case 64: strcopy(classname, maxLen, "weapon_revolver");
+    }
 }

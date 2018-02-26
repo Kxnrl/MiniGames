@@ -12,26 +12,17 @@ void BuildRankCache()
     
     if(g_hDatabase == null)
     {
-        CreateTimer(5.0, Timer_RebuildCache, _, TIMER_FLAG_NO_MAPCHANGE);
+        CreateTimer(2.0, Timer_RebuildCache, _, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
 
-    g_hDatabase.Query(SQL_RankCallback, "SELECT `pid`,`name`,`kills`,`deaths`,`score` FROM `rank_mg` WHERE `score` >= 0 ORDER BY `score` DESC;");
-}
-
-public Action Timer_RebuildCache(Handle timer)
-{
-    BuildRankCache();
-    return Plugin_Stop;
-}
-
-public void SQL_RankCallback(Database db, DBResultSet results, const char[] error, any unuse)
-{
-    PrintToServer("SQL_RankCallback ...");
-
+    DBResultSet results = SQL_Query(g_hDatabase, "SELECT `pid`,`name`,`kills`,`deaths`,`score` FROM `rank_mg` WHERE `score` >= 0 ORDER BY `score` DESC;", 128);
     if(results == null)
     {
-        LogError("[MG-Stats] Build Rank cache failed: %s", error);
+        char error[256];
+        SQL_GetError(g_hDatabase, error, 256);
+        MG_Core_LogError("MG-Stats", "BuildRankCache", "Build Rank Cache: %s", error);
+        delete results;
         return;
     }
 
@@ -47,7 +38,7 @@ public void SQL_RankCallback(Database db, DBResultSet results, const char[] erro
         SetMenuTitleEx(g_hTopMenu, "[MG] Top - 50");
         SetMenuExitButton(g_hTopMenu, true);
         SetMenuExitBackButton(g_hTopMenu, false);
-
+        
         int index;
         while(results.FetchRow())
         {
@@ -69,6 +60,14 @@ public void SQL_RankCallback(Database db, DBResultSet results, const char[] erro
             AddMenuItemEx(g_hTopMenu, ITEMDRAW_DISABLED, "", menu);
         }
     }
+    
+    delete results;
+}
+
+public Action Timer_RebuildCache(Handle timer)
+{
+    BuildRankCache();
+    return Plugin_Stop;
 }
 
 void LoadPlayer(int client)
