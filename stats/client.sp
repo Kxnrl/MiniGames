@@ -1,8 +1,7 @@
-
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
     UTIL_Scoreboard(client, buttons);
-    
+
     if(!IsPlayerAlive(client))
         return Plugin_Continue;
 
@@ -53,7 +52,7 @@ public Action Client_SpawnPost(Handle timer, int client)
     SetEntProp(client, Prop_Send, "m_iHideHUD", HIDE_RADAR);
     SetEntProp(client, Prop_Send, "m_iAccount", 10000);
     SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 0.0);
-    
+
     g_bPunished[client] = false;
 
     if(!IsPlayerAlive(client))
@@ -97,75 +96,48 @@ public Action Client_SpawnPost(Handle timer, int client)
 
 public Action Client_RandomTeam(Handle timer)
 {
-    ArrayList array_players = CreateArray();
-    
+    ArrayList array_players = new ArrayList();
+
     int teams[MAXPLAYERS+1];
-    int waifu[MAXPLAYERS+1];
 
     for(int x = 1; x <= MaxClients; ++x)
-        if(IsClientInGame(x))
+        if(IsClientInGame(x) && !IsFakeClient(x) && !IsClientSourceTV(x))
         {
             teams[x] = GetClientTeam(x);
             if(teams[x] <= 1)
                 continue;
             PushArrayCell(array_players, x);
-            waifu[x] = -2; //CG_CouplesGetPartnerIndex(x);
         }
 
-    char buffer[128];
-    int client, target, number, tindex, team, counts = RoundToNearest(GetArraySize(array_players)*0.5);
-    while((number = RandomArray(array_players)) != -1)
+    int random = 0;
+    int ctLeft = RoundFloat(GetArraySize(array_players)*0.5);
+    while((random = RandomArray(array_players)) != -1)
     {
-        client = GetArrayCell(array_players, number);
-        RemoveFromArray(array_players, number);
+        int client = GetArrayCell(array_players, random);
+        RemoveFromArray(array_players, random);
 
-        target = waifu[client];
-        if(waifu[client] > 0 && (tindex = FindValueInArray(array_players, waifu[client])) != -1)
+        if(ctLeft > 0)
         {
-            RemoveFromArray(array_players, tindex);
+            ctLeft--;
 
-            if(counts > 1)
-            {
-                counts -= 2;
-                CS_SwitchTeam(client, 2);
-                CS_SwitchTeam(target, 2);
-                Format(buffer, 128, "当前地图已经开启随机组队\n 你和你老婆已被移动到 <font color='#FF0000' size='20'>恐怖分子");
-            }
-            else
-            {
-                CS_SwitchTeam(client, 3);
-                CS_SwitchTeam(target, 3);
-                Format(buffer, 128, "当前地图已经开启随机组队\n 你和你老婆已被移动到 <font color='#0066CC' size='20'>反恐精英");
-            }
+            if(teams[client] == 3)
+                continue;
 
-            if(teams[target] != team)
-                PrintCenterText(target, buffer);
+            SetEntProp(client, Prop_Send, "m_iPendingTeamNum", CS_TEAM_CT);
+            PrintCenterText(client, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
+            
         }
         else
         {
-            if(counts > 0)
-            {
-                counts--;
-                CS_SwitchTeam(client, 2);
-                Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
-            }
-            else
-            {
-                CS_SwitchTeam(client, 3);
-                Format(buffer, 128, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
-            }
+            if(teams[client] != 2)
+                continue;
+
+            SetEntProp(client, Prop_Send, "m_iPendingTeamNum", CS_TEAM_T);
+            PrintCenterText(client, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
         }
-
-        if(teams[client] != team)
-            PrintCenterText(client, buffer);
-
-        //if(target < -1)
-        //    PrintToChat(client, "[\x0ECP\x01]   你没有老婆,不能享受CP的随机组队优选");
-        //else if(target == -1)
-        //    PrintToChat(client, "[\x0ECP\x01]   你老婆离线,不能享受CP的随机组队优选");
     }
 
-    CloseHandle(array_players);
+    delete array_players;
 
     return Plugin_Stop;
 }
@@ -195,7 +167,7 @@ void Client_OnRoundStart()
 
 public Action Timer_Wallhack(Handle timer)
 {
-    g_tWallHack = INVALID_HANDLE;
+    g_tWallHack = null;
     for(int client = 1; client <= MaxClients; ++client)
         if(IsClientInGame(client) && IsPlayerAlive(client) && MG_Users_UserIdentity(client) != 1)
             SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 9999999.0);
@@ -204,10 +176,10 @@ public Action Timer_Wallhack(Handle timer)
 
 void Client_OnRoundEnd()
 {
-    if(g_tWallHack != INVALID_HANDLE)
+    if(g_tWallHack != null)
         KillTimer(g_tWallHack);
-    g_tWallHack = INVALID_HANDLE;
+    g_tWallHack = null;
 
     if(mg_randomteam.BoolValue)
-        CreateTimer(3.0, Client_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
+        CreateTimer(5.0, Client_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
 }

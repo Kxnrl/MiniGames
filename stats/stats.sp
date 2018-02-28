@@ -1,51 +1,56 @@
-
+public Action Timer_RebuildCache(Handle timer)
+{
+    BuildRankCache();
+    return Plugin_Stop;
+}
 
 void BuildRankCache()
 {
-    PrintToServer("Build Rank Cacahe ...");
-    
-    if(g_RankArray == INVALID_HANDLE)
-        g_RankArray = CreateArray(ByteCountToCells(32));
+    if(g_RankArray == null)
+        g_RankArray = new ArrayList(ByteCountToCells(32));
 
-    ClearArray(g_RankArray);
-    PushArrayString(g_RankArray, "This is First Line in Array");
-    
+    g_RankArray.Clear();
+    g_RankArray.PushString("This is First Line in Array");
+
     if(g_hDatabase == null)
     {
         CreateTimer(2.0, Timer_RebuildCache, _, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
 
-    DBResultSet results = SQL_Query(g_hDatabase, "SELECT `pid`,`name`,`kills`,`deaths`,`score` FROM `rank_mg` WHERE `score` >= 0 ORDER BY `score` DESC;", 128);
-    if(results == null)
+    PrintToServer("Build Rank Cacahe ...");
+
+    g_hDatabase.Query(RankCacheCallback, "SELECT `pid`,`name`,`kills`,`deaths`,`score` FROM `rank_mg` WHERE `score` >= 0 ORDER BY `score` DESC;");
+}
+
+public void RankCacheCallback(Database db, DBResultSet results, const char[] error, any data)
+{
+    if(results == null || error[0])
     {
-        char error[256];
-        SQL_GetError(g_hDatabase, error, 256);
-        MG_Core_LogError("MG-Stats", "BuildRankCache", "Build Rank Cache: %s", error);
-        delete results;
+        MG_Core_LogError("MiniGames", "BuildRankCache", "SQL Error: %s", error);
         return;
     }
 
     if(results.RowCount > 0)
     {
-        char name[32], menu[128];
+        char name[32];
         int iKill, iDeath, iScore;
         
-        if(g_hTopMenu != INVALID_HANDLE)
-            CloseHandle(g_hTopMenu);
+        if(g_hTopMenu != null)
+            delete g_hTopMenu;
 
         g_hTopMenu = CreateMenu(MenuHandler_MenuTopPlayers);
         SetMenuTitleEx(g_hTopMenu, "[MG] Top - 50");
         SetMenuExitButton(g_hTopMenu, true);
         SetMenuExitBackButton(g_hTopMenu, false);
-        
+
         int index;
         while(results.FetchRow())
         {
             index++;
             int pid = results.FetchInt(0);
             results.FetchString(1, name, 32);
-            PushArrayCell(g_RankArray, pid);
+            g_RankArray.Push(pid);
     
             if(index > 50)
                 continue;
@@ -55,26 +60,24 @@ void BuildRankCache()
             iScore = results.FetchInt(4);
             float KD = (float(iKill) / float(iDeath));
             if(index < 10)
-                FormatEx(menu, 128, "#  %d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
-            else FormatEx(menu, 128, "#%d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
-            AddMenuItemEx(g_hTopMenu, ITEMDRAW_DISABLED, "", menu);
+                AddMenuItemEx(g_hTopMenu, ITEMDRAW_DISABLED, "", "#  %d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
+            else
+                AddMenuItemEx(g_hTopMenu, ITEMDRAW_DISABLED, "", "#%d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
         }
+
+        for(int client = 1; client <= MaxClients; ++client)
+            if(IsClientInGame(client) && !IsFakeClient(client) && g_bLoaded[client])
+                GetPlayerRank(client, false);
     }
-    
-    delete results;
 }
 
-public Action Timer_RebuildCache(Handle timer)
+void LoadPlayer(int client, int uid)
 {
-    BuildRankCache();
-    return Plugin_Stop;
-}
-
-void LoadPlayer(int client)
-{
-    if(IsFakeClient(client))
+    if(IsFakeClient(client) || IsClientSourceTV(client) || uid <= 0)
         return;
     
+    PrintToServer("Load \"%L\" Data!", client);
+
     g_eSession[client][Kills] = 0;
     g_eSession[client][Deaths] = 0;
     g_eSession[client][Assists] = 0;
@@ -98,11 +101,11 @@ void LoadPlayer(int client)
     g_eStatistical[client][Onlines] = 0;
 
     char m_szQuery[512];
-    Format(m_szQuery, 128, "SELECT * FROM `rank_mg` WHERE pid='%d';", MG_Users_UserIdentity(client));
-    g_hDatabase.Query(SQL_LoadCallback, m_szQuery, GetClientUserId(client));
+    FormatEx(m_szQuery, 128, "SELECT * FROM `rank_mg` WHERE pid='%d';", uid);
+    g_hDatabase.Query(LoadClientCallback, m_szQuery, GetClientUserId(client));
 }
 
-public void SQL_LoadCallback(Database db, DBResultSet results, const char[] error, int userid)
+public void LoadClientCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
     
@@ -111,7 +114,7 @@ public void SQL_LoadCallback(Database db, DBResultSet results, const char[] erro
 
     if(results == null)
     {
-        LogError("[MG-Stats] Load %N Failed: %s", client, error);
+        MG_Core_LogError("MiniGames", "LoadClientCallback", "Load \"%L\" Failed: %s", client, error);
         return;
     }
 
@@ -130,17 +133,17 @@ public void SQL_LoadCallback(Database db, DBResultSet results, const char[] erro
         g_eStatistical[client][Score] = results.FetchInt(10);
         g_eStatistical[client][Onlines] = results.FetchInt(11);
 
-        GetPlayerRank(client);
+        GetPlayerRank(client, true);
     }
     else
     {
         char m_szQuery[128];
         FormatEx(m_szQuery, 128, "INSERT INTO `rank_mg` (pid) VALUES ('%d')", MG_Users_UserIdentity(client));
-        g_hDatabase.Query(SQL_InsertCallback , m_szQuery, GetClientUserId(client));
+        g_hDatabase.Query(InsertClientCallback , m_szQuery, GetClientUserId(client));
     }
 }
 
-public void SQL_InsertCallback(Database db, DBResultSet results, const char[] error, int userid)
+public void InsertClientCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
 
@@ -149,14 +152,14 @@ public void SQL_InsertCallback(Database db, DBResultSet results, const char[] er
 
     if(results == null)
     {    
-        LogError("[MG-Stats] INSERT %N Failed: %s", client, error);
+        MG_Core_LogError("MiniGames", "InsertClientCallback", "Insert \"%L\" Failed: %s", client, error);
         return;
     }
 
     g_bLoaded[client] = true;
 }
 
-void GetPlayerRank(int client)
+void GetPlayerRank(int client, bool print)
 {
     int rank = FindValueInArray(g_RankArray, MG_Users_UserIdentity(client));
     if(rank > 0)
@@ -244,6 +247,7 @@ void GetPlayerRank(int client)
     g_fKDA[client] = (g_eStatistical[client][Kills]*1.0)/((g_eStatistical[client][Deaths]+1)*1.0);
     g_fHSP[client] = float(g_eStatistical[client][Headshots]*100)/float((g_eStatistical[client][Kills]-g_eStatistical[client][Knife]-g_eStatistical[client][Taser])+1);
     
+    if(print)
     PrintWellcomeMessage(client);
 }
 
@@ -254,10 +258,10 @@ void SavePlayer(int client)
 
     char m_szName[32], m_szEname[64], m_szAuth[32], m_szQuery[512];
     GetClientName(client, m_szName, 32);
-    SQL_EscapeString(g_hDatabase, m_szName, m_szEname, 64);
+    g_hDatabase.Escape(m_szName, m_szEname, 64);
     GetClientAuthId(client, AuthId_Steam2, m_szAuth, 32, true);
 
-    Format(m_szQuery, 512, "UPDATE `rank_mg` SET name='%s', kills=kills+%d, deaths=deaths+%d, assists=assists+%d, headshots=headshots+%d, taser=taser+%d, knife=knife+%d, survival=survival+%d, round=round+%d, score=score+%d, onlines=onlines+%d WHERE pid='%d';",
+    FormatEx(m_szQuery, 512, "UPDATE `rank_mg` SET name='%s', kills=kills+%d, deaths=deaths+%d, assists=assists+%d, headshots=headshots+%d, taser=taser+%d, knife=knife+%d, survival=survival+%d, round=round+%d, score=score+%d, onlines=onlines+%d WHERE pid='%d';",
                             m_szEname,
                             g_eSession[client][Kills],
                             g_eSession[client][Deaths],
@@ -271,25 +275,23 @@ void SavePlayer(int client)
                             GetTime() - g_eSession[client][Onlines],
                             MG_Users_UserIdentity(client));
 
-    Handle pack = CreateDataPack();
+    DataPack pack = new DataPack();
     WritePackString(pack, m_szQuery);
     ResetPack(pack);
-    g_hDatabase.Query(SQL_SaveCallback, m_szQuery, pack);
-
+    g_hDatabase.Query(SaveClientCallback, m_szQuery, pack);
     g_bLoaded[client] = false;
 }
 
-public void SQL_SaveCallback(Database owner, DBResultSet results, const char[] error, Handle pack)
+public void SaveClientCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
     if(results == null)
     {
         char m_szQuery[512];
-        ReadPackString(pack, m_szQuery, 512);
-        LogError("[MG-Stats] Save Player Failed: %s\nSQL Query: %s", error, m_szQuery);
-        return;
+        pack.ReadString(m_szQuery, 512);
+        MG_Core_LogError("MiniGames", "SaveClientCallback", "SQL Error: %s  |  Query String: %s", error, m_szQuery);
     }
-    
-    CloseHandle(pack);
+
+    delete pack;
 }
 
 void PrintWellcomeMessage(int client)
@@ -382,7 +384,7 @@ bool Stats_AllowScourgeClient(int client)
 
 void Stats_OnClientSpawn(int client)
 {
-    if(!g_bTracking || g_tWarmup != INVALID_HANDLE)
+    if(!g_bTracking || g_tWarmup != null)
         return;
     
     g_eSession[client][Round]++;
@@ -391,7 +393,7 @@ void Stats_OnClientSpawn(int client)
 
 public Action Stats_OnRoundEnd(Handle timer)
 {
-    if(!g_bTracking || g_tWarmup != INVALID_HANDLE)
+    if(!g_bTracking || g_tWarmup != null)
         return;
     
     for(int client = 1; client <= MaxClients; ++client)

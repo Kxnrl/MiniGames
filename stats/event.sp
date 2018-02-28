@@ -9,7 +9,7 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
 {
     if(g_tWarmup != INVALID_HANDLE)
         return;
-    
+
     int client = GetClientOfUserId(event.GetInt("userid"));
     int attacker = GetClientOfUserId(event.GetInt("attacker"));
     int assister = GetClientOfUserId(event.GetInt("assister"));

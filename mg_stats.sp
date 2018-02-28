@@ -26,7 +26,7 @@ public Plugin myinfo =
     name        = "MiniGames",
     author      = "Kyle",
     description = "Ex",
-    version     = "4.0 - 2018/02/06",
+    version     = "4.1 - 2018/02/28",
     url         = "https://steamcommunity.com/id/Kxnrl/"
 };
 
@@ -41,8 +41,6 @@ public void OnPluginStart()
     RegConsoleCmd("sm_rank", Command_Rank);
     RegConsoleCmd("sm_stats", Command_Rank);
     RegConsoleCmd("sm_top", Command_Top);
-    RegConsoleCmd("sm_bc", Command_Bet);
-    RegConsoleCmd("sm_bet", Command_Bet);
 
     for(int x; x < 27; ++x)
         AddCommandListener(Command_BlockCmd, g_szBlockCmd[x]);
@@ -56,16 +54,44 @@ public void OnPluginStart()
 
     HookEventEx("player_team", Event_dontBroadcast, EventHookMode_Pre);
     HookEventEx("player_disconnect", Event_dontBroadcast, EventHookMode_Pre);
-    
+
     HookEventEx("cs_win_panel_match", Event_WinPanel, EventHookMode_Post);
     HookEventEx("announce_phase_end", Event_AnnouncePhaseEnd, EventHookMode_Post);
     
-    char error[256];
-    g_hDatabase = SQL_Connect("default", false, error, 256);
-    if(g_hDatabase == null)
-        SetFailState("Connect to database Error. -> %s", error);
-    else
-        g_hDatabase.SetCharset("utf8");
+    ConnectToDatabase(0);
+}
+
+void ConnectToDatabase(int retry)
+{
+    if(g_hDatabase != null)
+        return;
+
+    Database.Connect(OnConnected, "default", retry);
+}
+
+public void OnConnected(Database db, const char[] error, int retry)
+{
+    if(db == null)
+    {
+        MG_Core_LogError("MySQL", "OnConnected", "Connect failed -> %s", error);
+        if(++retry <= 10)
+            CreateTimer(5.0, Timer_Reconnect, retry);
+        else
+            SetFailState("connect to database failed! -> %s", error);
+        return;
+    }
+
+    g_hDatabase = db;
+    g_hDatabase.SetCharset("utf8");
+
+    BuildRankCache();
+    //CreateTimer(1800.0, Timer_RebuildCache, _, TIMER_REPEAT);
+}
+
+public Action Timer_Reconnect(Handle timer, int retry)
+{
+    ConnectToDatabase(retry);
+    return Plugin_Stop;
 }
 
 public void OnPluginEnd()
@@ -77,8 +103,6 @@ public void OnPluginEnd()
 
 public void OnMapStart()
 {
-    BuildRankCache();
-
     g_smPunishList.Clear();
 
     cs_player_manager = FindEntityByClassname(MaxClients+1, "cs_player_manager");
@@ -95,7 +119,7 @@ public void OnMapStart()
     ConVar_OnMapStart();
 
     ClearTimer(g_tWarmup);
-    g_tWarmup = CreateTimer(GetConVarFloat(FindConVar("mp_warmuptime")), Timer_Warmup);
+    g_tWarmup = CreateTimer(FindConVar("mp_warmuptime").FloatValue, Timer_Warmup);
     CreateTimer(1.0, Timer_CheckWeapon, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
@@ -117,13 +141,9 @@ public void OnAutoConfigsBuffered()
     LogMessage("Executed %s", mapconfig);
 }
 
-public void OnConfigsExecuted()
-{
-    LockConVar();
-}
-
 public void OnMapEnd()
 {
+    ClearTimer(g_tWarmup);
     ClearTimer(g_tWallHack);
 
     if(cs_player_manager != -1)
@@ -149,14 +169,13 @@ public void OnClientConnected(int client)
 public void OnClientPutInServer(int client)
 {
     SDKHook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
-    
     IntToString(GetSteamAccountID(client), g_szAccount[client], 32);
 }
 
-public void OnClientDataChecked(int client)
+public void OnClientDataChecked(int client, int uid)
 {
     g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
-    LoadPlayer(client);
+    LoadPlayer(client, uid);
 }
 
 public void OnClientDisconnect(int client)
@@ -169,33 +188,13 @@ public void OnClientDisconnect(int client)
     g_iLvls[client] = 0;
     g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
     SDKUnhook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
-    
+
     if(g_bPunished[client])
     {
         int count = 0;
         g_smPunishList.GetValue(g_szAccount[client], count);
         g_smPunishList.SetValue(g_szAccount[client], ++count, true);
         g_bPunished[client] = false;
-    }
-}
-
-public Action CS_OnBuyCommand(int client, const char[] weapon)
-{
-    if(strcmp(weapon, "scar20") == 0 || strcmp(weapon, "g3sg1") == 0)
-    {
-        RequestFrame(Frame_SlayGaygun, client);
-        return Plugin_Handled;
-    }
-
-    return Plugin_Continue;
-}
-
-void Frame_SlayGaygun(int client)
-{
-    if(IsValidClient(client))
-    {
-        ForcePlayerSuicide(client);
-        PrintToChatAll("[\x04MG\x01]  \x0B%N\x01使用\x09连狙\x01时遭遇天谴", client);
     }
 }
 
@@ -252,13 +251,22 @@ void Frame_OnEquipPost(Handle pack)
     SetEntProp(client, Prop_Send, "m_iAmmo", 233, _, amtype);
 }
 
+void Frame_SlayGaygun(int client)
+{
+    if(IsValidClient(client))
+    {
+        ForcePlayerSuicide(client);
+        PrintToChatAll("[\x04MG\x01]  \x0B%N\x01使用\x09连狙\x01时遭遇天谴", client);
+    }
+}
+
 public Action Timer_Warmup(Handle timer)
 {
-    g_tWarmup = INVALID_HANDLE;
+    g_tWarmup = null;
     g_bTracking = (GetClientCount(true) >= 6) ?  true : false;
 
-    CreateTimer(5.0, Timer_CheckWarmup, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
-    
+    CreateTimer(5.0, Timer_CheckWarmup, _, TIMER_FLAG_NO_MAPCHANGE);
+
     return Plugin_Stop;
 }
 
@@ -290,7 +298,7 @@ public Action Command_Rank(int client, int args)
 
 public Action Command_Top(int client, int args)
 {
-    if(g_hTopMenu == INVALID_HANDLE)
+    if(g_hTopMenu == null)
         return Plugin_Handled;
     
     DisplayMenu(g_hTopMenu, client, 0);
@@ -305,13 +313,6 @@ public int MenuHandler_MenuTopPlayers(Handle menu, MenuAction action, int param1
 
 public Action Command_BlockCmd(int client, const char[] command, int args)
 {
-    return Plugin_Handled;
-}
-
-public Action Command_Bet(int client, int args)
-{
-    ShowBettingMenu(client);
-
     return Plugin_Handled;
 }
 
@@ -332,7 +333,7 @@ void UTIL_Scoreboard(int client, int buttons)
     if(GetEntProp(client, Prop_Data, "m_nOldButtons") & IN_SCORE)
         return;
 
-    if(StartMessageOne("ServerRankRevealAll", client) != INVALID_HANDLE)
+    if(StartMessageOne("ServerRankRevealAll", client) != null)
         EndMessage();
 }
 

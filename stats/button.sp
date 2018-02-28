@@ -1,12 +1,9 @@
-
-
 void Button_OnPluginStart()
 {
     HookEntityOutput("func_button", "OnPressed", Button_OnButtonPressed);
     
     g_aButtonArray = new ArrayList();
 }
-
 void Button_OnMapStart()
 {
     g_aButtonArray.Clear();
@@ -19,7 +16,7 @@ void Button_OnRoundStart()
     //{
     //    SDKHookEx(button, SDKHook_Use, Button_OnButtonUse);
     //}
-    
+
     if(GetArraySize(g_aButtonArray) > 3)
         g_aButtonArray.Erase(0);
 }
@@ -33,7 +30,7 @@ public void Button_OnButtonPressed(const char[] output, int caller, int client, 
     GetEntPropString(caller, Prop_Data, "m_iName", name, 32)
     PrintToChatAll("[\x04MG\x01]   \x04%N\x01按下了[\x04按钮%04d\x01(\x10%s\x01)]", client, caller, name);
 }
-
+/*
 public Action Button_OnButtonUse(int button, int activator, int caller, UseType type, float value)
 {
     if(!IsValidEdict(button) || !IsValidClient(activator))
@@ -59,3 +56,4 @@ public Action Button_OnButtonUse(int button, int activator, int caller, UseType 
 
     return Plugin_Continue;
 }
+*/

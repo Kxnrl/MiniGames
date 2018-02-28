@@ -1,6 +1,8 @@
-
 void Bets_OnPluginStart()
 {
+    RegConsoleCmd("sm_bc", Command_Bet);
+    RegConsoleCmd("sm_bet", Command_Bet);
+    
     g_hBetMenu = CreateMenu(MenuHandler_BetSelectTeam);
     SetMenuTitleEx(g_hBetMenu, "[MG]   菠菜");
     SetMenuExitButton(g_hBetMenu, true);
@@ -21,6 +23,16 @@ void Bets_OnPluginStart()
     AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "1000", "1000 G");
     AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "5000", "5000 G");
     AddMenuItemEx(g_hGetMenu, ITEMDRAW_DEFAULT, "10000", "10000 G");
+}
+
+public Action Command_Bet(int client, int args)
+{
+    if(!client)
+        return Plugin_Handled;
+
+    ShowBettingMenu(client);
+
+    return Plugin_Handled;
 }
 
 public int MenuHandler_BetSelectTeam(Handle menu, MenuAction action, int client, int itemNum) 

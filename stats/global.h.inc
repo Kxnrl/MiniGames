@@ -56,7 +56,7 @@ enum STAT_TYPES
 STAT_TYPES g_eStatistical[MAXPLAYERS+1][STAT_TYPES];
 STAT_TYPES g_eSession[MAXPLAYERS+1][STAT_TYPES];
 
-Handle g_RankArray;
+ArrayList g_RankArray;
 Handle g_hTopMenu;
 
 bool g_bTracking;
