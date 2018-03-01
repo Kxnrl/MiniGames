@@ -26,17 +26,8 @@ void ConVar_OnPluginStart()
     HookConVarChange(mp_t_default_melee, OnSettingChanged);
     HookConVarChange(mp_t_default_primary, OnSettingChanged);
     HookConVarChange(mp_t_default_secondary, OnSettingChanged);
-    HookConVarChange(mg_bhopspeed, OnSettingChanged);
-    HookConVarChange(sv_autobunnyhopping, OnSettingChanged);
-    HookConVarChange(sv_enablebunnyhopping, OnSettingChanged);
-    
-    AutoExecConfig(true, "minigames");
-}
 
-void ConVar_OnMapStart()
-{
-    LockConVar();
-    SetConVarString(FindConVar("sv_tags"), "MG,MiniGames,MultiGames,Shop,Talent", false, false);
+    AutoExecConfig(true, "minigames");
 }
 
 public void OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -44,9 +35,9 @@ public void OnSettingChanged(ConVar convar, const char[] oldValue, const char[] 
     LockConVar();
 }
 
-void LockConVar()
+void SetConVarDefault()
 {
-    FindConVar("phys_pushscale").SetInt(5);
+    FindConVar("phys_pushscale").SetInt(3);
     FindConVar("phys_timescale").SetInt(1);
     FindConVar("sv_damage_print_enable").SetInt(0);
     FindConVar("sv_staminamax").SetInt(0);
@@ -57,12 +48,17 @@ void LockConVar()
     FindConVar("sv_accelerate_use_weapon_speed").SetInt(0);
     FindConVar("sv_maxvelocity").SetInt(3500);
     FindConVar("sv_full_alltalk").SetInt(1);
-    FindConVar("mp_limitteams").SetInt(2);
-    FindConVar("mp_autoteambalance").SetInt(1);
+    FindConVar("mp_limitteams").SetInt(0);
+    FindConVar("mp_autoteambalance").SetInt(0);
+}
+
+void LockConVar()
+{
     mp_ct_default_melee.SetString("", true, false);
     mp_ct_default_primary.SetString("", true, false);
     mp_ct_default_secondary.SetString("", true, false);
     mp_t_default_melee.SetString("", true, false);
     mp_t_default_primary.SetString("", true, false);
     mp_t_default_secondary.SetString("", true, false);
+    FindConVar("sv_tags").SetString("MG,MiniGames,MultiGames,Shop,Talent", false, false);
 }

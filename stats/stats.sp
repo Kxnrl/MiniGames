@@ -1,5 +1,6 @@
 public Action Timer_RebuildCache(Handle timer)
 {
+    PrintToServer("Timer_RebuildCache ...");
     BuildRankCache();
     return Plugin_Stop;
 }
@@ -8,15 +9,6 @@ void BuildRankCache()
 {
     if(g_RankArray == null)
         g_RankArray = new ArrayList(ByteCountToCells(32));
-
-    g_RankArray.Clear();
-    g_RankArray.PushString("This is First Line in Array");
-
-    if(g_hDatabase == null)
-    {
-        CreateTimer(2.0, Timer_RebuildCache, _, TIMER_FLAG_NO_MAPCHANGE);
-        return;
-    }
 
     PrintToServer("Build Rank Cacahe ...");
 
@@ -33,6 +25,9 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
 
     if(results.RowCount > 0)
     {
+        g_RankArray.Clear();
+        g_RankArray.PushString("This is First Line in Array");
+
         char name[32];
         int iKill, iDeath, iScore;
         

@@ -1,4 +1,4 @@
-#include <cstrike>
+ #include <cstrike>
 #include <clientprefs>
 #include <maoling>
 #include <emitsoundany>
@@ -85,7 +85,7 @@ public void OnConnected(Database db, const char[] error, int retry)
     g_hDatabase.SetCharset("utf8");
 
     BuildRankCache();
-    //CreateTimer(1800.0, Timer_RebuildCache, _, TIMER_REPEAT);
+    CreateTimer(1200.0, Timer_RebuildCache, _, TIMER_REPEAT);
 }
 
 public Action Timer_Reconnect(Handle timer, int retry)
@@ -116,7 +116,6 @@ public void OnMapStart()
     g_iHalo = PrecacheModel("materials/sprites/halo.vmt");
 
     Button_OnMapStart();
-    ConVar_OnMapStart();
 
     ClearTimer(g_tWarmup);
     g_tWarmup = CreateTimer(FindConVar("mp_warmuptime").FloatValue, Timer_Warmup);
@@ -125,6 +124,9 @@ public void OnMapStart()
 
 public void OnAutoConfigsBuffered()
 {
+    LockConVar();
+    SetConVarDefault();
+    
     char mapconfig[256];
 
     GetCurrentMap(mapconfig, 256);

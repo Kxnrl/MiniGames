@@ -40,18 +40,19 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
 	GetCmdArg(1, arg, 4);
 	int newteam = StringToInt(arg);
 	int oldteam = GetClientTeam(client);
-	
-	if(GetUserFlagBits(client) & ADMFLAG_ROOT)
-	{
-		ChangeClientTeam(client, newteam);
-		return Plugin_Handled;
-	}
-	
+
 	if(IsPlayerAlive(client))
 	{
 		PrintToChat(client, " \x02活着的时候不能切换队伍");
 		return Plugin_Handled;
 	}
+    
+    //int pending = GetEntProp(client, Prop_Send, "m_iPendingTeamNum");
+    //if(pending == 2 || pending == 3)
+    //{
+    //    PrintToChat(client, " \x02交换队伍时不允许切换队伍");
+	//	return Plugin_Handled;
+    //}
 
 	if(oldteam == TEAM_UNASSIGNED)
 	{
@@ -59,23 +60,15 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
 		ChangeClientTeam(client, newteam);
 		return Plugin_Handled;
 	}
-	
+
 	if(newteam == oldteam)
 		return Plugin_Handled;
 
-	if(oldteam >= TEAM_SPECTATE)
+	if(oldteam > TEAM_SPECTATE)
 	{
-		if(newteam <= TEAM_SPECTATE)
-		{
-			ChangeClientTeam(client, TEAM_SPECTATE);
-			return Plugin_Handled;
-		}
-		else
-		{
-			newteam = GetAllowTeam();
-			ChangeClientTeam(client, newteam);
-			return Plugin_Handled;
-		}
+        newteam = GetAllowTeam();
+        ChangeClientTeam(client, newteam);
+        return Plugin_Handled;
 	}
 
 	ChangeClientTeam(client, TEAM_SPECTATE);

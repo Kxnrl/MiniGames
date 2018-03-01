@@ -1,7 +1,7 @@
 void Button_OnPluginStart()
 {
     HookEntityOutput("func_button", "OnPressed", Button_OnButtonPressed);
-    
+
     g_aButtonArray = new ArrayList();
 }
 void Button_OnMapStart()

@@ -97,43 +97,49 @@ public Action Client_SpawnPost(Handle timer, int client)
 public Action Client_RandomTeam(Handle timer)
 {
     ArrayList array_players = new ArrayList();
-
+    
     int teams[MAXPLAYERS+1];
-
     for(int x = 1; x <= MaxClients; ++x)
-        if(IsClientInGame(x) && !IsFakeClient(x) && !IsClientSourceTV(x))
+        if(IsClientInGame(x) && !IsFakeClient(x))
         {
             teams[x] = GetClientTeam(x);
             if(teams[x] <= 1)
                 continue;
-            PushArrayCell(array_players, x);
+            array_players.Push(x);
         }
 
-    int random = 0;
-    int ctLeft = RoundFloat(GetArraySize(array_players)*0.5);
+    int client, random, counts = RoundToNearest(array_players.Length*0.5);
+    LogMessage("Starting Random Team -> %d : %d", counts, array_players.Length - counts);
     while((random = RandomArray(array_players)) != -1)
     {
-        int client = GetArrayCell(array_players, random);
-        RemoveFromArray(array_players, random);
+        client = array_players.Get(random);
+        array_players.Erase(random);
 
-        if(ctLeft > 0)
+        if(counts > 0)
         {
-            ctLeft--;
+            counts--;
 
-            if(teams[client] == 3)
-                continue;
-
-            SetEntProp(client, Prop_Send, "m_iPendingTeamNum", CS_TEAM_CT);
-            PrintCenterText(client, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
-            
+            if(teams[x] != 2 && GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 2)
+            {
+                //CS_SwitchTeam(client, 2);
+                SetEntProp(client, Prop_Send, "m_iPendingTeamNum", 2);
+                LogMessage("%N switch to CS_TEAM_TE", client);
+                PrintCenterText(client, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
+            }
+            else
+                LogMessage("%N stay in CS_TEAM_TE", client);
         }
         else
         {
-            if(teams[client] != 2)
-                continue;
-
-            SetEntProp(client, Prop_Send, "m_iPendingTeamNum", CS_TEAM_T);
-            PrintCenterText(client, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
+            if(teams[x] != 2 && GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 2)
+            {
+                //CS_SwitchTeam(client, 3);
+                SetEntProp(client, Prop_Send, "m_iPendingTeamNum", 3);
+                LogMessage("%N switch to CS_TEAM_CT", client);
+                PrintCenterText(client, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
+            }
+            else
+                LogMessage("%N stay in CS_TEAM_CT", client);
         }
     }
 
@@ -144,12 +150,12 @@ public Action Client_RandomTeam(Handle timer)
 
 int RandomArray(ArrayList array)
 {
-    int x = GetArraySize(array);
-    
-    if(x == 0)
+    int x = array.Length - 1;
+
+    if(x < 0)
         return -1;
-    
-    return GetRandomInt(0, x-1);
+
+    return GetRandomInt(0, x);
 }
 
 bool Client_Bepunished(int client)
