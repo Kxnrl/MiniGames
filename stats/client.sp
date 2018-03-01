@@ -119,7 +119,7 @@ public Action Client_RandomTeam(Handle timer)
         {
             counts--;
 
-            if(teams[x] != 2 && GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 2)
+            if(teams[client] != 2 && GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 2)
             {
                 //CS_SwitchTeam(client, 2);
                 SetEntProp(client, Prop_Send, "m_iPendingTeamNum", 2);
@@ -131,7 +131,7 @@ public Action Client_RandomTeam(Handle timer)
         }
         else
         {
-            if(teams[x] != 2 && GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 2)
+            if(teams[client] != 2 && GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 2)
             {
                 //CS_SwitchTeam(client, 3);
                 SetEntProp(client, Prop_Send, "m_iPendingTeamNum", 3);
