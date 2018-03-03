@@ -1,7 +1,7 @@
 void Teams_OnRoundEnd()
 {
     if(mg_randomteam.BoolValue)
-        CreateTimer(3.0, Teams_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
+        CreateTimer(2.0, Teams_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Teams_RandomTeam(Handle timer)
@@ -17,7 +17,6 @@ public Action Teams_RandomTeam(Handle timer)
 
     int random = -1;
     int counts = RoundToNearest(array_players.Length*0.5);
-    LogMessage("Starting Random Team -> %d : %d", counts, array_players.Length - counts);
     while((random = RandomArray(array_players)) != -1)
     {
         int client = array_players.Get(random);
@@ -27,27 +26,23 @@ public Action Teams_RandomTeam(Handle timer)
         {
             counts--;
 
-            if(g_iTeam[client] != 2 && GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 2)
+            if(g_iTeam[client] != 2 /*&& GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 2*/)
             {
-                //CS_SwitchTeam(client, 2);
-                SetEntProp(client, Prop_Send, "m_iPendingTeamNum", 2);
+                CS_SwitchTeam(client, 2);
+                //SetEntProp(client, Prop_Send, "m_iPendingTeamNum", 2);
                 LogMessage("%N switch to CS_TEAM_TE", client);
                 PrintCenterText(client, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
             }
-            else
-                LogMessage("%N stay in CS_TEAM_TE", client);
         }
         else
         {
-            if(g_iTeam[client] != 3 && GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 3)
+            if(g_iTeam[client] != 3 /*&& GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 3*/)
             {
-                //CS_SwitchTeam(client, 3);
-                SetEntProp(client, Prop_Send, "m_iPendingTeamNum", 3);
+                CS_SwitchTeam(client, 3);
+                //SetEntProp(client, Prop_Send, "m_iPendingTeamNum", 3);
                 LogMessage("%N switch to CS_TEAM_CT", client);
                 PrintCenterText(client, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
             }
-            else
-                LogMessage("%N stay in CS_TEAM_CT", client);
         }
     }
 

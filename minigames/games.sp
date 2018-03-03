@@ -1,4 +1,6 @@
-Handle t_tWallHack = null;
+static Handle t_tWallHack = null;
+static bool t_bOnGround[MAXPLAYERS+1];
+
 
 void Games_OnMapStart()
 {
@@ -65,21 +67,22 @@ void Games_OnPlayerRunCmd(int client)
 
     if(!sv_enablebunnyhopping.BoolValue)
         return;
+
+    if(GetEntityFlags(client) & FL_ONGROUND)
+        t_bOnGround[client] = true;
+    else
+        t_bOnGround[client] = false;
     
-    static bool OnGround[MAXPLAYERS+1];
-    
-    OnGround[client] = view_as<bool>(GetEntityFlags(client) & FL_ONGROUND);
-    
-    Games_LimitPreSpeed(client, OnGround[client]);
+    Games_LimitPreSpeed(client);
 }
 
-void Games_LimitPreSpeed(int client, bool OnGround)
+void Games_LimitPreSpeed(int client)
 {
     static bool IsOnGround[MAXPLAYERS+1];
     
-    if(OnGround)
+    if(t_bOnGround[client])
     {
-        if(IsOnGround[client])
+        if(!IsOnGround[client])
         {
             float CurVelVec[3];
             GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);

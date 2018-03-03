@@ -1,8 +1,9 @@
-ArrayList t_aRankCache = null;
-Menu t_RankMenu = null;
-int t_iCompLevel[MAXPLAYERS+1];
-int t_iRank[MAXPLAYERS+1];
-int cs_player_manager = -1;
+static ArrayList t_aRankCache = null;
+static Menu t_RankMenu = null;
+static int t_iCompLevel[MAXPLAYERS+1];
+static int t_iRank[MAXPLAYERS+1];
+static int cs_player_manager = -1;
+
 
 void Ranks_OnPluginStart()
 {
@@ -11,7 +12,7 @@ void Ranks_OnPluginStart()
     RegConsoleCmd("sm_top",  Command_Rank);
     RegConsoleCmd("sm_rank", Command_Rank);
 
-    CreateTimer(3600.0, Timer_RefreshRank, _, TIMER_REPEAT);
+    CreateTimer(1200.0, Timer_RefreshRank, _, TIMER_REPEAT);
 }
 
 public Action Timer_RefreshRank(Handle timer)

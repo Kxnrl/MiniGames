@@ -21,6 +21,7 @@
 // libraries
 #include <sdktools>
 #include <sdkhooks>
+#include <cstrike>
 
 // header
 #include "minigames/global.h"
@@ -86,7 +87,7 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
     {
         LogError("Database_OnConnected -> Connect failed -> %s", error);
         if(++retry <= 10)
-            CreateTimer(5.0, Timer_ReconnectDB, retry);
+            CreateTimer(3.0, Timer_ReconnectDB, retry);
         else
             SetFailState("connect to database failed! -> %s", error);
         return;

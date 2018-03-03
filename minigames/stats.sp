@@ -1,9 +1,9 @@
-any t_Session[MAXPLAYERS+1][Analytics];
-any t_StatsDB[MAXPLAYERS+1][Analytics];
+static any t_Session[MAXPLAYERS+1][Analytics];
+static any t_StatsDB[MAXPLAYERS+1][Analytics];
 
-bool t_bLoaded[MAXPLAYERS+1];
+static bool t_bLoaded[MAXPLAYERS+1];
+static bool t_bEnabled = false;
 
-bool t_bEnabled = false;
 
 void Stats_OnPluginStart()
 {

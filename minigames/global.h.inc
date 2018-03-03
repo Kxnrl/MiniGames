@@ -1,7 +1,7 @@
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "beta1.1"
+#define PI_VERSION  "beta1.2"
 #define PI_URL      "https://02.ditf.moe/"
 
 public Plugin myinfo = 

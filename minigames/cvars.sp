@@ -1,10 +1,10 @@
-ConVar mp_ct_default_melee;
-ConVar mp_ct_default_primary;
-ConVar mp_ct_default_secondary;
-ConVar mp_t_default_melee;
-ConVar mp_t_default_primary;
-ConVar mp_t_default_secondary;
-ConVar sv_tags;
+static ConVar mp_ct_default_melee;
+static ConVar mp_ct_default_primary;
+static ConVar mp_ct_default_secondary;
+static ConVar mp_t_default_melee;
+static ConVar mp_t_default_primary;
+static ConVar mp_t_default_secondary;
+static ConVar sv_tags;
 
 
 void Cvars_OnPluginStart()
