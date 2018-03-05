@@ -94,7 +94,7 @@ stock void Chat(int client, const char[] buffer, any ...)
 
     Protobuf pb = UserMessageToProtobuf(SayText2);
     pb.SetInt("ent_idx", client);
-    pb.SetBool("chat", true); // force trigger sound
+    pb.SetBool("chat", true); // force trigger sound and console log
     pb.SetString("msg_name", msg);
     pb.AddString("params", "");
     pb.AddString("params", "");
@@ -118,7 +118,7 @@ stock void ChatAll(const char[] buffer, any ...)
 
     Protobuf pb = UserMessageToProtobuf(SayText2);
     pb.SetInt("ent_idx", 0);
-    pb.SetBool("chat", true); // force trigger sound
+    pb.SetBool("chat", true); // force trigger sound and console log
     pb.SetString("msg_name", msg);
     pb.AddString("params", "");
     pb.AddString("params", "");

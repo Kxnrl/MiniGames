@@ -43,7 +43,7 @@ void Ranks_OnDBConnected()
     Ranks_BuildRankCache();
 }
 
-void Ranks_BuildRankCache()
+static void Ranks_BuildRankCache()
 {
     PrintToServer("Building Rank Cache ...");
     g_hMySQL.Query(RankCacheCallback, "SELECT `uid`,`username`,`kills`,`deaths`,`score` FROM `dxg_minigames` WHERE `score` >= 0 ORDER BY `score` DESC;");

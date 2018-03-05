@@ -76,7 +76,7 @@ public void OnPluginEnd()
     Stats_OnPluginEnd();
 }
 
-void ConnectToDatabase(int retry)
+static void ConnectToDatabase(int retry)
 {
     if(g_hMySQL != null)
         return;

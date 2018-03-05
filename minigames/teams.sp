@@ -140,7 +140,7 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
     return Plugin_Handled;
 }
 
-int Teams_GetAllowTeam()
+static int Teams_GetAllowTeam()
 {
 	return (GetTeamClientCount(2) > GetTeamClientCount(3)) ? 3 : 2;
 }

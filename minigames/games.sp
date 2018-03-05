@@ -93,7 +93,7 @@ void Games_OnPlayerRunCmd(int client)
     Games_LimitPreSpeed(client);
 }
 
-void Games_LimitPreSpeed(int client)
+static void Games_LimitPreSpeed(int client)
 {
     static bool IsOnGround[MAXPLAYERS+1];
     

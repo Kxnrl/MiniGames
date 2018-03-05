@@ -62,7 +62,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     Cvars_LockedConVar();
 }
 
-void Cvars_LockedConVar()
+static void Cvars_LockedConVar()
 {
     mp_ct_default_melee.SetString("", true, false);
     mp_ct_default_primary.SetString("", true, false);
@@ -73,7 +73,7 @@ void Cvars_LockedConVar()
     sv_tags.SetString("MG,MiniGames,MultiGames,Shop", false, false);
 }
 
-void Cvars_SetCvarDefault()
+static void Cvars_SetCvarDefault()
 {
     FindConVar("phys_pushscale").SetInt(3);
     FindConVar("phys_timescale").SetInt(1);
