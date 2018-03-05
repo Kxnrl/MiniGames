@@ -141,6 +141,7 @@ public void OnClientConnected(int client)
     g_iTeam[client] = 0;
     
     Stats_OnClientConnected(client);
+    Teams_OnClientConnected(client);
 }
 
 public void OnClientPutInServer(int client)

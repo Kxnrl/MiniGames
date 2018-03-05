@@ -1,3 +1,10 @@
+static t_iNextTeam[MAXPLAYERS+1];
+
+void Teams_OnClientConnected(int client)
+{
+    t_iNextTeam[client] = 0;
+}
+
 void Teams_OnRoundEnd()
 {
     if(mg_randomteam.BoolValue)
@@ -26,27 +33,51 @@ public Action Teams_RandomTeam(Handle timer)
         {
             counts--;
 
-            if(g_iTeam[client] != 2 /*&& GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 2*/)
+            if(g_iTeam[client] != 2)
             {
-                CS_SwitchTeam(client, 2);
-                //SetEntProp(client, Prop_Send, "m_iPendingTeamNum", 2);
-                LogMessage("%N switch to CS_TEAM_TE", client);
-                PrintCenterText(client, "当前地图已经开启随机组队\n 你已被移动到 <font color='#FF0000' size='20'>恐怖分子");
+                t_iNextTeam[client] = 2;
+                PrintCenterText(client, "<font color='#0066CC' size='25'>你将在3s后切换到新的队伍!");
+                CreateTimer(3.0, Timer_ChangeClientTeam, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
             }
         }
         else
         {
             if(g_iTeam[client] != 3 /*&& GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 3*/)
             {
-                CS_SwitchTeam(client, 3);
-                //SetEntProp(client, Prop_Send, "m_iPendingTeamNum", 3);
-                LogMessage("%N switch to CS_TEAM_CT", client);
-                PrintCenterText(client, "当前地图已经开启随机组队\n 你已被移动到 <font color='#0066CC' size='20'>反恐精英");
+                t_iNextTeam[client] = 3;
+                PrintCenterText(client, "<font color='#0066CC' size='25'>你将在3s后切换到新的队伍!");
+                CreateTimer(3.0, Timer_ChangeClientTeam, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
             }
         }
     }
+    
+    ChatAll("\x04当前地图已开启随机组队,新的队伍已经分配...");
 
     delete array_players;
+
+    return Plugin_Stop;
+}
+
+public Action Timer_ChangeClientTeam(Handle timer, int userid)
+{
+    int client = GetClientOfUserId(client);
+    if(!client || !IsClientInGame(client))
+        return Plugin_Stop;
+
+    if(t_iNextTeam[client] == g_iTeam[client])
+    {
+        t_iNextTeam[client] = 0;
+        return Plugin_Stop;
+    }
+
+    CS_SwitchTeam(client, t_iNextTeam[client]);
+    
+    if(t_iNextTeam[client] == 3)
+        PrintCenterText(client, "当前地图已经开启随机组队\n 你已被随机到 <font color='#0066CC' size='20'>反恐精英");
+    else
+        PrintCenterText(client, "当前地图已经开启随机组队\n 你已被随机到 <font color='#FF0000' size='20'>恐怖分子");
+    
+    t_iNextTeam[client] = 0;
 
     return Plugin_Stop;
 }
@@ -60,6 +91,13 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
     GetCmdArg(1, arg, 4);
     int newteam = StringToInt(arg);
     int oldteam = GetClientTeam(client);
+    
+    if(t_iNextTeam[client] != 0)
+    {
+        ChangeClientTeam(client, t_iNextTeam[client]);
+        Chat(client, "\x02随机组队切换队伍中...");
+        return Plugin_Handled;
+    }
 
     if(newteam == oldteam)
         return Plugin_Handled;
