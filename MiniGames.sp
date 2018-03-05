@@ -35,6 +35,9 @@
 
 public void OnPluginStart()
 {
+    if(GetEngineVersion() != Engine_CSGO)
+        SetFailState("This plugin only for CSGO!");
+
     // Database
     ConnectToDatabase(0);
     
@@ -108,6 +111,11 @@ public Action Timer_ReconnectDB(Handle timer, int retry)
 
 public void OnMapStart()
 {
+    char map[128];
+    GetCurrentMap(map, 128);
+    if(StrContains(map, "mg_", false) != 0)
+        SetFailState("This plugin only for mg_ (MiniGames/MultiGames) map!");
+    
     Stats_OnMapStart();
     Games_OnMapStart();
     Ranks_OnMapStart();
@@ -198,6 +206,8 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
     Games_OnPlayerRunCmd(client);
     Ranks_OnPlayerRunCmd(client, buttons);
+    
+    return Plugin_Continue;
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
