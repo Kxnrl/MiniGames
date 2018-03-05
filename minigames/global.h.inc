@@ -89,7 +89,7 @@ stock void Chat(int client, const char[] buffer, any ...)
     }
 
     char msg[256];
-    VFormat(msg, 256, buffer, 2);
+    VFormat(msg, 256, buffer, 3);
     Format(msg, 256, "[\x04MG\x01]   %s", msg);
 
     Protobuf pb = UserMessageToProtobuf(SayText2);
