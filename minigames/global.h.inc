@@ -1,8 +1,25 @@
+/******************************************************************/
+/*                                                                */
+/*                         MiniGames Core                         */
+/*                                                                */
+/*                                                                */
+/*  File:          global.h.inc                                   */
+/*  Description:   MiniGames Game Mod.                            */
+/*                                                                */
+/*                                                                */
+/*  Copyright (C) 2018  Kyle                                      */
+/*  2018/03/05 16:51:01                                           */
+/*                                                                */
+/*  This code is licensed under the GPLv3 License.                */
+/*                                                                */
+/******************************************************************/
+
+
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "beta1.2"
-#define PI_URL      "https://02.ditf.moe/"
+#define PI_VERSION  "1.0+git<commit_counts>"
+#define PI_URL      "https://kxnrl.com/git/sourcepawn/MiniGames"
 
 public Plugin myinfo = 
 {

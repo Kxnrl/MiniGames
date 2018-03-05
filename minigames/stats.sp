@@ -1,3 +1,20 @@
+/******************************************************************/
+/*                                                                */
+/*                         MiniGames Core                         */
+/*                                                                */
+/*                                                                */
+/*  File:          stats.sp                                       */
+/*  Description:   MiniGames Game Mod.                            */
+/*                                                                */
+/*                                                                */
+/*  Copyright (C) 2018  Kyle                                      */
+/*  2018/03/05 16:51:01                                           */
+/*                                                                */
+/*  This code is licensed under the GPLv3 License.                */
+/*                                                                */
+/******************************************************************/
+
+
 static any t_Session[MAXPLAYERS+1][Analytics];
 static any t_StatsDB[MAXPLAYERS+1][Analytics];
 

@@ -1,3 +1,20 @@
+/******************************************************************/
+/*                                                                */
+/*                         MiniGames Core                         */
+/*                                                                */
+/*                                                                */
+/*  File:          games.sp                                       */
+/*  Description:   MiniGames Game Mod.                            */
+/*                                                                */
+/*                                                                */
+/*  Copyright (C) 2018  Kyle                                      */
+/*  2018/03/05 16:51:01                                           */
+/*                                                                */
+/*  This code is licensed under the GPLv3 License.                */
+/*                                                                */
+/******************************************************************/
+
+
 static Handle t_tWallHack = null;
 static bool t_bOnGround[MAXPLAYERS+1];
 
