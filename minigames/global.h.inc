@@ -81,16 +81,50 @@ ConVar sv_enablebunnyhopping    = null;
 // stock functions
 stock void Chat(int client, const char[] buffer, any ...)
 {
-    char vf[256];
-    VFormat(vf, 256, buffer, 3);
-    PrintToChat(client, "[\x04MG\x01]   %s", vf);
+    Handle SayText2 = StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
+    if(SayText2 == null)
+    {
+        LogError("StartMessageOne -> SayText2 is null");
+        return;
+    }
+
+    char msg[256];
+    VFormat(msg, 256, buffer, 2);
+    Format(msg, 256, "[\x04MG\x01]   %s", msg);
+
+    Protobuf pb = UserMessageToProtobuf(SayText2);
+    pb.SetInt("ent_idx", client);
+    pb.SetBool("chat", true); // force trigger sound
+    pb.SetString("msg_name", msg);
+    pb.AddString("params", "");
+    pb.AddString("params", "");
+    pb.AddString("params", "");
+    pb.AddString("params", "");
+    EndMessage();
 }
 
 stock void ChatAll(const char[] buffer, any ...)
 {
-    char vf[256];
-    VFormat(vf, 256, buffer, 2);
-    PrintToChatAll("[\x04MG\x01]   %s", vf);
+    Handle SayText2 = StartMessageAll("SayText2", USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
+    if(SayText2 == null)
+    {
+        LogError("StartMessageAll -> SayText2 is null");
+        return;
+    }
+    
+    char msg[256];
+    VFormat(msg, 256, buffer, 2);
+    Format(msg, 256, "[\x04MG\x01]   %s", msg);
+
+    Protobuf pb = UserMessageToProtobuf(SayText2);
+    pb.SetInt("ent_idx", 0);
+    pb.SetBool("chat", true); // force trigger sound
+    pb.SetString("msg_name", msg);
+    pb.AddString("params", "");
+    pb.AddString("params", "");
+    pb.AddString("params", "");
+    pb.AddString("params", "");
+    EndMessage();
 }
 
 stock void GetWeaponClassname(int weapon, int index, char[] classname, int maxLen)
