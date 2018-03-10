@@ -160,14 +160,20 @@ void DisplayRankDetails(int client, const char[] username, DataPack pack)
     FormatEx(buffer, 128, "刀杀: %d  |  电死: %d  |  雷杀: %d  |  烧死: %d", data[iKnifeKills], data[iTaserKills], data[iGrenadeKills], data[iMolotovKills]);panel.DrawText(buffer);
     FormatEx(buffer, 128, "回合: %d  |  存活: %d  ", data[iPlayRounds], data[iSurvivals]);panel.DrawText(buffer);
     FormatEx(buffer, 128, "得分: %d  |  在线: %d小时  ", data[iTotalScores], data[iTotalOnline] / 3600);panel.DrawText(buffer);
-    
-    panel.Send(client, MenuHandler_RankDetails, 25);
+    panel.DrawText(" ");
+    panel.DrawText(" ");
+    panel.DrawText(" ");
+    panel.DrawItem("", "返回")
+    panel.DrawItem("", "退出");
+    panel.Send(client, MenuHandler_RankDetails, 15);
 }
 
 public int MenuHandler_RankDetails(Menu menu, MenuAction action, int param1, int param2)
 {
     if(action == MenuAction_End)
         delete menu;
+    else if(action == MenuAction_Select && param2 == 0)
+        t_RankMenu.Display(param1, 60);
 }
 
 public Action Command_Rank(int client, int args)
