@@ -41,7 +41,7 @@ cd build
 echo -e "Upload file ..."
 lftp -c "open -u $FTP_USER,$FTP_PSWD $FTP_HOST; put -O /MiniGames/$1/ $FILE"
 
-if [ "$1" = "1.8" ] && [ "$5" = "master" ]; then
+if [ "$1" = "1.8" ]; then
 echo "Upload RAW..."
 cd plugins
 lftp -c "open -u $FTP_USER,$FTP_PSWD $FTP_HOST; put -O /MiniGames/Raw/ MiniGames.smx"

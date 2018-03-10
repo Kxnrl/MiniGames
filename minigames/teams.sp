@@ -15,17 +15,26 @@
 /******************************************************************/
 
 
-static t_iNextTeam[MAXPLAYERS+1];
+static int t_iNextTeam[MAXPLAYERS+1];
+static int t_iSwitchCD = -1;
 
 void Teams_OnClientConnected(int client)
 {
     t_iNextTeam[client] = 0;
 }
 
+void Teams_OnRoundStart()
+{
+    t_iSwitchCD = -1;
+    for(int i = 0; i <= MaxClients; ++i)
+        t_iNextTeam[i] = 0;
+}
+
 void Teams_OnRoundEnd()
 {
+    t_iSwitchCD = -1
     if(mg_randomteam.BoolValue)
-        CreateTimer(2.0, Teams_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
+        CreateTimer(1.5, Teams_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Teams_RandomTeam(Handle timer)
@@ -39,6 +48,7 @@ public Action Teams_RandomTeam(Handle timer)
         if(IsClientInGame(x) && !IsFakeClient(x) && g_iTeam[x] > 1)
             array_players.Push(x);
 
+    int change = 0;
     int random = -1;
     int counts = RoundToNearest(array_players.Length*0.5);
     while((random = RandomArray(array_players)) != -1)
@@ -53,8 +63,8 @@ public Action Teams_RandomTeam(Handle timer)
             if(g_iTeam[client] != 2)
             {
                 t_iNextTeam[client] = 2;
-                PrintCenterText(client, "<font color='#0066CC' size='25'>你将在3s后切换到新的队伍!");
-                CreateTimer(3.0, Timer_ChangeClientTeam, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+                change++;
+                PrintCenterText(client, "<font color='#0066CC' size='25'>你将在4s后切换到新的队伍!");
             }
         }
         else
@@ -62,41 +72,60 @@ public Action Teams_RandomTeam(Handle timer)
             if(g_iTeam[client] != 3)
             {
                 t_iNextTeam[client] = 3;
-                PrintCenterText(client, "<font color='#0066CC' size='25'>你将在3s后切换到新的队伍!");
-                CreateTimer(3.0, Timer_ChangeClientTeam, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+                change++;
+                PrintCenterText(client, "<font color='#0066CC' size='25'>你将在4s后切换到新的队伍!");
             }
         }
     }
 
-    ChatAll("\x04当前地图已开启随机组队,新的队伍已经分配...");
+    if(change > 0)
+    {
+        ChatAll("\x04当前地图已开启随机组队,新的队伍已经分配...");
+        t_iSwitchCD = 3;
+        CreateTimer(1.0, Timer_ChangeTeam, _, TIMER_REPEAT);
+    }
 
     delete array_players;
 
     return Plugin_Stop;
 }
 
-public Action Timer_ChangeClientTeam(Handle timer, int userid)
+public Action Timer_ChangeTeam(Handle timer)
 {
-    int client = GetClientOfUserId(userid);
-    if(!client || !IsClientInGame(client))
+    if(t_iSwitchCD < 0)
         return Plugin_Stop;
-
-    if(t_iNextTeam[client] == g_iTeam[client])
+    
+    if(t_iSwitchCD > 0)
     {
-        t_iNextTeam[client] = 0;
-        return Plugin_Stop;
+        for(int x = 1; x <= MaxClients; ++x)
+            if(IsClientInGame(x) && !IsFakeClient(x) && t_iNextTeam[x] > 0)
+                PrintCenterText(x, "<font color='#0066CC' size='25'>你将在%ds后切换到新的队伍!", t_iSwitchCD);
+    }
+    else
+    {
+        for(int x = 1; x <= MaxClients; ++x)
+            if(IsClientInGame(x) && !IsFakeClient(x) && t_iNextTeam[x] > 0)
+            {
+                if(t_iNextTeam[x] == g_iTeam[x])
+                {
+                    t_iNextTeam[x] = 0;
+                    continue;
+                }
+                
+                CS_SwitchTeam(x, t_iNextTeam[x]);
+                
+                if(t_iNextTeam[x] == 3)
+                    PrintCenterText(x, "当前地图已经开启随机组队\n 你已被随机到 <font color='#0066CC' size='20'>反恐精英");
+                else
+                    PrintCenterText(x, "当前地图已经开启随机组队\n 你已被随机到 <font color='#FF0000' size='20'>恐怖分子");
+            
+                t_iNextTeam[x] = 0;
+            }
     }
 
-    CS_SwitchTeam(client, t_iNextTeam[client]);
-
-    if(t_iNextTeam[client] == 3)
-        PrintCenterText(client, "当前地图已经开启随机组队\n 你已被随机到 <font color='#0066CC' size='20'>反恐精英");
-    else
-        PrintCenterText(client, "当前地图已经开启随机组队\n 你已被随机到 <font color='#FF0000' size='20'>恐怖分子");
+    t_iSwitchCD--;
     
-    t_iNextTeam[client] = 0;
-
-    return Plugin_Stop;
+    return Plugin_Continue;
 }
 
 public Action Command_Jointeam(int client, const char[] command, int argc)

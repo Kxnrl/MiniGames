@@ -270,6 +270,7 @@ public Action Event_PlayerDisconnect(Event event, const char[] name, bool dontBr
 public void Event_RoundStart(Event event, const char[] name, bool dontBroadcast)
 {
     Games_OnRoundStart();
+    Teams_OnRoundStart();
 }
 
 public void Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
