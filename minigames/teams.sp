@@ -59,7 +59,7 @@ public Action Teams_RandomTeam(Handle timer)
         }
         else
         {
-            if(g_iTeam[client] != 3 /*&& GetEntProp(client, Prop_Send, "m_iPendingTeamNum") != 3*/)
+            if(g_iTeam[client] != 3)
             {
                 t_iNextTeam[client] = 3;
                 PrintCenterText(client, "<font color='#0066CC' size='25'>你将在3s后切换到新的队伍!");
@@ -67,7 +67,7 @@ public Action Teams_RandomTeam(Handle timer)
             }
         }
     }
-    
+
     ChatAll("\x04当前地图已开启随机组队,新的队伍已经分配...");
 
     delete array_players;
@@ -77,7 +77,7 @@ public Action Teams_RandomTeam(Handle timer)
 
 public Action Timer_ChangeClientTeam(Handle timer, int userid)
 {
-    int client = GetClientOfUserId(client);
+    int client = GetClientOfUserId(userid);
     if(!client || !IsClientInGame(client))
         return Plugin_Stop;
 
@@ -88,7 +88,7 @@ public Action Timer_ChangeClientTeam(Handle timer, int userid)
     }
 
     CS_SwitchTeam(client, t_iNextTeam[client]);
-    
+
     if(t_iNextTeam[client] == 3)
         PrintCenterText(client, "当前地图已经开启随机组队\n 你已被随机到 <font color='#0066CC' size='20'>反恐精英");
     else
@@ -109,19 +109,20 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
     int newteam = StringToInt(arg);
     int oldteam = GetClientTeam(client);
     
-    if(t_iNextTeam[client] != 0)
-    {
-        ChangeClientTeam(client, t_iNextTeam[client]);
-        Chat(client, "\x02随机组队切换队伍中...");
-        return Plugin_Handled;
-    }
-
-    if(newteam == oldteam)
-        return Plugin_Handled;
-
     if(oldteam <= 1)
     {
         ChangeClientTeam(client, Teams_GetAllowTeam());
+        return Plugin_Handled;
+    }
+    
+    if(newteam == oldteam)
+        return Plugin_Handled;
+    
+    if(t_iNextTeam[client] != 0)
+    {
+        ChangeClientTeam(client, t_iNextTeam[client]);
+        t_iNextTeam[client] = 0;
+        Chat(client, "\x02随机组队切换队伍中...");
         return Plugin_Handled;
     }
 
