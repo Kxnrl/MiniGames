@@ -150,21 +150,21 @@ void DisplayRankDetails(int client, const char[] username, DataPack pack)
     Panel panel = new Panel();
     
     panel.SetTitle("▽ Ranking ▽");
-    panel.DrawText(" ");
+    panel.DrawText("    ");
     panel.DrawText(username);
-    panel.DrawText(" ");
-    
+    panel.DrawText("    ");
+
     FormatEx(buffer, 128, "杀敌: %d  |  死亡: %d  |  助攻: %d", data[iKills], data[iDeaths], data[iAssists]);panel.DrawText(buffer);
     FormatEx(buffer, 128, "开火: %d  |  命中: %d  |  爆头: %d  |  总伤害: %d", data[iShots], data[iHits], data[iHeadshots], data[iTotalDamage]);panel.DrawText(buffer);
     FormatEx(buffer, 128, "杀亡比: %.2f  |  爆头率: %.2f%%  |  命中率: %.2f%%", float(data[iKills])/float(data[iDeaths]+1), float(data[iHeadshots] * 100)/float(data[iKills] - data[iKnifeKills] - data[iTaserKills]), float(data[iHits])/float(data[iShots]+1));panel.DrawText(buffer);
     FormatEx(buffer, 128, "刀杀: %d  |  电死: %d  |  雷杀: %d  |  烧死: %d", data[iKnifeKills], data[iTaserKills], data[iGrenadeKills], data[iMolotovKills]);panel.DrawText(buffer);
     FormatEx(buffer, 128, "回合: %d  |  存活: %d  ", data[iPlayRounds], data[iSurvivals]);panel.DrawText(buffer);
     FormatEx(buffer, 128, "得分: %d  |  在线: %d小时  ", data[iTotalScores], data[iTotalOnline] / 3600);panel.DrawText(buffer);
-    panel.DrawText(" ");
-    panel.DrawText(" ");
-    panel.DrawText(" ");
-    panel.DrawItem("", "返回")
-    panel.DrawItem("", "退出");
+    panel.DrawText("    ");
+    panel.DrawText("    ");
+    panel.DrawText("    ");
+    panel.DrawItem("返回");
+    panel.DrawItem("退出");
     panel.Send(client, MenuHandler_RankDetails, 15);
 }
 

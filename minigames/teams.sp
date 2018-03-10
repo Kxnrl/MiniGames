@@ -32,7 +32,7 @@ void Teams_OnRoundStart()
 
 void Teams_OnRoundEnd()
 {
-    t_iSwitchCD = -1
+    t_iSwitchCD = -1;
     if(mg_randomteam.BoolValue)
         CreateTimer(1.5, Teams_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
 }
