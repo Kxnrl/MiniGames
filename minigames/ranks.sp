@@ -259,6 +259,7 @@ void Ranks_OnPlayerRunCmd(int client, int buttons)
 void Ranks_OnClientLoaded(int client)
 {
     // loading rank
+    g_iTeam[client] = GetClientTeam(client);
 
     int rank = t_aRankCache.FindValue(g_iUId[client]);
     if(rank == -1)
