@@ -33,10 +33,10 @@
 #include "minigames/cvars.sp"
 #include "minigames/games.sp"
 
-public void APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
     g_bLateLoad = late;
-    
+
     return APLRes_Success;
 }
 
