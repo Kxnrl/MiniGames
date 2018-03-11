@@ -34,7 +34,7 @@ void Cvars_OnPluginStart()
     mg_spawn_helmet     = CreateConVar("mg_spawn_helmet", "0", "", _, true, 0.0, true, 1.0);
     mg_bhopspeed        = CreateConVar("mg_bhopspeed", "250.0", "bhop speed limit", _, true, 200.0, true, 3500.0);
     mg_randomteam       = CreateConVar("mg_randomteam", "1", "scrable team", _, true, 0.0, true, 1.0);
-    mg_wallhack_delay   = CreateConVar("mg_wallhack_delay", "150.0", "how many seconds wallhack all after round start", _, true, 60.0, true, 600.0);
+    mg_wallhack_delay   = CreateConVar("mg_wallhack_delay", "150.0", "how many seconds wallhack all after round start", _, true, 60.0, true, 150.0);
 
     mp_ct_default_melee         = FindConVar("mp_ct_default_melee");
     mp_ct_default_primary       = FindConVar("mp_ct_default_primary");
@@ -94,10 +94,11 @@ static void Cvars_SetCvarDefault()
 
 void Cvars_OnAutoConfigsBuffered()
 {
+    // set default convars
     Cvars_SetCvarDefault();
     
+    // load map config
     char mapconfig[256];
-
     GetCurrentMap(mapconfig, 256);
     LogMessage("Searching %s.cfg", mapconfig);
     Format(mapconfig, 256, "sourcemod/map-configs/%s.cfg", mapconfig);

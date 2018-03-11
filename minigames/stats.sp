@@ -27,11 +27,34 @@ void Stats_OnPluginStart()
     RegConsoleCmd("sm_stats", Command_Stats);
 }
 
+public Action Command_Stats(int client, int args)
+{
+    if(!client)
+        return Plugin_Handled;
+    
+    if(!t_bLoaded[client])
+    {
+        Chat(client, "请等待你的数据加载完毕...");
+        return Plugin_Handled;
+    }
+    
+    char username[32];
+    GetClientName(client, username, 32);
+    
+    DataPack pack = new DataPack();
+    for(int i = 0; i < view_as<int>(Analytics); ++i)
+        pack.WriteCell(t_Session[client][i] + t_StatsDB[client][i]);
+    
+    DisplayRankDetails(client, username, pack);
+    
+    return Plugin_Handled;
+}
+
 void Stats_OnPluginEnd()
 {
     for(int client = 1; client <= MaxClients; ++ client)
         if(IsClientInGame(client) && !IsFakeClient(client))
-            Stats_OnClientConnected(client);
+            Stats_OnClientDisconnect(client);
 }
 
 void Stats_OnWinPanel()
@@ -43,22 +66,26 @@ void Stats_OnWinPanel()
 
 void Stats_OnMapStart()
 {
+    // disallow tracking
     t_bEnabled = false;
 }
 
 void Stats_OnWarmupEnd()
 {
+    // check tracking
     t_bEnabled = (GetClientCount(true) >= 6 && g_tWarmup == null);
 }
 
 void Stats_OnClientConnected(int client)
 {
+    // init client
+    
     for(int i = 0; i < view_as<int>(Analytics); ++i)
     {
         t_Session[client][i] = 0;
         t_StatsDB[client][i] = 0;
     }
-    
+
     t_bLoaded[client] = false;
     
     t_Session[client][iTotalOnline] = GetTime();
@@ -66,14 +93,18 @@ void Stats_OnClientConnected(int client)
 
 void Stats_OnClientPutInServer(int client)
 {
+    // check tracking
     t_bEnabled = (GetClientCount(true) >= 6 && g_tWarmup == null);
 
+    // ignore bot and gotv
     if(IsFakeClient(client) || IsClientSourceTV(client))
         return;
     
+    // load uid first
+    
     char steamid[32];
     GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
-    
+
     char m_szQuery[128];
     FormatEx(m_szQuery, 128, "SELECT `uid` FROM `dxg_users` WHERE `steamid` = '%s';", steamid);
     g_hMySQL.Query(LoadUserCallback, m_szQuery, GetClientUserId(client));
@@ -83,8 +114,10 @@ void Stats_OnClientDisconnect(int client)
 {
     t_bEnabled = (GetClientCount(true) >= 6 && g_tWarmup == null);
 
-    if(!IsClientInGame(client) || !t_bLoaded[client])
+    if(!t_bLoaded[client])
         return;
+    
+    Stats_PublicMessage(client, true);
 
     t_bLoaded[client] = false;
 
@@ -92,42 +125,43 @@ void Stats_OnClientDisconnect(int client)
     GetClientName(client, name, 32);
     g_hMySQL.Escape(name, ename, 64);
 
+    // saving data
     char m_szQuery[1024];
-    FormatEx(m_szQuery, 1024, "UPDATE `dxg_minigames` SET        \
-                               `username` = '%s',                \
-                               `kills` = `kills` + '%d',         \
-                               `deaths` = `deaths` + '%d',       \
-                               `assists` = `assists` + '%d',     \
-                               `hits` = `hits` + '%d',           \
-                               `shots` = `shots` + '%d',         \
-                               `headshots` = `headshots` + '%d', \
-                               `knife` = `knife` + '%d',         \
-                               `taser` = `taser` + '%d',         \
-                               `grenade` = `grenade` + '%d',     \
-                               `molotov` = `molotov` + '%d',     \
-                               `damage` = `damage` + '%d',       \
-                               `survivals` = `survivals` + '%d', \
-                               `rounds` = `rounds` + '%d',       \
-                               `score` = `score` + '%d',         \
-                               `online` = `online` + '%d'        \
-                               WHERE `uid` = '%d';",
-                               ename,
-                               t_Session[client][iKills],
-                               t_Session[client][iDeaths],
-                               t_Session[client][iAssists],
-                               t_Session[client][iHits],
-                               t_Session[client][iShots],
-                               t_Session[client][iHeadshots],
-                               t_Session[client][iKnifeKills],
-                               t_Session[client][iTaserKills],
-                               t_Session[client][iGrenadeKills],
-                               t_Session[client][iMolotovKills],
-                               t_Session[client][iTotalDamage],
-                               t_Session[client][iSurvivals],
-                               t_Session[client][iPlayRounds],
-                               t_Session[client][iTotalScores],
-                               GetTime() - t_Session[client][iTotalOnline],
-                               g_iUId[client]);
+    FormatEx(m_szQuery, 1024,  "UPDATE `dxg_minigames` SET        \
+                                   `username` = '%s',                \
+                                   `kills` = `kills` + '%d',         \
+                                   `deaths` = `deaths` + '%d',       \
+                                   `assists` = `assists` + '%d',     \
+                                   `hits` = `hits` + '%d',           \
+                                   `shots` = `shots` + '%d',         \
+                                   `headshots` = `headshots` + '%d', \
+                                   `knife` = `knife` + '%d',         \
+                                   `taser` = `taser` + '%d',         \
+                                   `grenade` = `grenade` + '%d',     \
+                                   `molotov` = `molotov` + '%d',     \
+                                   `damage` = `damage` + '%d',       \
+                                   `survivals` = `survivals` + '%d', \
+                                   `rounds` = `rounds` + '%d',       \
+                                   `score` = `score` + '%d',         \
+                                   `online` = `online` + '%d'        \
+                                WHERE `uid` = '%d';",
+                                ename,
+                                t_Session[client][iKills],
+                                t_Session[client][iDeaths],
+                                t_Session[client][iAssists],
+                                t_Session[client][iHits],
+                                t_Session[client][iShots],
+                                t_Session[client][iHeadshots],
+                                t_Session[client][iKnifeKills],
+                                t_Session[client][iTaserKills],
+                                t_Session[client][iGrenadeKills],
+                                t_Session[client][iMolotovKills],
+                                t_Session[client][iTotalDamage],
+                                t_Session[client][iSurvivals],
+                                t_Session[client][iPlayRounds],
+                                t_Session[client][iTotalScores],
+                                GetTime() - t_Session[client][iTotalOnline],
+                                g_iUId[client]);
 
     g_hMySQL.Query(LoadUserCallback, m_szQuery, GetClientUserId(client));
 }
@@ -160,6 +194,7 @@ public void LoadUserCallback(Database db, DBResultSet results, const char[] erro
     
     g_iUId[client] = results.FetchInt(0);
 
+    // load mg data
     char m_szQuery[128];
     FormatEx(m_szQuery, 128, "SELECT * FROM dxg_minigames WHERE uid = %d;", g_iUId[client]);
     db.Query(LoadDataCallback, m_szQuery, userid);
@@ -206,7 +241,7 @@ public Action Stats_ReloadClientUser(Handle timer, int userid)
         return Plugin_Stop;
     
     Stats_OnClientPutInServer(client);
-    
+
     return Plugin_Stop;
 }
 
@@ -216,6 +251,7 @@ public Action Stats_ReloadClientData(Handle timer, int userid)
     if(!client)
         return Plugin_Stop;
     
+    // uid in not valid
     if(g_iUId[client] == 0)
     {
         Stats_OnClientPutInServer(client);
@@ -233,7 +269,7 @@ void Stats_CreateNewClient(int client)
 {
     char m_szQuery[128];
     FormatEx(m_szQuery, 128, "INSERT INTO `dxg_minigames` (uid) VALUES ('%d');", g_iUId[client]);
-    g_hMySQL.Query(CreateClientCallback , m_szQuery, GetClientUserId(client));
+    g_hMySQL.Query(CreateClientCallback, m_szQuery, GetClientUserId(client));
 }
 
 public void CreateClientCallback(Database db, DBResultSet results, const char[] error, int userid)
@@ -261,22 +297,22 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
     Ranks_OnClientLoaded(client);
 }
 
-void Stats_WelcomMessage(int client)
+void Stats_PublicMessage(int client, bool disconnected = false)
 {
-    float hsp = 0.0;
-    if(t_StatsDB[client][iHeadshots] > 0 && t_StatsDB[client][iKills] - t_StatsDB[client][iKnifeKills] - t_StatsDB[client][iTaserKills] > 0)
-        hsp = float(t_StatsDB[client][iHeadshots] * 100)/float(t_StatsDB[client][iKills] - t_StatsDB[client][iKnifeKills] - t_StatsDB[client][iTaserKills]);
-    
-    ChatAll("\x04%N\x01进入了游戏  \x01排名\x04%d  \x0C杀亡比\x04%.2f  \x0C爆头率\x04%.2f%%  \x0C得分\x04%d  \x0C在线\x04%d\x01小时", 
+    // public message
+    ChatAll("\x04%N\x01%s了游戏  \x01排名\x04%d  \x0C杀亡比\x04%.2f  \x0C爆头率\x04%.2f%%  \x0C得分\x04%d  \x0C在线\x04%d\x01小时", 
             client, 
-            Ranks_GetClientRank(client), 
-            float(t_StatsDB[client][iKills])/float(t_StatsDB[client][iDeaths]+1),
-            hsp,
+            disconnected ? "离开" : "进入",
+            Ranks_GetRank(client), 
+            Stats_GetKDA(client) * 100,
+            Stats_GetHSP(client),
             t_StatsDB[client][iTotalScores],
             t_StatsDB[client][iTotalOnline]/3600
             );
-            
-    CreateTimer(5.0, Stats_PrivateMessage, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+
+    // private message
+    if(!disconnected)
+    CreateTimer(15.0, Stats_PrivateMessage, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Stats_PrivateMessage(Handle timer, int userid)
@@ -284,7 +320,7 @@ public Action Stats_PrivateMessage(Handle timer, int userid)
     int client = GetClientOfUserId(userid);
     if(!client || !IsClientInGame(client))
         return Plugin_Stop;
-    
+
     Chat(client, "\x04欢迎来到MagicGirl娱乐世界,祝您游戏愉快...");
     Chat(client, "\x05程序版本 \x04%s\x01  by  \x10%s", PI_VERSION, PI_AUTHOR);
     Chat(client, "\x05常用指令 \x04!rank !stats !top !music !shop !store");
@@ -292,6 +328,9 @@ public Action Stats_PrivateMessage(Handle timer, int userid)
     return Plugin_Stop;
 }
 
+/*******************************************************/
+/******************** Event to Track *******************/
+/*******************************************************/
 void Stats_OnClientSpawn(int client)
 {
     if(!t_bEnabled)
@@ -366,30 +405,51 @@ void Stats_OnRoundEnd()
             t_Session[client][iSurvivals]++;
 }
 
+/*******************************************************/
+/********************** Local API **********************/
+/*******************************************************/
 int Stats_GetTotalScore(int client)
 {
     return t_Session[client][iTotalScores] + t_StatsDB[client][iTotalScores];
 }
 
-public Action Command_Stats(int client, int args)
+int Stats_GetKills(int client)
 {
-    if(!client)
-        return Plugin_Handled;
-    
-    if(!t_bLoaded[client])
-    {
-        Chat(client, "请等待你的数据加载完毕...");
-        return Plugin_Handled;
-    }
-    
-    char username[32];
-    GetClientName(client, username, 32);
-    
-    DataPack pack = new DataPack();
-    for(int i = 0; i < view_as<int>(Analytics); ++i)
-        pack.WriteCell(t_Session[client][i] + t_StatsDB[client][i]);
-    
-    DisplayRankDetails(client, username, pack);
-    
-    return Plugin_Handled;
+    return t_Session[client][iKills] + t_StatsDB[client][iKills];
+}
+
+int Stats_GetAssists(int client)
+{
+    return t_Session[client][iAssists] + t_StatsDB[client][iAssists];
+}
+
+int Stats_GetDeaths(int client)
+{
+    return t_Session[client][iDeaths] + t_StatsDB[client][iDeaths];
+}
+
+float Stats_GetKDA(int client)
+{
+    return float(Stats_GetKills(client))/float(Stats_GetDeaths(client)+1);
+}
+
+int Stats_GetHeadShots(int client)
+{
+    return t_Session[client][iHeadshots] + t_StatsDB[client][iHeadshots];
+}
+
+int Stats_GetKnifeKills(int client)
+{
+    return t_Session[client][iKnifeKills] + t_StatsDB[client][iKnifeKills];
+}
+
+int Stats_GetTaserKills(int client)
+{
+    return t_Session[client][iTaserKills] + t_StatsDB[client][iTaserKills];
+}
+
+float Stats_GetHSP(int client)
+{
+    int totalKill = Stats_GetKills(client) - Stats_GetKnifeKills(client) - Stats_GetTaserKills(client);
+    return (Stats_GetHeadShots(client) > 0 && totalKill > 0) ? float(totalKill) : 0.0;
 }

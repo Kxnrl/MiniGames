@@ -19,16 +19,17 @@ static ArrayList t_aRankCache = null;
 static Menu t_RankMenu = null;
 static int t_iCompLevel[MAXPLAYERS+1];
 static int t_iRank[MAXPLAYERS+1];
-static int cs_player_manager = -1;
 
 
 void Ranks_OnPluginStart()
 {
+    // arraylist to store rank list
     t_aRankCache = new ArrayList(ByteCountToCells(32));
-    
+
     RegConsoleCmd("sm_top",  Command_Rank);
     RegConsoleCmd("sm_rank", Command_Rank);
 
+    // we using timer to dump cache.
     CreateTimer(1200.0, Timer_RefreshRank, _, TIMER_REPEAT);
 }
 
@@ -57,17 +58,20 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
         return;
     }
 
+    // has row?
     if(results.RowCount > 0)
     {
         t_aRankCache.Clear();
-        t_aRankCache.PushString("This is First Line in Array");
+        t_aRankCache.PushString("This is First Line in Array"); // array index start from 0.
 
         if(t_RankMenu != null)
             delete t_RankMenu;
 
+        // rank menu.
         t_RankMenu = new Menu(MenuHandler_RankingTop);
         t_RankMenu.SetTitle("[MG] Top - 100\n ");
 
+        // process data
         char name[32], pidstr[16], buffer[128];
         int index, iKill, iDeath, iScore;
         while(results.FetchRow())
@@ -94,6 +98,7 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
 
 public int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int param2)
 {
+    // loading details
     if(action == MenuAction_Select)
     {
         char info[32];
@@ -109,7 +114,7 @@ public void RankDetailsCallback(Database db, DBResultSet results, const char[] e
     int client = GetClientOfUserId(userid);
     if(!client)
         return;
-    
+
     if(results == null || error[0])
     {
         LogError("RankDetailsCallback -> %L -> %s", client, error);
@@ -124,14 +129,15 @@ public void RankDetailsCallback(Database db, DBResultSet results, const char[] e
         Command_Rank(client, 0);
         return;
     }
-    
+
+    // using datapack instead of array
     DataPack pack = new DataPack();
     for(int i = 0; i < view_as<int>(Analytics); ++i)
         pack.WriteCell(results.FetchInt(i+2));
 
     char username[32];
     results.FetchString(1, username, 32);
-    
+
     DisplayRankDetails(client, username, pack);
 }
 
@@ -147,6 +153,7 @@ void DisplayRankDetails(int client, const char[] username, DataPack pack)
 
     char buffer[128];
 
+    // using panel instead of menu
     Panel panel = new Panel();
     
     panel.SetTitle("▽ Ranking ▽");
@@ -160,11 +167,14 @@ void DisplayRankDetails(int client, const char[] username, DataPack pack)
     FormatEx(buffer, 128, "刀杀: %d  |  电死: %d  |  雷杀: %d  |  烧死: %d", data[iKnifeKills], data[iTaserKills], data[iGrenadeKills], data[iMolotovKills]);panel.DrawText(buffer);
     FormatEx(buffer, 128, "回合: %d  |  存活: %d  ", data[iPlayRounds], data[iSurvivals]);panel.DrawText(buffer);
     FormatEx(buffer, 128, "得分: %d  |  在线: %d小时  ", data[iTotalScores], data[iTotalOnline] / 3600);panel.DrawText(buffer);
+    
     panel.DrawText("    ");
     panel.DrawText("    ");
     panel.DrawText("    ");
     panel.DrawItem("返回");
     panel.DrawItem("退出");
+    
+    // display 
     panel.Send(client, MenuHandler_RankDetails, 15);
 }
 
@@ -180,7 +190,7 @@ public Action Command_Rank(int client, int args)
 {
     if(!client || t_RankMenu == null)
         return Plugin_Handled;
-    
+
     Chat(client, "要查看自己的统计数据,请输入\x04!stats");
 
     t_RankMenu.Display(client, 60);
@@ -190,28 +200,14 @@ public Action Command_Rank(int client, int args)
 
 void Ranks_OnMapStart()
 {
-    cs_player_manager = FindEntityByClassname(MaxClients+1, "cs_player_manager");
-    if(cs_player_manager != -1)
-        if(!SDKHookEx(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost))
-            LogMessage("Ranks_OnMapStart -> Hook cs_player_manager failed!");
-}
-
-public void Hook_OnThinkPost(int entity)
-{
-    static int Offset = -1;
-    if(Offset == -1)
-        Offset = FindSendPropInfo("CCSPlayerResource", "m_iCompetitiveRanking");
-
-    SetEntDataArray(entity, Offset, t_iCompLevel, MAXPLAYERS+1, _, true);
+    // hook scoreboard
+    HookScoreboard(true);
 }
 
 void Ranks_OnMapEnd()
 {
-    if(cs_player_manager != -1)
-    {
-        SDKUnhook(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
-        cs_player_manager = -1;
-    }
+    // unhook scoreboard
+    HookScoreboard(false);
 }
 
 void Ranks_OnClientPutInServer(int client)
@@ -228,11 +224,20 @@ void Ranks_OnClientDisconnect(int client)
 
 void Ranks_OnPlayerRunCmd(int client, int buttons)
 {
+    // process competitive ranking
+    
+    static bool bLast[MAXPLAYERS+1];
+
     if(!(buttons & IN_SCORE))
+    {
+        bLast[client] = false;
+        return;
+    }
+
+    if(bLast[client])
         return;
     
-    if(GetEntProp(client, Prop_Data, "m_nOldButtons") & IN_SCORE)
-        return;
+    bLast[client] = true;
 
     if(StartMessageOne("ServerRankRevealAll", client) != null)
         EndMessage();
@@ -240,6 +245,8 @@ void Ranks_OnPlayerRunCmd(int client, int buttons)
 
 void Ranks_OnClientLoaded(int client)
 {
+    // loading rank
+    
     int rank = t_aRankCache.FindValue(g_iUId[client]);
     if(rank == -1)
         t_iRank[client] = t_aRankCache.Length + 1;
@@ -285,10 +292,53 @@ void Ranks_OnClientLoaded(int client)
     else if(score >= 25)
         t_iCompLevel[client] = 1;
 
-    Stats_WelcomMessage(client);
+    Stats_PublicMessage(client);
 }
 
-int Ranks_GetClientRank(int client)
+int Ranks_GetRank(int client)
 {
     return t_iRank[client];
+}
+
+void HookScoreboard(bool hook)
+{
+    static int  cs_player_manager = -1;
+    static bool bHook = false;
+    cs_player_manager = FindEntityByClassname(MaxClients+1, "cs_player_manager");
+    if(hook)
+    {
+        if(cs_player_manager == -1)
+        {
+            LogError("HookScoreboard -> %b -> cs_player_manager is not valid.");
+            return;
+        }
+
+        bHook = SDKHookEx(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
+
+        if(!bHook)
+            LogError("HookScoreboard -> Hook cs_player_manager failed!");
+    }
+    else
+    {
+        if(cs_player_manager == -1)
+        {
+            LogError("HookScoreboard -> %b -> cs_player_manager is not valid.");
+            return;
+        }
+        
+        if(bHook)
+        {
+            SDKUnhook(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
+            cs_player_manager = -1;
+        }
+    }
+}
+
+public void Hook_OnThinkPost(int entity)
+{
+    static int Offset = -1;
+    if(Offset == -1)
+        Offset = FindSendPropInfo("CCSPlayerResource", "m_iCompetitiveRanking");
+
+    SetEntDataArray(entity, Offset, t_iCompLevel, MAXPLAYERS+1, _, true);
 }

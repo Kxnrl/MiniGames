@@ -73,6 +73,7 @@ public void OnPluginStart()
 
 public void OnPluginEnd()
 {
+    // save all when unload plugin
     Stats_OnPluginEnd();
 }
 
@@ -81,11 +82,13 @@ static void ConnectToDatabase(int retry)
     if(g_hMySQL != null)
         return;
 
+    // connect to database
     Database.Connect(Database_OnConnected, "default", retry);
 }
 
 public void Database_OnConnected(Database db, const char[] error, int retry)
 {
+    // Exception
     if(db == null)
     {
         LogError("Database_OnConnected -> Connect failed -> %s", error);
@@ -99,11 +102,13 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
     g_hMySQL = db;
     g_hMySQL.SetCharset("utf8");
 
+    // fire to module
     Ranks_OnDBConnected();
 }
 
 public Action Timer_ReconnectDB(Handle timer, int retry)
 {
+    // retry
     LogError("Timer_ReconnectDB -> Reconnect -> %d", retry);
     ConnectToDatabase(retry);
     return Plugin_Stop;
@@ -111,11 +116,13 @@ public Action Timer_ReconnectDB(Handle timer, int retry)
 
 public void OnMapStart()
 {
+    // we only work on mg_ maps
     char map[128];
     GetCurrentMap(map, 128);
     if(StrContains(map, "mg_", false) != 0)
         SetFailState("This plugin only for mg_ (MiniGames/MultiGames) map!");
-    
+
+    // fire to module
     Stats_OnMapStart();
     Games_OnMapStart();
     Ranks_OnMapStart();
@@ -123,11 +130,13 @@ public void OnMapStart()
 
 public void OnAutoConfigsBuffered()
 {
+    // fire to module
     Cvars_OnAutoConfigsBuffered();
 }
 
 public void OnConfigsExecuted()
 {
+    // set up warmup timer
     if(g_tWarmup != null)
         KillTimer(g_tWarmup);
     g_tWarmup = CreateTimer(mp_warmuptime.FloatValue + 0.5, Timer_WarmupEnd);
@@ -135,9 +144,11 @@ public void OnConfigsExecuted()
 
 public void OnMapEnd()
 {
+    // fire to module
     Games_OnMapEnd();
     Ranks_OnMapEnd();
     
+    // clear timer
     if(g_tWarmup != null)
         KillTimer(g_tWarmup);
     g_tWarmup = null;
@@ -145,26 +156,36 @@ public void OnMapEnd()
 
 public void OnClientConnected(int client)
 {
+    // reset client vars
     g_iUId [client] = 0;
     g_iTeam[client] = 0;
     
+    // fire to module
     Stats_OnClientConnected(client);
     Teams_OnClientConnected(client);
 }
 
 public void OnClientPutInServer(int client)
 {
+    // fire to module
     Ranks_OnClientPutInServer(client);
     Stats_OnClientPutInServer(client);
     
+    // hook this to check weapon
     SDKHookEx(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
 }
 
 public void OnClientDisconnect(int client)
 {
+    // if client is not fully in-game
+    if(!IsClientInGame(client))
+        return;
+    
+    // fire to module
     Ranks_OnClientDisconnect(client);
     Stats_OnClientDisconnect(client);
 
+    // unhook
     SDKUnhook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
 }
 
@@ -173,6 +194,7 @@ public void Hook_OnPostWeaponEquip(int client, int weapon)
     if(!IsValidEdict(weapon))
         return;
 
+    // we need check weapon when client fully equipped. 1 frame delay.
     DataPack pack = new DataPack();
     pack.WriteCell(client);
     pack.WriteCell(EntIndexToEntRef(weapon));
@@ -183,6 +205,8 @@ public Action Timer_WarmupEnd(Handle timer)
 {
     g_tWarmup = null;
     Stats_OnWarmupEnd();
+    
+    // custom gamemode maybe cause WARMUPTIME 0:01
     CreateTimer(5.0, Timer_CheckWarmupEnd, _, TIMER_FLAG_NO_MAPCHANGE);
     return Plugin_Stop;
 }
@@ -192,6 +216,7 @@ public Action Timer_CheckWarmupEnd(Handle timer)
     if(GameRules_GetProp("m_bWarmupPeriod") != 1)
         return Plugin_Stop;
 
+    // force end warmup
     ServerCommand("mp_warmup_end");
 
     return Plugin_Stop;
@@ -199,11 +224,13 @@ public Action Timer_CheckWarmupEnd(Handle timer)
 
 public Action Command_BlockRadio(int client, const char[] command, int args)
 {
+    // block radio command
     return Plugin_Handled;
 }
 
 public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
 {
+    // fire to module
     Games_OnPlayerRunCmd(client);
     Ranks_OnPlayerRunCmd(client, buttons);
     
@@ -218,7 +245,7 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
     Stats_OnClientSpawn(client);
 
     CreateTimer(0.1, Games_OnClientSpawn, userid);
-    
+
     // for no block
     SetEntData(client, g_offsetNoBlock, 2, 4, true);
 }
@@ -293,11 +320,13 @@ public void Event_WeaponFire(Event event, const char[] name, bool dontBroadcast)
 
 public void Event_WinPanel(Event event, const char[] name, bool dontBroadcast)
 {
+    // save all ...
     Stats_OnWinPanel();
 }
 
 public void Event_AnnouncePhaseEnd(Event event, const char[] name, bool dontBroadcast)
 {
+    // scoreboard ranking
     if(StartMessageAll("ServerRankRevealAll") != null)
         EndMessage();
 }

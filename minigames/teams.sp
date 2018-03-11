@@ -26,6 +26,8 @@ void Teams_OnClientConnected(int client)
 void Teams_OnRoundStart()
 {
     t_iSwitchCD = -1;
+    
+    // reset all player
     for(int i = 0; i <= MaxClients; ++i)
         t_iNextTeam[i] = 0;
 }
@@ -33,6 +35,8 @@ void Teams_OnRoundStart()
 void Teams_OnRoundEnd()
 {
     t_iSwitchCD = -1;
+
+    // timer to delay random team
     if(mg_randomteam.BoolValue)
         CreateTimer(1.5, Teams_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
 }
@@ -44,6 +48,7 @@ public Action Teams_RandomTeam(Handle timer)
     
     ArrayList array_players = new ArrayList();
 
+    // push all client to random pool
     for(int x = 1; x <= MaxClients; ++x)
         if(IsClientInGame(x) && !IsFakeClient(x) && g_iTeam[x] > 1)
             array_players.Push(x);
@@ -51,6 +56,8 @@ public Action Teams_RandomTeam(Handle timer)
     int change = 0;
     int random = -1;
     int counts = RoundToNearest(array_players.Length*0.5);
+    
+    // random client
     while((random = RandomArray(array_players)) != -1)
     {
         int client = array_players.Get(random);
@@ -60,21 +67,27 @@ public Action Teams_RandomTeam(Handle timer)
         {
             counts--;
 
+            // if client is not terrorist
             if(g_iTeam[client] != 2)
             {
                 t_iNextTeam[client] = 2;
                 change++;
                 PrintCenterText(client, "<font color='#0066CC' size='25'>你将在4s后切换到新的队伍!");
             }
+            else
+                PrintCenterText(client, "<font color='#B15700' size='25'>注意: 4s后将出现25仔!");
         }
         else
         {
+            // if client is not CT
             if(g_iTeam[client] != 3)
             {
                 t_iNextTeam[client] = 3;
                 change++;
                 PrintCenterText(client, "<font color='#0066CC' size='25'>你将在4s后切换到新的队伍!");
             }
+            else
+                PrintCenterText(client, "<font color='#B15700' size='25'>注意: 4s后将出现25仔!");
         }
     }
 
@@ -82,6 +95,8 @@ public Action Teams_RandomTeam(Handle timer)
     {
         ChatAll("\x04当前地图已开启随机组队,新的队伍已经分配...");
         t_iSwitchCD = 3;
+        
+        // timer countdown
         CreateTimer(1.0, Timer_ChangeTeam, _, TIMER_REPEAT);
     }
 
@@ -95,14 +110,19 @@ public Action Timer_ChangeTeam(Handle timer)
     if(t_iSwitchCD < 0)
         return Plugin_Stop;
     
+    // countdown
     if(t_iSwitchCD > 0)
     {
         for(int x = 1; x <= MaxClients; ++x)
-            if(IsClientInGame(x) && !IsFakeClient(x) && t_iNextTeam[x] > 0)
-                PrintCenterText(x, "<font color='#0066CC' size='25'>你将在%ds后切换到新的队伍!", t_iSwitchCD);
+            if(IsClientInGame(x) && !IsFakeClient(x))
+                if(t_iNextTeam[x] > 0)
+                    PrintCenterText(x, "<font color='#0066CC' size='25'>你将在%ds后切换到新的队伍!", t_iSwitchCD);
+                else
+                    PrintCenterText(x, "<font color='#B15700' size='25'>注意: %ds后将出现25仔!", t_iSwitchCD);
     }
     else
     {
+        // swtich all client
         for(int x = 1; x <= MaxClients; ++x)
             if(IsClientInGame(x) && !IsFakeClient(x) && t_iNextTeam[x] > 0)
             {
@@ -111,7 +131,7 @@ public Action Timer_ChangeTeam(Handle timer)
                     t_iNextTeam[x] = 0;
                     continue;
                 }
-                
+
                 CS_SwitchTeam(x, t_iNextTeam[x]);
                 
                 if(t_iNextTeam[x] == 3)
@@ -138,15 +158,18 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
     int newteam = StringToInt(arg);
     int oldteam = GetClientTeam(client);
     
+    // if client join game at the moment.
     if(oldteam <= 1)
     {
         ChangeClientTeam(client, Teams_GetAllowTeam());
         return Plugin_Handled;
     }
     
+    // team?
     if(newteam == oldteam)
         return Plugin_Handled;
     
+    // in random team processing
     if(t_iNextTeam[client] != 0)
     {
         ChangeClientTeam(client, t_iNextTeam[client]);
@@ -155,15 +178,10 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
         return Plugin_Handled;
     }
 
-    if(IsPlayerAlive(client))
+    // force change
+    if(IsPlayerAlive(client) || newteam == 1)
     {
-        Chat(client, "\x02活着的时候不能切换队伍");
-        return Plugin_Handled;
-    }
-
-    if(newteam == 1)
-    {
-        ChangeClientTeam(client, 1);
+        ChangeClientTeam(client, newteam);
         return Plugin_Handled;
     }
 
@@ -172,5 +190,18 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
 
 static int Teams_GetAllowTeam()
 {
-	return (GetTeamClientCount(2) > GetTeamClientCount(3)) ? 3 : 2;
+    // allow team.
+    int cts = GetTeamClientCount(3);
+    int tes = GetTeamClientCount(2);
+
+    // random t or ct
+    if(cts == tes)
+        return RandomInt(2, 3);
+
+    // force t side
+    if(cts > tes)
+        return 2;
+    
+    // ct side
+    return 3;
 }
