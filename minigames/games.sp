@@ -38,7 +38,7 @@ public Action Games_UpdateGameHUD(Handle timer)
 {
     // spec hud
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && IsPlayerAlive(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+        if(IsClientInGame(client) && !IsPlayerAlive(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
         {
             // client is in - menu?
             if(GetClientMenu(client, null) != MenuSource_None)

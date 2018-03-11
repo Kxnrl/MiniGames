@@ -304,7 +304,7 @@ void Stats_PublicMessage(int client, bool disconnected = false)
             client, 
             disconnected ? "离开" : "进入",
             Ranks_GetRank(client), 
-            Stats_GetKDA(client) * 100,
+            Stats_GetKDA(client),
             Stats_GetHSP(client),
             t_StatsDB[client][iTotalScores],
             t_StatsDB[client][iTotalOnline]/3600
