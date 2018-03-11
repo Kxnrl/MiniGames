@@ -368,7 +368,7 @@ void Stats_OnRoundEnd()
 
 int Stats_GetTotalScore(int client)
 {
-    return t_Session[client][iTotalScores] + t_Session[client][iTotalScores];
+    return t_Session[client][iTotalScores] + t_StatsDB[client][iTotalScores];
 }
 
 public Action Command_Stats(int client, int args)
