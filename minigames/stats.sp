@@ -451,5 +451,5 @@ int Stats_GetTaserKills(int client)
 float Stats_GetHSP(int client)
 {
     int totalKill = Stats_GetKills(client) - Stats_GetKnifeKills(client) - Stats_GetTaserKills(client);
-    return (Stats_GetHeadShots(client) > 0 && totalKill > 0) ? float(totalKill) : 0.0;
+    return (Stats_GetHeadShots(client) > 0 && totalKill > 0) ? float(Stats_GetHeadShots(client) * 100) / float(totalKill) : 0.0;
 }
