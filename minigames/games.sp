@@ -33,18 +33,18 @@ public Action Games_UpdateGameHUD(Handle timer)
     if(t_iWallHackCD > 0)
     {
         needClear = true;
-        SetHudTextParams(0.695313, 0.066000, 2.0, 9, 128, 0, 128, 0, 30.0, 0.0, 0.0);
+        SetHudTextParams(-1.0, 0.785, 2.0, 9, 255, 9, 255, 0, 30.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if(IsClientInGame(client))
-                ShowSyncHudText(client, t_hndlHudSync, "距离VAC还有:  %d秒", t_iWallHackCD);
+                ShowSyncHudText(client, t_hndlHudSync, ">>>距离VAC还有%d秒<<<", t_iWallHackCD);
     }
     else if(t_iWallHackCD != -1)
     {
         needClear = true;
-        SetHudTextParams(0.695313, 0.066000, 10.0, 9, 128, 0, 128, 0, 30.0, 0.0, 0.0);
+        SetHudTextParams(-1.0, 0.785, 15.0, 9, 255, 9, 255, 0, 30.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if(IsClientInGame(client))
-                ShowSyncHudText(client, t_hndlHudSync, "VAC-WH作弊器已激活!");
+                ShowSyncHudText(client, t_hndlHudSync, "VAC-WH作弊器已激活");
     }
     else if(needClear)
     {
