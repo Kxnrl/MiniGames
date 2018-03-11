@@ -68,7 +68,7 @@ public Action Games_UpdateGameHUD(Handle timer)
             iLastSpecTarget[client] = target;
 
             char message[512];
-            FormatEx(message, 512, "【Lv.%d】 %N\n总排名: %d\n杀敌数: %d\n死亡数: %d\n助攻数: %d\n杀亡比: %.2f\n爆头率: %.2f%%\n得分: %d", Ranks_GetLevel(target), target, Ranks_GetRank(client), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target));
+            FormatEx(message, 512, "【Lv.%d】 %N\n总排名: %d\n杀敌数: %d\n死亡数: %d\n助攻数: %d\n杀亡比: %.2f\n爆头率: %.2f%%\n总得分: %d", Ranks_GetLevel(target), target, Ranks_GetRank(client), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target));
             ReplaceString(message, 512, "#", "＃");
             
             // setup hud

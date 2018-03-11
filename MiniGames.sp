@@ -111,15 +111,6 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
 
     // fire to module
     Ranks_OnDBConnected();
-    
-    // if late load
-    if(g_bLateLoad)
-        for(int client = 1; client <= MaxClients; ++client)
-            if(IsClientInGame(client))
-            {
-                OnClientConnected(client);
-                OnClientPutInServer(client);
-            }
 }
 
 public Action Timer_ReconnectDB(Handle timer, int retry)

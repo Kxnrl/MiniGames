@@ -75,7 +75,7 @@ public Action Teams_RandomTeam(Handle timer)
                 PrintCenterText(client, "<font color='#0066CC' size='25'>你将在4s后切换到新的队伍!");
             }
             else
-                PrintCenterText(client, "<font color='#B15700' size='25'>注意: 4s后将出现25仔!");
+                PrintCenterText(client, "<font color='#0066CC' size='20'>25仔将于</font><font color='#B15700' size='25'>   4s   </font><font color='#0066CC' size='20'>后出现!</font>");
         }
         else
         {
@@ -87,7 +87,7 @@ public Action Teams_RandomTeam(Handle timer)
                 PrintCenterText(client, "<font color='#0066CC' size='25'>你将在4s后切换到新的队伍!");
             }
             else
-                PrintCenterText(client, "<font color='#B15700' size='25'>注意: 4s后将出现25仔!");
+                PrintCenterText(client, "<font color='#0066CC' size='20'>25仔将于</font><font color='#B15700' size='25'>   4s   </font><font color='#0066CC' size='20'>后出现!</font>");
         }
     }
 
@@ -118,7 +118,7 @@ public Action Timer_ChangeTeam(Handle timer)
                 if(t_iNextTeam[x] > 0)
                     PrintCenterText(x, "<font color='#0066CC' size='25'>你将在%ds后切换到新的队伍!", t_iSwitchCD);
                 else
-                    PrintCenterText(x, "<font color='#B15700' size='25'>注意: %ds后将出现25仔!", t_iSwitchCD);
+                    PrintCenterText(x, "<font color='#0066CC' size='20'>25仔将于</font><font color='#B15700' size='25'>   %ds   </font><font color='#0066CC' size='20'>后出现!</font>", t_iSwitchCD);
     }
     else
     {

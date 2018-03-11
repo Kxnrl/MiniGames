@@ -231,7 +231,7 @@ public void LoadDataCallback(Database db, DBResultSet results, const char[] erro
     
     t_bLoaded[client] = true;
     
-    Ranks_OnClientLoaded(client, true);
+    Ranks_OnClientLoaded(client);
 }
 
 public Action Stats_ReloadClientUser(Handle timer, int userid)
@@ -294,7 +294,7 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
     
     t_bLoaded[client] = true;
     
-    Ranks_OnClientLoaded(client, true);
+    Ranks_OnClientLoaded(client);
 }
 
 void Stats_PublicMessage(int client, bool disconnected = false)

@@ -92,11 +92,20 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
             IntToString(pid, pidstr, 16);
             FormatEx(buffer, 128, "#%d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
             t_RankMenu.AddItem(pidstr, buffer);
-            
-            for(int client = 1; client <= MaxClients; ++client)
-                if(IsClientInGame(client))
-                    Ranks_OnClientLoaded(client, false);
         }
+    }
+
+    // if late load
+    if(g_bLateLoad)
+    {
+        g_bLateLoad = false;
+
+        for(int client = 1; client <= MaxClients; ++client)
+            if(IsClientInGame(client))
+            {
+                OnClientConnected(client);
+                OnClientPutInServer(client);
+            }
     }
 }
 
@@ -247,10 +256,10 @@ void Ranks_OnPlayerRunCmd(int client, int buttons)
         EndMessage();
 }
 
-void Ranks_OnClientLoaded(int client, bool print = false)
+void Ranks_OnClientLoaded(int client)
 {
     // loading rank
-    
+
     int rank = t_aRankCache.FindValue(g_iUId[client]);
     if(rank == -1)
         t_iRank[client] = t_aRankCache.Length + 1;
@@ -296,7 +305,6 @@ void Ranks_OnClientLoaded(int client, bool print = false)
     else if(score >= 25)
         t_iCompLevel[client] = 1;
 
-    if(print)
     Stats_PublicMessage(client);
 }
 
