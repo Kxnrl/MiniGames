@@ -15,20 +15,56 @@
 /******************************************************************/
 
 
-static Handle t_tWallHack = null;
-static bool t_bOnGround[MAXPLAYERS+1];
-
+static int t_iWallHackCD = -1;
+static Handle t_hndlHudSync = null;
+static Handle t_tRoundTimer = null
 
 void Games_OnMapStart()
 {
-    // 
+    if(t_hndlHudSync == null)
+        t_hndlHudSync = CreateHudSynchronizer();
+
+    CreateTimer(1.0, Games_UpdateGameHUD, _, TIMER_REPEAT|TIMER_FLAG_NO_MAOCHANGE);
+}
+
+public Action Games_UpdateGameHUD(Handle timer)
+{
+    SetHudTextParams(-1.0, 0.745, 2.0, 9, 128, 0, 128, 0, 30.0, 0.0, 0.0);
+
+    static bool needClear;
+    if(t_iWallHackCD > 0)
+    {
+        needClear = true;
+        for(int client = 1; client <= MaxClients; ++client)
+            if(IsClientInGame(client))
+                ShowSyncHudText(client, t_hndlHudSync, "距离VAC还有:  %d秒", t_iWallHackCD);
+    }
+    else if(t_iWallHackCD != -1)
+    {
+        needClear = true;
+        for(int client = 1; client <= MaxClients; ++client)
+            if(IsClientInGame(client))
+                ShowSyncHudText(client, t_hndlHudSync, "VAC-WH作弊器已激活!");
+    }
+    else if(needClear)
+    {
+        for(int client = 1; client <= MaxClients; ++client)
+            if(IsClientInGame(client))
+                ClearSyncHud(client, t_hndlHudSync);
+    }
+
+    return Plugin_Continue;
 }
 
 void Games_OnMapEnd()
 {
-    if(t_tWallHack != null)
-        KillTimer(t_tWallHack);
-    t_tWallHack = null;
+    if(t_hndlHudSync != null)
+        CloseHandle(t_hndlHudSync);
+    t_hndlHudSync = null;
+
+    if(t_tRoundTimer != null)
+        KillTimer(t_tRoundTimer);
+    t_tRoundTimer = null;
 }
 
 // reset ammo and slay.
@@ -85,19 +121,14 @@ void Games_OnPlayerRunCmd(int client)
     if(!sv_enablebunnyhopping.BoolValue)
         return;
 
-    if(GetEntityFlags(client) & FL_ONGROUND)
-        t_bOnGround[client] = true;
-    else
-        t_bOnGround[client] = false;
-    
-    Games_LimitPreSpeed(client);
+    Games_LimitPreSpeed(client, view_as<bool>(GetEntityFlags(client) & FL_ONGROUND));
 }
 
-static void Games_LimitPreSpeed(int client)
+static void Games_LimitPreSpeed(int client, bool bOnGround)
 {
     static bool IsOnGround[MAXPLAYERS+1];
-    
-    if(t_bOnGround[client])
+
+    if(bOnGround)
     {
         if(!IsOnGround[client])
         {
@@ -153,25 +184,32 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
 
 void Games_OnRoundStart()
 {
-    if(t_tWallHack != null)
-        KillTimer(t_tWallHack);
-    t_tWallHack = CreateTimer(mg_wallhack_delay.FloatValue, Games_EnableWallhack);
+    t_iWallHackCD = RoundToCeil(mg_wallhack_delay.FloatValue);
+
+    if(t_tRoundTimer != null)
+        KillTimer(t_tRoundTimer);
+    t_tRoundTimer = CreateTimer(1.0, Games_RoundTimer, _, TIMER_REPEAT);
 }
 
-public Action Games_EnableWallhack(Handle timer)
+public Action Games_RoundTimer(Handle timer)
 {
-    t_tWallHack = null;
+    if(t_iWallHackCD > 0)
+    {
+        t_iWallHackCD--;
+        if(t_iWallHackCD == 0)
+            for(int client = 1; client <= MaxClients; ++client)
+                if(IsClientInGame(client) && IsPlayerAlive(client))
+                    SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 9999999.0);
+    }
 
-    for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && IsPlayerAlive(client))
-            SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 9999999.0);
-
-    return Plugin_Stop;
+    return Plugin_Continue;
 }
 
 void Games_OnRoundEnd()
 {
-    if(t_tWallHack != null)
-        KillTimer(t_tWallHack);
-    t_tWallHack = null;
+    if(t_tRoundTimer != null)
+        KillTimer(t_tRoundTimer);
+    t_tRoundTimer = null;
+
+    t_iWallHackCD = -1;
 }
