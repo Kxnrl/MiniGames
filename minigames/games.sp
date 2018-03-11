@@ -17,14 +17,14 @@
 
 static int t_iWallHackCD = -1;
 static Handle t_hndlHudSync = null;
-static Handle t_tRoundTimer = null
+static Handle t_tRoundTimer = null;
 
 void Games_OnMapStart()
 {
     if(t_hndlHudSync == null)
         t_hndlHudSync = CreateHudSynchronizer();
 
-    CreateTimer(1.0, Games_UpdateGameHUD, _, TIMER_REPEAT|TIMER_FLAG_NO_MAOCHANGE);
+    CreateTimer(1.0, Games_UpdateGameHUD, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Games_UpdateGameHUD(Handle timer)
