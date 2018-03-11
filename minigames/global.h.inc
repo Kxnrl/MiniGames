@@ -62,6 +62,8 @@ int g_iUId[MAXPLAYERS+1];
 
 int g_offsetNoBlock = -1;
 
+bool g_bLateLoad = false;
+
 // convars
 ConVar mp_warmuptime            = null;
 

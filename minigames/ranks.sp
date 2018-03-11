@@ -92,6 +92,10 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
             IntToString(pid, pidstr, 16);
             FormatEx(buffer, 128, "#%d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
             t_RankMenu.AddItem(pidstr, buffer);
+            
+            for(int client = 1; client <= MaxClients; ++client)
+                if(IsClientInGame(client))
+                    Ranks_OnClientLoaded(client, false);
         }
     }
 }
@@ -243,7 +247,7 @@ void Ranks_OnPlayerRunCmd(int client, int buttons)
         EndMessage();
 }
 
-void Ranks_OnClientLoaded(int client)
+void Ranks_OnClientLoaded(int client, bool print = false)
 {
     // loading rank
     
@@ -292,12 +296,18 @@ void Ranks_OnClientLoaded(int client)
     else if(score >= 25)
         t_iCompLevel[client] = 1;
 
+    if(print)
     Stats_PublicMessage(client);
 }
 
 int Ranks_GetRank(int client)
 {
     return t_iRank[client];
+}
+
+int Ranks_GetLevel(int client)
+{
+    return t_iCompLevel[client];
 }
 
 void HookScoreboard(bool hook)

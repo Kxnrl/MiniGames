@@ -33,6 +33,13 @@
 #include "minigames/cvars.sp"
 #include "minigames/games.sp"
 
+public void APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
+{
+    g_bLateLoad = late;
+    
+    return APLRes_Success;
+}
+
 public void OnPluginStart()
 {
     if(GetEngineVersion() != Engine_CSGO)
@@ -104,6 +111,15 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
 
     // fire to module
     Ranks_OnDBConnected();
+    
+    // if late load
+    if(g_bLateLoad)
+        for(int client = 1; client <= MaxClients; ++client)
+            if(IsClientInGame(client))
+            {
+                OnClientConnected(client);
+                OnClientPutInServer(client);
+            }
 }
 
 public Action Timer_ReconnectDB(Handle timer, int retry)
