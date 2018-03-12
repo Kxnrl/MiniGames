@@ -68,7 +68,7 @@ public void OnClientPutInServer(int client)
     SDKHookEx(client, SDKHook_TraceAttack, Hook_HandleTraceAttackAction);
 
     char steamid[32];
-    GetClientAuthId(client, AuthId_Steam64ID, steamid, 32, true);
+    GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
     
     g_bCheater[client] = (g_aCheaters.FindString(steamid) != -1);
 }
@@ -112,7 +112,7 @@ public Action Hook_HandleTraceAttackAction(int victim, int &attacker, int &infli
                 return Plugin_Changed;
             }
             
-            damage = 20.0
+            damage = 20.0;
             return Plugin_Changed;
         }
         
@@ -129,7 +129,7 @@ public Action Hook_HandleTraceAttackAction(int victim, int &attacker, int &infli
         }
         
         // if hegrenade
-        if(dmgType == DMG_FROM_NADES)
+        if(dmgType == DMG_NADES)
         {
             // force damage
             damage = 2.0;
@@ -137,12 +137,12 @@ public Action Hook_HandleTraceAttackAction(int victim, int &attacker, int &infli
         }
         
         // decrease other damage
-        damage *= 0.5
+        damage *= 0.5;
         return Plugin_Changed;
     }
     
     // by rifles?
-    if(dmgType == DMG_FROM_RIFLE)
+    if(dmgType == DMG_RIFLE)
     {
         // decrease damage
         damage *= 0.35;
