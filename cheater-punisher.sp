@@ -93,6 +93,7 @@ public Action Hook_HandleTraceAttackAction(int victim, int &attacker, int &infli
     {
         // force no headshot. xD
         damage *= 0.1;
+        LogDamage("[%N] attack [%N] via headshot -> final damage %.2f", attacker, victim, damage);
         return Plugin_Changed;
     }
 
@@ -109,10 +110,12 @@ public Action Hook_HandleTraceAttackAction(int victim, int &attacker, int &infli
             if(damage > 35.0)
             {
                 damage = 35.0;
+                LogDamage("[%N] attack [%N] via knife slash -> final damage %.2f", attacker, victim, damage);
                 return Plugin_Changed;
             }
             
             damage = 20.0;
+            LogDamage("[%N] attack [%N] via knife -> final damage %.2f", attacker, victim, damage);
             return Plugin_Changed;
         }
         
@@ -125,6 +128,7 @@ public Action Hook_HandleTraceAttackAction(int victim, int &attacker, int &infli
         {
             // force damage
             damage = 1.0;
+            LogDamage("[%N] attack [%N] via inferno -> final damage %.2f", attacker, victim, damage);
             return Plugin_Changed;
         }
         
@@ -133,11 +137,13 @@ public Action Hook_HandleTraceAttackAction(int victim, int &attacker, int &infli
         {
             // force damage
             damage = 2.0;
+            LogDamage("[%N] attack [%N] via hegrenade -> final damage %.2f", attacker, victim, damage);
             return Plugin_Changed;
         }
         
         // decrease other damage
         damage *= 0.5;
+        LogDamage("[%N] attack [%N] via other entity -> final damage %.2f", attacker, victim, damage);
         return Plugin_Changed;
     }
     
@@ -146,6 +152,7 @@ public Action Hook_HandleTraceAttackAction(int victim, int &attacker, int &infli
     {
         // decrease damage
         damage *= 0.35;
+        LogDamage("[%N] attack [%N] via rifle -> final damage %.2f -> hitbox[%d] hitgroup[%d]", attacker, victim, damage, hitbox, hitgroup);
         return Plugin_Changed;
     }
     
@@ -172,4 +179,11 @@ static void PushCheatersToArrayList()
     g_aCheaters.PushString("76561198360323854");
     g_aCheaters.PushString("76561198345576604");
     g_aCheaters.PushString("76561198381452231");
+}
+
+static void LogDamage(const char[] buffer, any ...)
+{
+    char log[512];
+    VFormat(log, 512, buffer, 2);
+    LogToFileEx("addons/sourcemod/logs/cheater-punisher.log", log);
 }
