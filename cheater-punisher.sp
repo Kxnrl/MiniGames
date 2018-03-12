@@ -41,6 +41,10 @@ public void OnPluginStart()
     RegConsoleCmd("sm_cheater", Command_Cheater);
     
     PushCheatersToArrayList();
+    
+    for(int client = 1; client <= MaxClients; ++client)
+        if(IsClientInGame(client))
+            OnClientPutInServer(client);
 }
 
 public Action Command_Cheater(int client, int args)
