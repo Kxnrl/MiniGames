@@ -19,7 +19,7 @@
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
 #define PI_VERSION  "1.2+git<commit_counts>"
-#define PI_URL      "https://kxnrl.com/git/sourcepawn/MiniGames"
+#define PI_URL      "https://kxnrl.com/git/MiniGames"
 
 public Plugin myinfo = 
 {

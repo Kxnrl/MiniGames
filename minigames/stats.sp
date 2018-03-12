@@ -321,9 +321,11 @@ public Action Stats_PrivateMessage(Handle timer, int userid)
     if(!client || !IsClientInGame(client))
         return Plugin_Stop;
 
+    Chat(client, "\x04*****************************************");
     Chat(client, "\x04欢迎来到MagicGirl娱乐世界,祝您游戏愉快...");
-    Chat(client, "\x05程序版本 \x04%s\x01  by  \x10%s", PI_VERSION, PI_AUTHOR);
+    Chat(client, "\x05程序版本 \x01[\x04%s\x01] by \x10%s", PI_VERSION, PI_AUTHOR);
     Chat(client, "\x05常用指令 \x04!rank !stats !top !music !shop !store");
+    Chat(client, "\x05程序链接 \x04%s", PI_URL);
 
     return Plugin_Stop;
 }
