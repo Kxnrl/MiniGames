@@ -20,6 +20,17 @@ public Plugin myinfo =
     url         = PI_URL
 };
 
+#include <sdktools>
+#include <sdkhooks>
+
+enum damageType
+{
+    DMG_OTHER,
+    DMG_RIFLE,
+    DMG_NADES,
+    DMG_KNIFE
+}
+
 bool g_bCheater[MAXPLAYERS+1];
 ArrayList g_aCheaters;
 
