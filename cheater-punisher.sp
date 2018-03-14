@@ -183,6 +183,7 @@ static void PushCheatersToArrayList()
     g_aCheaters.PushString("76561198360323854");
     g_aCheaters.PushString("76561198345576604");
     g_aCheaters.PushString("76561198381452231");
+    g_aCheaters.PushString("76561198360725035");
 }
 
 static void LogDamage(const char[] buffer, any ...)
