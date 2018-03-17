@@ -22,6 +22,7 @@ public Plugin myinfo =
 
 #include <sdktools>
 #include <sdkhooks>
+#include <regex>
 
 enum damageType
 {
@@ -177,17 +178,24 @@ static damageType UTIL_GetDamageType(int damagetype)
 
 static bool CheckIpInPool(int client)
 {
-    char ip[16], data[4][4];
+    RegexError errcode = REGEX_ERROR_NONE;
+
+    static Regex regex = null;
+    if(regex == null)
+    {
+        char error[256];
+        
+        regex = CompileRegex("182\.201\.6[3-7]\.*", PCRE_UTF8|PCRE_NOTEMPTY, error, 256, errcode);
+        if(regex == null || error[0] || errcode != REGEX_ERROR_NONE)
+            SetFailState("RegEx error[%d]: %s", view_as<int>(errcode), error);
+    }
+
+    char ip[16];
     GetClientIP(client, ip, 16);
-    ExplodeString(ip, ".", data, 4, 4, true);
-    
-    int ipdata[4];
-    for(int i = 0; i < 4; ++i)
-        ipdata[i] = StringToInt(data[i]);
-    
-    if(ip[0] == 139 && ip[1] == 196)
+
+    if(StrContains(ip, "139.196.") == 0)
         return true;
-    else if(ip[0] == 182 && ip[1] == 201 && 63 <= ip[3] <= 67)
+    else if(regex.Match(ip, errcode) != -1)
         return true;
 
     return false;
