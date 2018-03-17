@@ -61,7 +61,7 @@ public Action Games_UpdateGameHUD(Handle timer)
             int target = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
             
             // target is valid?
-            if(iLastSpecTarget[client] == target || target == -1 || !IsClientInGame(target))
+            if(iLastSpecTarget[client] == target || target < 1 || target > MaxClients || !IsClientInGame(target))
                 continue;
 
             bLastDisplayHud[client] = true;
