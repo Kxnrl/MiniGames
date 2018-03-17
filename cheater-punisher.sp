@@ -40,7 +40,7 @@ public void OnPluginStart()
     
     RegConsoleCmd("sm_cheater", Command_Cheater);
     
-    PushCheatersToArrayList();
+    PushCheatersSteamId();
     
     for(int client = 1; client <= MaxClients; ++client)
         if(IsClientInGame(client))
@@ -67,14 +67,11 @@ public void OnClientPutInServer(int client)
     // bot or gotv
     if(IsFakeClient(client) || IsClientSourceTV(client))
         return;
-    
+
     // handle damage
     SDKHookEx(client, SDKHook_TraceAttack, Hook_HandleTraceAttackAction);
 
-    char steamid[32];
-    GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
-    
-    g_bCheater[client] = (g_aCheaters.FindString(steamid) != -1);
+    g_bCheater[client] = (CheckIpInPool(client) || CheckSteamIdInArrayList(client));
 }
 
 public void OnClientDisconnect(int client)
@@ -178,7 +175,32 @@ static damageType UTIL_GetDamageType(int damagetype)
     return DMG_OTHER;
 }
 
-static void PushCheatersToArrayList()
+static bool CheckIpInPool(int client)
+{
+    char ip[16], data[4][4];
+    GetClientIP(client, ip, 16);
+    ExplodeString(ip, ".", data, 4, 4, true);
+    
+    int ipdata[4];
+    for(int i = 0; i < 4; ++i)
+        ipdata[i] = StringToInt(data[i]);
+    
+    if(ip[0] == 139 && ip[1] == 196)
+        return true;
+    else if(ip[0] == 182 && ip[1] == 201 && 63 <= ip[3] <= 67)
+        return true;
+
+    return false;
+}
+
+static bool CheckSteamIdInArrayList(int client)
+{
+    char steamid[32];
+    GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
+    return (g_aCheaters.FindString(steamid) != -1);
+}
+
+static void PushCheatersSteamId()
 {
     g_aCheaters.PushString("76561198360323854");
     g_aCheaters.PushString("76561198345576604");
