@@ -89,7 +89,7 @@ public void OnClientDisconnect(int client)
 
 public Action Hook_HandleTraceAttackAction(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &ammotype, int hitbox, int hitgroup)
 {
-    if(damage <= 0.0 || !attacker || !g_bCheater[attacker])
+    if(damage <= 0.0 || !attacker || attacker <= 0 || attacker > MaxClients || !g_bCheater[attacker])
         return Plugin_Continue;
     
     // headshot?
