@@ -184,8 +184,8 @@ static bool CheckIpInPool(int client)
     if(regex == null)
     {
         char error[256];
-        regex = CompileRegex("182\\.201\\.6[3-7]\\.*", PCRE_UTF8|PCRE_NOTEMPTY, error, 256, errcode);
-        if(regex == null || error[0] || errcode != REGEX_ERROR_NONE)
+        regex = CompileRegex("182[.]201[.]6[3-7][.]*", PCRE_UTF8|PCRE_NOTEMPTY, error, 256, errcode);
+        if(errcode != REGEX_ERROR_NONE)
             SetFailState("RegEx error[%d]: %s", view_as<int>(errcode), error);
     }
 
@@ -194,7 +194,7 @@ static bool CheckIpInPool(int client)
 
     if(StrContains(ip, "139.196.") == 0)
         return true;
-    else if(regex.Match(ip, errcode) != -1)
+    else if(regex.Match(ip, errcode) > 0)
         return true;
 
     return false;
