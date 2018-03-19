@@ -34,6 +34,8 @@ enum damageType
 
 bool g_bCheater[MAXPLAYERS+1];
 ArrayList g_aCheaters;
+Regex regex;
+RegexError regexErr;
 
 public void OnPluginStart()
 {
@@ -42,6 +44,11 @@ public void OnPluginStart()
     RegConsoleCmd("sm_cheater", Command_Cheater);
     
     PushCheatersSteamId();
+
+    char error[256];
+    regex = CompileRegex("182[.]201[.]6[3-7][.]*", PCRE_CASELESS, error, 256, regexErr);
+    if(regexErr != REGEX_ERROR_NONE)
+        SetFailState("RegEx error[%d]: %s", view_as<int>(regexErr), error);
     
     for(int client = 1; client <= MaxClients; ++client)
         if(IsClientInGame(client))
@@ -178,23 +185,12 @@ static damageType UTIL_GetDamageType(int damagetype)
 
 static bool CheckIpInPool(int client)
 {
-    RegexError errcode = REGEX_ERROR_NONE;
-
-    static Regex regex = null;
-    if(regex == null)
-    {
-        char error[256];
-        regex = CompileRegex("182[.]201[.]6[3-7][.]*", PCRE_UTF8|PCRE_NOTEMPTY, error, 256, errcode);
-        if(errcode != REGEX_ERROR_NONE)
-            SetFailState("RegEx error[%d]: %s", view_as<int>(errcode), error);
-    }
-
     char ip[16];
     GetClientIP(client, ip, 16);
 
     if(StrContains(ip, "139.196.") == 0)
         return true;
-    else if(regex.Match(ip, errcode) > 0)
+    else if(regex.Match(ip, regexErr) > 0)
         return true;
 
     return false;
