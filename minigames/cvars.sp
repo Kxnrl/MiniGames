@@ -94,9 +94,9 @@ static void Cvars_LockedConVar()
     else
     {
         sv_staminamax.SetFloat(100.0, true, false);
-        sv_staminajumpcost.SetFloat(0.16, true, false);
-        sv_staminalandcost.SetFloat(0.10, true, false);
-        sv_staminarecoveryrate.SetFloat(50.0, true, false);
+        sv_staminajumpcost.SetFloat(0.12, true, false);
+        sv_staminalandcost.SetFloat(0.06, true, false);
+        sv_staminarecoveryrate.SetFloat(60.0, true, false);
     }
 }
 
