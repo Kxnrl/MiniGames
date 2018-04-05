@@ -86,44 +86,45 @@ static void Cvars_LockedConVar()
 
     if(sv_autobunnyhopping.IntValue == 1)
     {
-        sv_staminamax.SetInt(0);
-        sv_staminajumpcost.SetInt(0);
-        sv_staminalandcost.SetInt(0);
-        sv_staminarecoveryrate.SetInt(0);
+        sv_staminamax.SetInt(0, true, false);
+        sv_staminajumpcost.SetInt(0, true, false);
+        sv_staminalandcost.SetInt(0, true, false);
+        sv_staminarecoveryrate.SetInt(0, true, false);
     }
     else
     {
-        sv_staminamax.SetFloat(100.0);
-        sv_staminajumpcost.SetFloat(0.16);
-        sv_staminalandcost.SetFloat(0.10);
-        sv_staminarecoveryrate.SetFloat(50.0);
+        sv_staminamax.SetFloat(100.0, true, false);
+        sv_staminajumpcost.SetFloat(0.16, true, false);
+        sv_staminalandcost.SetFloat(0.10, true, false);
+        sv_staminarecoveryrate.SetFloat(50.0, true, false);
     }
 }
 
 static void Cvars_SetCvarDefault()
 {
-    FindConVar("phys_pushscale").SetInt(3);
-    FindConVar("phys_timescale").SetInt(1);
-    FindConVar("sv_damage_print_enable").SetInt(1);
-    FindConVar("sv_airaccelerate").SetInt(9999);
-    FindConVar("sv_accelerate_use_weapon_speed").SetInt(0);
-    FindConVar("sv_maxvelocity").SetInt(3500);
-    FindConVar("sv_full_alltalk").SetInt(1);
-    FindConVar("mp_limitteams").SetInt(0);
-    FindConVar("mp_autoteambalance").SetInt(0);
+    FindConVar("phys_pushscale").SetInt(3, true, false);
+    FindConVar("phys_timescale").SetInt(1, true, false);
+    FindConVar("sv_damage_print_enable").SetInt(1, true, false);
+    FindConVar("sv_airaccelerate").SetInt(9999, true, false);
+    FindConVar("sv_accelerate_use_weapon_speed").SetInt(0, true, false);
+    FindConVar("sv_maxvelocity").SetInt(3500, true, false);
+    FindConVar("sv_full_alltalk").SetInt(1, true, false);
+    FindConVar("mp_limitteams").SetInt(0, true, false);
+    FindConVar("mp_autoteambalance").SetInt(0, true, false);
 
-    sv_staminamax.SetFloat(100.0);
-    sv_staminajumpcost.SetFloat(0.16);
-    sv_staminalandcost.SetFloat(0.10);
-    sv_staminarecoveryrate.SetFloat(50.0);
+    sv_staminamax.SetFloat(100.0, true, false);
+    sv_staminajumpcost.SetFloat(0.16, true, false);
+    sv_staminalandcost.SetFloat(0.10, true, false);
+    sv_staminarecoveryrate.SetFloat(50.0, true, false);
 
-    sv_autobunnyhopping.SetInt(0);
+    sv_autobunnyhopping.SetInt(0, true, false);
 }
 
 void Cvars_OnAutoConfigsBuffered()
 {
     // set default convars
     Cvars_SetCvarDefault();
+    Cvars_EnforceOptions();
     
     // load map config
     char mapconfig[256];
@@ -142,4 +143,38 @@ void Cvars_OnAutoConfigsBuffered()
 
     ServerCommand("exec %s", mapconfig);
     LogMessage("Executed %s", mapconfig);
+}
+
+void Cvars_EnforceOptions()
+{
+    if(FileExists("cfg/options.cfg"))
+    {
+        ServerCommand("exec options.cfg");
+        LogMessage("Executed options.cfg");
+        return;
+    }
+    
+    LogMessage("Executed advanced convar options");
+    
+    // network
+    FindConVar("sv_maxrate").SetInt(128000, true, false); 
+    FindConVar("sv_minrate").SetInt(128000, true, false); 
+    FindConVar("sv_minupdaterate").SetInt(128, true, false);
+    FindConVar("sv_mincmdrate").SetInt(128, true, false);
+    
+    // optimized
+    FindConVar("net_splitrate").SetInt(2, true, false); 
+    FindConVar("sv_parallel_sendsnapshot").SetInt(1, true, false); 
+    FindConVar("sv_enable_delta_packing").SetInt(1, true, false); 
+    FindConVar("sv_maxunlag").SetFloat(0.1, true, false);]
+    
+    // phys
+    FindConVar("phys_enable_experimental_optimizations").SetInt(1, true, false);
+    
+    // sv var
+    FindConVar("sv_alternateticks").SetInt(1, true, false);
+    FindConVar("sv_forcepreload").SetInt(1, true, false);
+    FindConVar("sv_force_transmit_players").SetInt(0, true, false);
+    FindConVar("sv_force_transmit_ents").SetInt(0, true, false);
+    FindConVar("sv_occlude_players").SetInt(0, true, false);
 }
