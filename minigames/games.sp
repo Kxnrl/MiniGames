@@ -81,7 +81,7 @@ public Action Games_UpdateGameHUD(Handle timer)
     if(t_iWallHackCD > 0)
     {
         needClear = true;
-        SetHudTextParams(-1.0, 0.785, 2.0, 9, 255, 9, 255, 0, 30.0, 0.0, 0.0);
+        SetHudTextParams(-1.0, 0.975, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
                 ShowSyncHudText(client, t_hHudSync[1], ">>>距离VAC还有%d秒<<<", t_iWallHackCD);
@@ -89,13 +89,14 @@ public Action Games_UpdateGameHUD(Handle timer)
     else if(t_iWallHackCD != -1)
     {
         needClear = true;
-        SetHudTextParams(-1.0, 0.785, 15.0, 9, 255, 9, 255, 0, 30.0, 0.0, 0.0);
+        SetHudTextParams(-1.0, 0.975, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
                 ShowSyncHudText(client, t_hHudSync[1], "*** VAC已激活 ***");
     }
     else if(needClear)
     {
+        needClear = false;
         for(int client = 1; client <= MaxClients; ++client)
             if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
                 ClearSyncHud(client, t_hHudSync[1]);
