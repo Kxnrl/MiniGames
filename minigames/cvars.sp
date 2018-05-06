@@ -96,7 +96,7 @@ static void Cvars_LockedConVar()
         sv_staminamax.SetFloat(100.0, true, false);
         sv_staminajumpcost.SetFloat(0.12, true, false);
         sv_staminalandcost.SetFloat(0.06, true, false);
-        sv_staminarecoveryrate.SetFloat(60.0, true, false);
+        sv_staminarecoveryrate.SetFloat(100.0, true, false);
     }
 }
 
@@ -166,8 +166,8 @@ void Cvars_EnforceOptions()
     FindConVar("net_splitrate").SetInt(2, true, false); 
     FindConVar("sv_parallel_sendsnapshot").SetInt(1, true, false); 
     FindConVar("sv_enable_delta_packing").SetInt(1, true, false); 
-    FindConVar("sv_maxunlag").SetFloat(0.1, true, false);]
-    
+    FindConVar("sv_maxunlag").SetFloat(0.1, true, false);
+
     // phys
     FindConVar("phys_enable_experimental_optimizations").SetInt(1, true, false);
     
