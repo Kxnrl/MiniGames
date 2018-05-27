@@ -99,14 +99,12 @@ void Stats_OnClientPutInServer(int client)
     // ignore bot and gotv
     if(IsFakeClient(client) || IsClientSourceTV(client))
         return;
-    
-    // load uid first
-    
+
     char steamid[32];
     GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
 
     char m_szQuery[128];
-    FormatEx(m_szQuery, 128, "SELECT `uid` FROM `dxg_users` WHERE `steamid` = '%s';", steamid);
+    FormatEx(m_szQuery, 128, "SELECT * FROM `k_minigames` WHERE `steamid` = '%s';", steamid);
     g_hMySQL.Query(LoadUserCallback, m_szQuery, GetClientUserId(client));
 }
 
@@ -116,7 +114,7 @@ void Stats_OnClientDisconnect(int client)
 
     if(!t_bLoaded[client])
         return;
-    
+
     Stats_PublicMessage(client, true);
 
     t_bLoaded[client] = false;
@@ -127,7 +125,7 @@ void Stats_OnClientDisconnect(int client)
 
     // saving data
     char m_szQuery[1024];
-    FormatEx(m_szQuery, 1024,  "UPDATE `dxg_minigames` SET        \
+    FormatEx(m_szQuery, 1024,  "UPDATE `dxg_minigames` SET           \
                                    `username` = '%s',                \
                                    `kills` = `kills` + '%d',         \
                                    `deaths` = `deaths` + '%d',       \
@@ -144,7 +142,8 @@ void Stats_OnClientDisconnect(int client)
                                    `rounds` = `rounds` + '%d',       \
                                    `score` = `score` + '%d',         \
                                    `online` = `online` + '%d'        \
-                                WHERE `uid` = '%d';",
+                                WHERE `uid` = '%d';                  \
+                                ",
                                 ename,
                                 t_Session[client][iKills],
                                 t_Session[client][iDeaths],
@@ -163,7 +162,7 @@ void Stats_OnClientDisconnect(int client)
                                 GetTime() - t_Session[client][iTotalOnline],
                                 g_iUId[client]);
 
-    g_hMySQL.Query(LoadUserCallback, m_szQuery, GetClientUserId(client));
+    MySQL_VoidQuery(m_szQuery);
 }
 
 public void LoadUserCallback(Database db, DBResultSet results, const char[] error, int userid)
@@ -171,44 +170,10 @@ public void LoadUserCallback(Database db, DBResultSet results, const char[] erro
     int client = GetClientOfUserId(userid);
     if(!client)
         return;
-    
+
     if(results == null || error[0])
     {
         LogError("LoadUserCallback -> %L -> %s", client, error);
-        CreateTimer(1.0, Stats_ReloadClientUser, userid, TIMER_FLAG_NO_MAPCHANGE);
-        return;
-    }
-    
-    if(results.RowCount == 0)
-    {
-        CreateTimer(1.0, Stats_ReloadClientUser, userid, TIMER_FLAG_NO_MAPCHANGE);
-        return;
-    }
-    
-    if(!results.FetchRow())
-    {
-        LogError("LoadUserCallback -> %L -> Can not fetch row.", client);
-        CreateTimer(1.0, Stats_ReloadClientUser, userid, TIMER_FLAG_NO_MAPCHANGE);
-        return;
-    }
-    
-    g_iUId[client] = results.FetchInt(0);
-
-    // load mg data
-    char m_szQuery[128];
-    FormatEx(m_szQuery, 128, "SELECT * FROM dxg_minigames WHERE uid = %d;", g_iUId[client]);
-    db.Query(LoadDataCallback, m_szQuery, userid);
-}
-
-public void LoadDataCallback(Database db, DBResultSet results, const char[] error, int userid)
-{
-    int client = GetClientOfUserId(userid);
-    if(!client)
-        return;
-    
-    if(results == null || error[0])
-    {
-        LogError("LoadDataCallback -> %L -> %s", client, error);
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
@@ -218,7 +183,7 @@ public void LoadDataCallback(Database db, DBResultSet results, const char[] erro
         Stats_CreateNewClient(client);
         return;
     }
-    
+
     if(!results.FetchRow())
     {
         LogError("LoadUserCallback -> %L -> Can not fetch row.", client);
@@ -226,23 +191,14 @@ public void LoadDataCallback(Database db, DBResultSet results, const char[] erro
         return;
     }
     
+    g_iUId[client] = results.FetchInt(0);
+
     for(int i = 0; i < view_as<int>(Analytics); ++i)
-        t_StatsDB[client][i] = results.FetchInt(i+2);
-    
+        t_StatsDB[client][i] = results.FetchInt(i+3);
+
     t_bLoaded[client] = true;
     
     Ranks_OnClientLoaded(client);
-}
-
-public Action Stats_ReloadClientUser(Handle timer, int userid)
-{
-    int client = GetClientOfUserId(userid);
-    if(!client)
-        return Plugin_Stop;
-    
-    Stats_OnClientPutInServer(client);
-
-    return Plugin_Stop;
 }
 
 public Action Stats_ReloadClientData(Handle timer, int userid)
@@ -251,16 +207,7 @@ public Action Stats_ReloadClientData(Handle timer, int userid)
     if(!client)
         return Plugin_Stop;
     
-    // uid in not valid
-    if(g_iUId[client] == 0)
-    {
-        Stats_OnClientPutInServer(client);
-        return Plugin_Stop;
-    }
-
-    char m_szQuery[128];
-    FormatEx(m_szQuery, 128, "SELECT * FROM dxg_minigames WHERE uid = %d;", g_iUId[client]);
-    g_hMySQL.Query(LoadDataCallback, m_szQuery, userid);
+    Stats_OnClientPutInServer(client);
 
     return Plugin_Stop;
 }
@@ -405,6 +352,34 @@ void Stats_OnRoundEnd()
     for(int client = 1; client <= MaxClients; ++client)
         if(IsClientInGame(client) && IsPlayerAlive(client))
             t_Session[client][iSurvivals]++;
+}
+
+static void MySQL_VoidQuery(const char[] m_szQuery)
+{
+    DataPack pack = new DataPack();
+    pack.WriteCell(strlen(m_szQuery)+1);
+    pack.WriteString(m_szQuery);
+    pack.Reset();
+
+    g_hMySQL.Query(MySQL_VoidQueryCallback, m_szQuery, _, DBPrio_Low);
+}
+
+public void MySQL_VoidQueryCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
+{
+    if(results == null || error[0])
+    {
+        int maxLen = pack.ReadCell();
+        char[] m_szQuery = new char[maxLen];
+        pack.ReadString(m_szQuery, maxLen);
+        
+        char path[256];
+        BuildPath(Path_SM, path, 256, "log/MySQL_VoidQueryError.log");
+
+        LogToFileEx(path, "----------------------------------------------------------------");
+        LogToFileEx(path, "Query: %s", m_szQuery);
+        LogToFileEx(path, "Error: %s", error);
+    }
+    delete pack;
 }
 
 /*******************************************************/

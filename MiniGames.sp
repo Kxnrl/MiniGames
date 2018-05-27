@@ -107,8 +107,40 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
     }
 
     g_hMySQL = db;
-    g_hMySQL.SetCharset("utf8");
+    g_hMySQL.SetCharset("utf8mb4");
 
+    char m_szQuery[2048];
+    FormatEx(m_szQuery, 2048, "CREATE TABLE IF NOT EXISTS `k_minigames` (               \
+                              `uid` int(11) unsigned NOT NULL AUTO_INCREMENT,           \
+                              `steamid` varchar(32) unsigned NOT NULL DEFAULT '0',      \
+                              `username` varchar(32) DEFAULT NULL,                      \
+                              `kills` int(11) unsigned NOT NULL DEFAULT '0',            \
+                              `deaths` int(11) unsigned NOT NULL DEFAULT '0',           \
+                              `assists` int(11) unsigned NOT NULL DEFAULT '0',          \
+                              `hits` int(11) unsigned NOT NULL DEFAULT '0',             \
+                              `shots` int(11) unsigned NOT NULL DEFAULT '0',            \
+                              `headshots` int(11) unsigned NOT NULL DEFAULT '0',        \
+                              `knife` int(11) unsigned NOT NULL DEFAULT '0',            \
+                              `taser` int(11) unsigned NOT NULL DEFAULT '0',            \
+                              `grenade` int(11) unsigned NOT NULL DEFAULT '0',          \
+                              `molotov` int(11) unsigned NOT NULL DEFAULT '0',          \
+                              `damage` int(11) unsigned NOT NULL DEFAULT '0',           \
+                              `survivals` int(11) unsigned NOT NULL DEFAULT '0',        \
+                              `rounds` int(11) unsigned NOT NULL DEFAULT '0',           \
+                              `score` int(11) unsigned NOT NULL DEFAULT '0',            \
+                              `online` int(11) unsigned NOT NULL DEFAULT '0',           \
+                              PRIMARY KEY (`uid`)                                       \
+                              UNIQUE KEY `uk_steamid` (`steamid`)                       \
+                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;                    \
+                            ");
+    g_hMySQL.Query(Database_CreateTable, m_szQuery, _, DBPrio_High);
+}
+
+public void Database_CreateTable(Database db, DBResultSet results, const char[] error, DataPack pack)
+{
+    if(results == null || error[0])
+        LogError("Database_CreateTable -> %s", error);
+    
     // fire to module
     Ranks_OnDBConnected();
 }
