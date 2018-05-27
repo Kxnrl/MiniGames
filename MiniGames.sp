@@ -112,7 +112,7 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
     char m_szQuery[2048];
     FormatEx(m_szQuery, 2048, "CREATE TABLE IF NOT EXISTS `k_minigames` (               \
                               `uid` int(11) unsigned NOT NULL AUTO_INCREMENT,           \
-                              `steamid` varchar(32) unsigned NOT NULL DEFAULT '0',      \
+                              `steamid` varchar(32) NOT NULL DEFAULT 'INVALID_STEAMID', \
                               `username` varchar(32) DEFAULT NULL,                      \
                               `kills` int(11) unsigned NOT NULL DEFAULT '0',            \
                               `deaths` int(11) unsigned NOT NULL DEFAULT '0',           \
@@ -139,7 +139,7 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
 public void Database_CreateTable(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
     if(results == null || error[0])
-        LogError("Database_CreateTable -> %s", error);
+        SetFailState("Database_CreateTable -> %s", error);
     
     // fire to module
     Ranks_OnDBConnected();
