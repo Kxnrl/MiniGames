@@ -99,7 +99,9 @@ void Stats_OnClientPutInServer(int client)
     // ignore bot and gotv
     if(IsFakeClient(client) || IsClientSourceTV(client))
         return;
-
+    
+    // load uid first
+    
     char steamid[32];
     GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
 
@@ -214,9 +216,12 @@ public Action Stats_ReloadClientData(Handle timer, int userid)
 
 void Stats_CreateNewClient(int client)
 {
+    char steamid[32];
+    GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
+    
     char m_szQuery[128];
-    FormatEx(m_szQuery, 128, "INSERT INTO `k_minigames` (uid) VALUES ('%d');", g_iUId[client]);
-    g_hMySQL.Query(CreateClientCallback, m_szQuery, GetClientUserId(client));
+    FormatEx(m_szQuery, 128, "INSERT INTO `k_minigames` (`uid`, '%s') VALUES (DEFAULT, '%s');", steamid);
+    g_hMySQL.Query(CreateClientCallback, m_szQuery, GetClientUserId(client), DBPrio_High);
 }
 
 public void CreateClientCallback(Database db, DBResultSet results, const char[] error, int userid)
@@ -227,20 +232,20 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
     
     if(results == null || error[0])
     {
-        LogError("LoadDataCallback -> %L -> %s", client, error);
+        LogError("CreateClientCallback -> %L -> %s", client, error);
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
     
     if(results.AffectedRows == 0)
     {
-        LogError("LoadDataCallback -> %L -> no affected rows...", client);
+        LogError("CreateClientCallback -> %L -> no affected rows...", client);
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
     
     t_bLoaded[client] = true;
-    
+
     Ranks_OnClientLoaded(client);
 }
 
