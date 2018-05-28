@@ -47,7 +47,7 @@ void Ranks_OnDBConnected()
 static void Ranks_BuildRankCache()
 {
     PrintToServer("Building Rank Cache ...");
-    g_hMySQL.Query(RankCacheCallback, "SELECT `uid`,`username`,`kills`,`deaths`,`score` FROM `dxg_minigames` WHERE `score` >= 0 ORDER BY `score` DESC;");
+    g_hMySQL.Query(RankCacheCallback, "SELECT `uid`,`username`,`kills`,`deaths`,`score` FROM `k_minigames` WHERE `score` >= 0 ORDER BY `score` DESC;");
 }
 
 public void RankCacheCallback(Database db, DBResultSet results, const char[] error, any data)
@@ -117,7 +117,7 @@ public int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int 
         char info[32];
         menu.GetItem(param2, info, 32);
         char m_szQuery[128];
-        FormatEx(m_szQuery, 128, "SELECT * FROM dxg_minigames WHERE uid = '%d';", StringToInt(info));
+        FormatEx(m_szQuery, 128, "SELECT * FROM `k_minigames` WHERE uid = '%d';", StringToInt(info));
         g_hMySQL.Query(RankDetailsCallback, m_szQuery, GetClientUserId(param1));
     }
 }

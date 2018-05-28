@@ -125,7 +125,7 @@ void Stats_OnClientDisconnect(int client)
 
     // saving data
     char m_szQuery[1024];
-    FormatEx(m_szQuery, 1024,  "UPDATE `dxg_minigames` SET           \
+    FormatEx(m_szQuery, 1024,  "UPDATE `k_minigames` SET           \
                                    `username` = '%s',                \
                                    `kills` = `kills` + '%d',         \
                                    `deaths` = `deaths` + '%d',       \
@@ -215,7 +215,7 @@ public Action Stats_ReloadClientData(Handle timer, int userid)
 void Stats_CreateNewClient(int client)
 {
     char m_szQuery[128];
-    FormatEx(m_szQuery, 128, "INSERT INTO `dxg_minigames` (uid) VALUES ('%d');", g_iUId[client]);
+    FormatEx(m_szQuery, 128, "INSERT INTO `k_minigames` (uid) VALUES ('%d');", g_iUId[client]);
     g_hMySQL.Query(CreateClientCallback, m_szQuery, GetClientUserId(client));
 }
 
