@@ -22,28 +22,18 @@ do
   rm output.txt
 done
 
-for file in cheater-punisher.sp
-do
-  sed -i "s%<commit_counts>%$COUNT%g" $file > output.txt
-  rm output.txt
-done
-
 mkdir build
 mkdir build/plugins
 mkdir build/scripts
 
 cp -rf minigames            addons/sourcemod/scripting
 cp -rf MiniGames.sp         addons/sourcemod/scripting
-cp -rf cheater-punisher.sp  addons/sourcemod/scripting
 
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/MiniGames.sp        -o"build/plugins/MiniGames.smx"
-addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/cheater-punisher.sp -o"build/plugins/cheater-punisher.smx"
 
 mv LICENSE build
 mv minigames/*          build/scripts
 mv MiniGames.sp         build/scripts
-mv cheater-punisher.sp  build/scripts
-
 
 cd build
 7z a $FILE -t7z -mx9 LICENSE plugins scripts >nul
@@ -55,5 +45,4 @@ if [ "$1" = "1.8" ]; then
 echo "Upload RAW..."
 cd plugins
 lftp -c "open -u $FTP_USER,$FTP_PSWD $FTP_HOST; put -O /MiniGames/Raw/ MiniGames.smx"
-lftp -c "open -u $FTP_USER,$FTP_PSWD $FTP_HOST; put -O /MiniGames/Raw/ cheater-punisher.smx"
 fi
