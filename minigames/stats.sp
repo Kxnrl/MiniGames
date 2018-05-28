@@ -220,7 +220,7 @@ void Stats_CreateNewClient(int client)
     GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
     
     char m_szQuery[128];
-    FormatEx(m_szQuery, 128, "INSERT INTO `k_minigames` (`uid`, '%s') VALUES (DEFAULT, '%s');", steamid);
+    FormatEx(m_szQuery, 128, "INSERT INTO `k_minigames` (`uid`, 'steamid') VALUES (DEFAULT, '%s');", steamid);
     g_hMySQL.Query(CreateClientCallback, m_szQuery, GetClientUserId(client), DBPrio_High);
 }
 
