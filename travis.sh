@@ -1,12 +1,8 @@
 #!/bin/bash
 
-FTP_HOST=$2
-FTP_USER=$3
-FTP_PSWD=$4
-
 git fetch --unshallow
 COUNT=$(git rev-list --count HEAD)
-FILE=MiniGames-git$COUNT-$5.7z
+FILE=MiniGames-git$COUNT-$2.7z
 
 echo " "
 echo "*** Trigger build ***"
@@ -38,11 +34,10 @@ mv MiniGames.sp         build/scripts
 cd build
 7z a $FILE -t7z -mx9 LICENSE plugins scripts >nul
 
-echo -e "Upload file ..."
-lftp -c "open -u $FTP_USER,$FTP_PSWD $FTP_HOST; put -O /MiniGames/$1/ $FILE"
+echo -e "Upload file RSYNC ..."
+RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./$FILE $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/$1/
 
 if [ "$1" = "1.8" ]; then
-echo "Upload RAW..."
-cd plugins
-lftp -c "open -u $FTP_USER,$FTP_PSWD $FTP_HOST; put -O /MiniGames/Raw/ MiniGames.smx"
+echo "Upload RAW RSYNC ..."
+RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/MiniGames.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/_Raw/
 fi
