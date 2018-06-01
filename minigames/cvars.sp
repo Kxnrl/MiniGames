@@ -221,11 +221,11 @@ void GenerateMapConfigs(const char[] path)
     
     //Max flashbang
     file.WriteLine("//最大携带闪光(个)");
-    file.WriteLine("ammo_grenade_limit_flashbang "1"");
+    file.WriteLine("ammo_grenade_limit_flashbang \"1\"");
     
     //Man grenade
     file.WriteLine("//最大携带手雷(个)");
-    file.WriteLine("ammo_grenade_limit_total "1"");
+    file.WriteLine("ammo_grenade_limit_total \"1\"");
     
     //Gravity
     file.WriteLine("//重力(单位)");
@@ -266,4 +266,6 @@ void GenerateMapConfigs(const char[] path)
     //VAC timer
     file.WriteLine("//开局多久后透视全体玩家(秒,默认120[范围60~180])");
     file.WriteLine("mg_wallhack_delay \"120\"");
+    
+    delete file;
 }
