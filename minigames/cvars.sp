@@ -29,6 +29,9 @@ static ConVar sv_staminalandcost;
 static ConVar sv_staminarecoveryrate;
 static ConVar sv_autobunnyhopping;
 
+static bool  t_LastEBhop;
+static bool  t_LastABhop;
+static float t_LastSpeed;
 
 void Cvars_OnPluginStart()
 {
@@ -74,6 +77,11 @@ void Cvars_OnPluginStart()
         LogMessage("Create cfg/sourcemod/map-configs");
         CreateDirectory("cfg/sourcemod/map-configs", 755);
     }
+    
+    // you need add these to bspcvar_whitelist.cfg
+    RegServerCmd("mg_setbhop_allow", Command_SetBhopAllow);
+    RegServerCmd("mg_setbhop_auto",  Command_SetBhopAuto);
+    RegServerCmd("mg_setbhop_speed", Command_SetBhopSpeed);
 }
 
 public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -268,4 +276,123 @@ void GenerateMapConfigs(const char[] path)
     file.WriteLine("mg_wallhack_delay \"120\"");
     
     delete file;
+}
+
+public Action Command_SetBhopAllow(int args)
+{
+    if(args != 1)
+    {
+        LogError("Error trigger command mg_setbhop_allow!");
+        return Plugin_Handled;
+    }
+
+    char buffer[16];
+    GetCmdArg(1, buffer, 16);
+    if(StringToInt(buffer) == 0 || 
+       strcmp(buffer, "false", false) == 0 || 
+       strcmp(buffer, "no", false) == 0 ||
+       strcmp(buffer, "off", false) == 0)
+    {
+       t_LastEBhop = true;
+       sv_enablebunnyhopping.SetInt(0, true, true);
+       ChatAll("\x0A地图已临时 \x07关闭\x0A \x0E连跳加速");
+    }
+    else if(StringToInt(buffer) == 1 || 
+            strcmp(buffer, "true", false) == 0 || 
+            strcmp(buffer, "yes", false) == 0 ||
+            strcmp(buffer, "on", false) == 0)
+    {
+        t_LastEBhop = true;
+        sv_enablebunnyhopping.SetInt(1, true, true);
+        ChatAll("\x0A地图已临时 \x04开启\x0A \x0E连跳加速");
+    }
+    else
+    {
+        LogError("Error trigger command mg_setbhop_allow! arg[1]: %s", buffer);
+    }
+    
+    return Plugin_Handled;
+}
+
+public Action Command_SetBhopAuto(int args)
+{
+    if(args != 1)
+    {
+        LogError("Error trigger command mg_setbhop_auto!");
+        return Plugin_Handled;
+    }
+
+    char buffer[16];
+    GetCmdArg(1, buffer, 16);
+    if(StringToInt(buffer) == 0 || 
+       strcmp(buffer, "false", false) == 0 || 
+       strcmp(buffer, "no", false) == 0 ||
+       strcmp(buffer, "off", false) == 0)
+    {
+       t_LastABhop = true;
+       sv_autobunnyhopping.SetInt(0, true, true);
+       ChatAll("\x0A地图已临时 \x07关闭\x0A \x0E自动连跳");
+    }
+    else if(StringToInt(buffer) == 1 || 
+            strcmp(buffer, "true", false) == 0 || 
+            strcmp(buffer, "yes", false) == 0 ||
+            strcmp(buffer, "on", false) == 0)
+    {
+        t_LastABhop = true;
+        sv_autobunnyhopping.SetInt(1, true, true);
+        ChatAll("\x0A地图已临时 \x04开启\x0A \x0E自动连跳");
+    }
+    else
+    {
+        LogError("Error trigger command mg_setbhop_auto! arg[1]: %s", buffer);
+    }
+    
+    return Plugin_Handled;
+}
+
+public Action Command_SetBhopSpeed(int args)
+{
+    if(args != 1)
+    {
+        LogError("Error trigger command mg_setbhop_speed!");
+        return Plugin_Handled;
+    }
+    
+    char buffer[16];
+    GetCmdArg(1, buffer, 16);
+    
+    float speed = StringToFloat(buffer);
+    if(speed > 3500.0 || speed < 200.0)
+    {
+        LogError("Error trigger command mg_setbhop_speed! Wrong speed!");
+        return Plugin_Handled;
+    }
+    
+    t_LastSpeed = mg_bhopspeed.FloatValue;
+    mg_bhopspeed.FloatValue = speed;
+    
+    ChatAll("\x0A地图已临时 \x07更改\x0A \x0E地速上限 \x0A为 \x04%.1f", mg_bhopspeed.FloatValue);
+
+    return Plugin_Handled;
+}
+
+void Cvars_OnRoundStart()
+{
+    if(t_LastABhop)
+    {
+        sv_autobunnyhopping.SetBool(!sv_autobunnyhopping.BoolValue, true, true);
+        t_LastABhop = false;
+    }
+    
+    if(t_LastEBhop)
+    {
+        sv_enablebunnyhopping.SetBool(!sv_enablebunnyhopping.BoolValue, true, true);
+        t_LastEBhop = false;
+    }
+    
+    if(t_LastSpeed > 0.0)
+    {
+        mg_bhopspeed.FloatValue = t_LastSpeed;
+        t_LastSpeed = -1.0;
+    }
 }

@@ -335,6 +335,7 @@ public Action Event_PlayerDisconnect(Event event, const char[] name, bool dontBr
 
 public void Event_RoundStart(Event event, const char[] name, bool dontBroadcast)
 {
+    Cvars_OnRoundStart();
     Games_OnRoundStart();
     Teams_OnRoundStart();
 }
