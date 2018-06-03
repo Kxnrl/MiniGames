@@ -72,13 +72,14 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
         t_RankMenu.SetTitle("[MG] Top - 100\n ");
 
         // process data
-        char name[32], pidstr[16], buffer[128];
+        char name[64], pidstr[16], buffer[128];
         int index, iKill, iDeath, iScore;
         while(results.FetchRow())
         {
             index++;
             int pid = results.FetchInt(0);
-            results.FetchString(1, name, 32);
+            results.FetchString(1, name, 64);
+            Ranks_FilterName(name, 64);
             t_aRankCache.Push(pid);
 
             if(index > 100)
@@ -90,7 +91,7 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
             float KD = (float(iKill) / float(iDeath+1));
 
             IntToString(pid, pidstr, 16);
-            FormatEx(buffer, 128, "#%d - %s [K/D%.2f 得分%d]", index, name, KD, iScore);
+            FormatEx(buffer, 128, " #%02d  %s  [K/D: %.2f 得分: %d]", index, name, KD, iScore);
             t_RankMenu.AddItem(pidstr, buffer);
         }
     }
@@ -360,4 +361,18 @@ public void Hook_OnThinkPost(int entity)
         Offset = FindSendPropInfo("CCSPlayerResource", "m_iCompetitiveRanking");
 
     SetEntDataArray(entity, Offset, t_iCompLevel, MAXPLAYERS+1, _, true);
+}
+
+static void Ranks_FilterName(char[] buffer, int maxLen)
+{
+    ReplaceString(buffer, maxLen, "#", "＃");
+    ReplaceString(buffer, maxLen, "\\", "＼");
+    ReplaceString(buffer, maxLen, "/", "／");
+    ReplaceString(buffer, maxLen, "     ", " ");
+    ReplaceString(buffer, maxLen, "    ", " ");
+    ReplaceString(buffer, maxLen, "   ", " ");
+    ReplaceString(buffer, maxLen, "  ", " ");
+    
+    if(strlen(buffer) > 32)
+        buffer[32] = '\0';
 }
