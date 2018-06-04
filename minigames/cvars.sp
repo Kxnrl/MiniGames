@@ -79,9 +79,14 @@ void Cvars_OnPluginStart()
     }
     
     // you need add these to bspcvar_whitelist.cfg
+    
+    // Bhop
     RegServerCmd("mg_setbhop_allow", Command_SetBhopAllow);
     RegServerCmd("mg_setbhop_auto",  Command_SetBhopAuto);
     RegServerCmd("mg_setbhop_speed", Command_SetBhopSpeed);
+    
+    // Cvar
+    RegServerCmd("mg_setcvar", Command_SetCvar);
 }
 
 public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -395,4 +400,29 @@ void Cvars_OnRoundStart()
         mg_bhopspeed.FloatValue = t_LastSpeed;
         t_LastSpeed = -1.0;
     }
+}
+
+public Action Command_SetCvar(int args)
+{
+    if(args != 2)
+    {
+        LogError("Error trigger command mg_setcvar! Wrong args!");
+        return Plugin_Handled;
+    }
+
+    char buffer[128];
+    GetCmdArg(1, buffer, 128);
+    
+    ConVar cvar = FindConVar(buffer);
+    if(cvar == null)
+    {
+        LogError("Error trigger command mg_setcvar! Wrong convar name!");
+        return Plugin_Handled;
+    }
+    
+    GetCmdArg(2, buffer, 128);
+    
+    cvar.SetString(buffer, true, false);
+
+    return Plugin_Handled;
 }
