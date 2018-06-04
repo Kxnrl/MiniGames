@@ -61,7 +61,8 @@ public void OnPluginStart()
     AddCommandListener(Command_Jointeam, "jointeam");
 
     // game events
-    HookEventEx("round_freeze_end",     Event_RoundStart,       EventHookMode_Post);
+    HookEventEx("round_prestart",       Event_RoundStart,       EventHookMode_Post);
+    HookEventEx("round_freeze_end",     Event_RoundStarted,     EventHookMode_Post);
     HookEventEx("round_end",            Event_RoundEnd,         EventHookMode_Post);
     HookEventEx("player_spawn",         Event_PlayerSpawn,      EventHookMode_Post);
     HookEventEx("player_death",         Event_PlayerDeath,      EventHookMode_Post);
@@ -336,8 +337,12 @@ public Action Event_PlayerDisconnect(Event event, const char[] name, bool dontBr
 public void Event_RoundStart(Event event, const char[] name, bool dontBroadcast)
 {
     Cvars_OnRoundStart();
-    Games_OnRoundStart();
     Teams_OnRoundStart();
+}
+
+public void Event_RoundStarted(Event event, const char[] name, bool dontBroadcast)
+{
+    Games_OnRoundStarted();
 }
 
 public void Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)

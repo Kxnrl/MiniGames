@@ -258,7 +258,7 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
     return Plugin_Stop;
 }
 
-void Games_OnRoundStart()
+void Games_OnRoundStarted()
 {
     t_iWallHackCD = RoundToCeil(mg_wallhack_delay.FloatValue);
 
