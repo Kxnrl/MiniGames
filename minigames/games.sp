@@ -294,6 +294,6 @@ void Games_OnRoundEnd()
 
 static void Games_ShowCurrentSpeed(int client, float speed)
 {
-    SetHudTextParams(-1.0, 0.785, 0.5, 0, 191, 255, 200, 0.0, 0.0, 0.0);
+    SetHudTextParams(-1.0, 0.785, 0.5, 0, 191, 255, 200, 0, 0.0, 0.0, 0.0);
     ShowSyncHudText(client, t_hHudSync[2], "%.3f", speed);
 }
