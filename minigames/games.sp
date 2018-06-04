@@ -18,7 +18,7 @@
 static int  t_iWallHackCD = -1;
 static int  iLastSpecTarget[MAXPLAYERS+1];
 static bool bLastDisplayHud[MAXPLAYERS+1];
-static Handle t_hHudSync[2] = null;
+static Handle t_hHudSync[3] = null;
 static Handle t_tRoundTimer = null;
 
 void Games_OnMapStart()
@@ -29,6 +29,9 @@ void Games_OnMapStart()
     
     if(t_hHudSync[1] == null)
         t_hHudSync[1] = CreateHudSynchronizer();
+    
+    if(t_hHudSync[2] == null)
+        t_hHudSync[2] = CreateHudSynchronizer();
 
     // timer to update hud
     CreateTimer(1.0, Games_UpdateGameHUD, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
@@ -116,6 +119,10 @@ void Games_OnMapEnd()
     if(t_hHudSync[1] != null)
         CloseHandle(t_hHudSync[1]);
     t_hHudSync[1] = null;
+    
+    if(t_hHudSync[2] != null)
+        CloseHandle(t_hHudSync[1]);
+    t_hHudSync[2] = null;
 
     if(t_tRoundTimer != null)
         KillTimer(t_tRoundTimer);
@@ -181,13 +188,19 @@ void Games_OnPlayerRunCmd(int client)
 
     if(!sv_enablebunnyhopping.BoolValue)
         return;
+    
+    float CurVelVec[3];
+    GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
+    
+    // show speed hud
+    Games_ShowCurrentSpeed(client, SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0)));
 
     // limit pref speed
-    Games_LimitPreSpeed(client, view_as<bool>(GetEntityFlags(client) & FL_ONGROUND));
+    Games_LimitPreSpeed(client, view_as<bool>(GetEntityFlags(client) & FL_ONGROUND), CurVelVec);
 }
 
 // code from KZTimer by 1NutWunDeR -> https://github.com/1NutWunDeR/KZTimerOffical
-static void Games_LimitPreSpeed(int client, bool bOnGround)
+static void Games_LimitPreSpeed(int client, bool bOnGround, float curVelvec[3])
 {
     static bool IsOnGround[MAXPLAYERS+1];
 
@@ -195,17 +208,14 @@ static void Games_LimitPreSpeed(int client, bool bOnGround)
     {
         if(!IsOnGround[client])
         {
-            float CurVelVec[3];
-            GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
-            
             float speedlimit = mg_bhopspeed.FloatValue;
 
             IsOnGround[client] = true;    
-            if(GetVectorLength(CurVelVec) > speedlimit)
+            if(GetVectorLength(curVelvec) > speedlimit)
             {
-                NormalizeVector(CurVelVec, CurVelVec);
-                ScaleVector(CurVelVec, speedlimit);
-                TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, CurVelVec);
+                NormalizeVector(curVelvec, curVelvec);
+                ScaleVector(curVelvec, speedlimit);
+                TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, curVelvec);
             }
         }
     }
@@ -280,4 +290,10 @@ void Games_OnRoundEnd()
     t_tRoundTimer = null;
 
     t_iWallHackCD = -1;
+}
+
+static void Games_ShowCurrentSpeed(int client, float speed)
+{
+    SetHudTextParams(-1.0, 0.785, 0.5, 0, 191, 255, 200, 0.0, 0.0, 0.0);
+    ShowSyncHudText(client, t_hHudSync[2], "%.3f", speed);
 }
