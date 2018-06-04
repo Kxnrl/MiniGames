@@ -87,6 +87,8 @@ void Cvars_OnPluginStart()
     
     // Cvar
     RegServerCmd("mg_setcvar", Command_SetCvar);
+    
+    HookEvent("server_cvar", MuteConVarChanged, EventHookMode_Pre);
 }
 
 public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -410,19 +412,29 @@ public Action Command_SetCvar(int args)
         return Plugin_Handled;
     }
 
-    char buffer[128];
-    GetCmdArg(1, buffer, 128);
+    char cvr[128];
+    GetCmdArg(1, cvr, 128);
     
-    ConVar cvar = FindConVar(buffer);
+    ConVar cvar = FindConVar(cvr);
     if(cvar == null)
     {
         LogError("Error trigger command mg_setcvar! Wrong convar name!");
         return Plugin_Handled;
     }
+
+    char val[128];
+    GetCmdArg(2, val, 128);
     
-    GetCmdArg(2, buffer, 128);
-    
-    cvar.SetString(buffer, true, false);
+    cvar.SetString(val, true, false);
+
+    //ChatAll("\x0A地图修改 \x04%s\x0A 为 \x10%s", cvr, val);
+    LogMessage("Changed ConVar \"%s\" to \"%s\". ", cvr, val);
 
     return Plugin_Handled;
+}
+
+public Action MuteConVarChanged(Event event, const char[] name, bool dontBroadcast)
+{
+    event.BroadcastDisabled = true;
+    return Plugin_Changed;
 }
