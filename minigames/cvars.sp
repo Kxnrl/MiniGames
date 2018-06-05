@@ -222,87 +222,104 @@ void GenerateMapConfigs(const char[] path)
     file.WriteLine("");
 
     //Round Time
-    file.WriteLine("//设置回合时间(分钟)");
+    file.WriteLine("// 设置回合时间(分钟)");
+    file.WriteLine("// Set Round Time(Minutes)");
     file.WriteLine("mp_roundtime \"5.0\"");
     file.WriteLine("");
     
     //Time limit
-    file.WriteLine("//地图时间(分钟)");
+    file.WriteLine("// 地图时间(分钟)");
+    file.WriteLine("// Set Map Timelimit(Minutes)");
     file.WriteLine("mp_timelimit \"40\"");
     file.WriteLine("");
     
     //Auto bunnyhopping
-    file.WriteLine("//自动连跳开关(默认1,1为启用)");
+    file.WriteLine("// 自动连跳开关(按住空格连跳)");
+    file.WriteLine("// Auto bunnyhopping(Hold +jump)");
     file.WriteLine("sv_autobunnyhopping \"1\"");
     file.WriteLine("");
     
     //Allow bunnyhopping
-    file.WriteLine("//BHOP限制类型(设置为1则允许超过250低速)");
+    file.WriteLine("// BHOP限制类型(允许超过250低速)");
+    file.WriteLine("// Allow bunnyhopping(Landing speed > 250)");
     file.WriteLine("sv_enablebunnyhopping \"0\"");
     file.WriteLine("");
-    
+
     //Bhop max speed
-    file.WriteLine("//BHOP地速上限(单位, 需要sv_enablebunnyhopping设置为1)");
+    file.WriteLine("// BHOP地速上限(需要sv_enablebunnyhopping设置为1)");
+    file.WriteLine("// Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)");
     file.WriteLine("mg_bhopspeed \"300.0\"");
     file.WriteLine("");
     
     //Max flashbang
-    file.WriteLine("//最大携带闪光(个)");
+    file.WriteLine("// 最大携带闪光");
+    file.WriteLine("// How many flashbangs for each player can carry");
     file.WriteLine("ammo_grenade_limit_flashbang \"1\"");
     file.WriteLine("");
     
     //Man grenade
-    file.WriteLine("//最大携带手雷(个)");
+    file.WriteLine("// 最大携带手雷(个)");
+    file.WriteLine("// How many grenade for each player can carry");
     file.WriteLine("ammo_grenade_limit_total \"1\"");
     file.WriteLine("");
-    
+
     //Gravity
-    file.WriteLine("//重力(单位)");
+    file.WriteLine("// 重力(单位)");
+    file.WriteLine("// Gravity");
     file.WriteLine("sv_gravity \"790\"");
     file.WriteLine("");
     
     //Random switch team
-    file.WriteLine("//随机组队(1为启用)");
+    file.WriteLine("// 随机组队");
+    file.WriteLine("// Scramble Team after Round End");
     file.WriteLine("mg_randomteam \"1\"");
     file.WriteLine("");
     
     //Give pistol on spawn
-    file.WriteLine("//出生发手枪(默认0,1为启用)");
+    file.WriteLine("// 出生发手枪");
+    file.WriteLine("// Give pistol On player spawn");
     file.WriteLine("mg_spawn_pistol \"0\"");
     file.WriteLine("");
     
     //Give knife on spawn
-    file.WriteLine("//出生发刀(默认0,1为启用)");
+    file.WriteLine("// 出生发刀");
+    file.WriteLine("// Give knife On player spawn");
     file.WriteLine("mg_spawn_knife \"0\"");
     file.WriteLine("");
     
     //Give kevlar on spawn
-    file.WriteLine("//出生护甲(具体数值0~100)");
+    file.WriteLine("// 出生护甲(数值0~100)");
+    file.WriteLine("// Give kevlar On player spawn (value 0~100)");
     file.WriteLine("mg_spawn_kevlar \"0\"");
     file.WriteLine("");
     
     //Give helmet on spawn
-    file.WriteLine("//出生头盔(0或1)");
+    file.WriteLine("// 出生头盔");
+    file.WriteLine("// Give helmet On player spawn");
     file.WriteLine("mg_spawn_helmet \"0\"");
     file.WriteLine("");
     
     //Taser recharge time
     file.WriteLine("//电击枪充电时间(秒)");
+    file.WriteLine("// Determines recharge time for taser (Seconds)");
     file.WriteLine("mp_taser_recharge_time \"15\"");
     file.WriteLine("");
     
     //Restrict AWP
     file.WriteLine("//禁止使用AWP(1为启用)");
+    file.WriteLine("// Restrict use AWP");
     file.WriteLine("mg_restrictawp \"0\"");
     file.WriteLine("");
     
     //Slay player who uses gaygun
     file.WriteLine("//处死使用连狙玩家(默认1,1为启用)");
+    file.WriteLine("// Slay player who uses gaygun");
     file.WriteLine("mg_slaygaygun \"1\"");
     file.WriteLine("");
     
     //VAC timer
     file.WriteLine("//开局多久后透视全体玩家(秒,默认120[范围60~180])");
+    file.WriteLine("// VAC WALLHACK timer (Seconds)");
     file.WriteLine("mg_wallhack_delay \"120\"");
 
     delete file;

@@ -95,7 +95,7 @@ stock void Chat(int client, const char[] buffer, any ...)
     Format(msg, 256, "[\x04MG\x01]   %s", msg);
 
     Protobuf pb = UserMessageToProtobuf(SayText2);
-    pb.SetInt("ent_idx", client);
+    pb.SetInt("ent_idx", 0);
     pb.SetBool("chat", true); // force trigger sound and console log
     pb.SetString("msg_name", msg);
     pb.AddString("params", "");
