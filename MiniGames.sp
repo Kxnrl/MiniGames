@@ -69,9 +69,11 @@ public void OnPluginStart()
     HookEventEx("player_hurt",          Event_PlayerHurts,      EventHookMode_Post);
     HookEventEx("player_team",          Event_PlayerTeams,      EventHookMode_Pre);
     HookEventEx("player_disconnect",    Event_PlayerDisconnect, EventHookMode_Pre);
+    HookEventEx("player_connect_full",  Event_PlayerConnected,  EventHookMode_Post);
     HookEventEx("weapon_fire",          Event_WeaponFire,       EventHookMode_Post);
     HookEventEx("cs_win_panel_match",   Event_WinPanel,         EventHookMode_Post);
     HookEventEx("announce_phase_end",   Event_AnnouncePhaseEnd, EventHookMode_Post);
+    
     
     // for noblock
     g_offsetNoBlock = FindSendPropInfo("CBaseEntity", "m_CollisionGroup");
@@ -166,6 +168,7 @@ public void OnMapStart()
     Stats_OnMapStart();
     Games_OnMapStart();
     Ranks_OnMapStart();
+    Teams_OnMapStart();
 }
 
 public void OnAutoConfigsBuffered()
@@ -333,6 +336,11 @@ public Action Event_PlayerDisconnect(Event event, const char[] name, bool dontBr
 {
     SetEventBroadcast(event, true);
     return Plugin_Changed;
+}
+
+public void Event_PlayerConnected(Event event, const char[] name, bool dontBroadcast)
+{
+    Teams_OnPlayerConnected(event.GetInt("userid"));
 }
 
 public void Event_RoundStart(Event event, const char[] name, bool dontBroadcast)
