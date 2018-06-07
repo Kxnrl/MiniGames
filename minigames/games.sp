@@ -315,14 +315,14 @@ void Games_PlayerHurts(int client, int hitgroup)
     if(hitgroup == 1)
     {
         lastDisplay[client] = GetGameTime() + 0.66;
-        SetHudTextParams(-1.0, -1.0, 0.66, 255, 0, 0, 128, 0, 0.1, 0.1, 0.1);
+        SetHudTextParams(-1.0, -1.0, 0.66, 255, 0, 0, 128, 0, 0.3, 0.3, 0.3);
     }
     else
     {
         if(GetGameTime() < lastDisplay[client])
             return;
 
-        SetHudTextParams(-1.0, -1.0, 0.25, 250, 128, 114, 128, 0, 0.1, 0.1, 0.1);
+        SetHudTextParams(-1.0, -1.0, 0.25, 250, 128, 114, 128, 0, 0.125, 0.125, 0.125);
     }
 
     //ShowSyncHudText(client, t_hHudSync[3], "◞　◟\n◝　◜");
