@@ -18,7 +18,7 @@
 static int  t_iWallHackCD = -1;
 static int  iLastSpecTarget[MAXPLAYERS+1];
 static bool bLastDisplayHud[MAXPLAYERS+1];
-static Handle t_hHudSync[3] = null;
+static Handle t_hHudSync[4] = null;
 static Handle t_tRoundTimer = null;
 
 void Games_OnMapStart()
@@ -32,6 +32,9 @@ void Games_OnMapStart()
     
     if(t_hHudSync[2] == null)
         t_hHudSync[2] = CreateHudSynchronizer();
+    
+    if(t_hHudSync[3] == null)
+        t_hHudSync[3] = CreateHudSynchronizer();
 
     // timer to update hud
     CreateTimer(1.0, Games_UpdateGameHUD, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
@@ -123,6 +126,10 @@ void Games_OnMapEnd()
     if(t_hHudSync[2] != null)
         CloseHandle(t_hHudSync[1]);
     t_hHudSync[2] = null;
+    
+    if(t_hHudSync[3] != null)
+        CloseHandle(t_hHudSync[1]);
+    t_hHudSync[3] = null;
 
     if(t_tRoundTimer != null)
         KillTimer(t_tRoundTimer);
@@ -296,4 +303,28 @@ static void Games_ShowCurrentSpeed(int client, float speed)
 {
     SetHudTextParams(-1.0, 0.785, 0.1, 0, 191, 255, 200, 0, 0.0, 0.0, 0.0);
     ShowSyncHudText(client, t_hHudSync[2], "%.3f", speed);
+}
+
+void Games_PlayerHurts(int client, int hitgroup)
+{
+    if(!client)
+        return;
+    
+    static float lastDisplay[MAXPLAYERS+1];
+
+    if(hitgroup == 1)
+    {
+        lastDisplay[client] = GetGameTime() + 0.66;
+        SetHudTextParams(-1.0, -1.0, 0.66, 255, 0, 0, 128, 0, 0.1, 0.1, 0.1);
+    }
+    else
+    {
+        if(GetGameTime() < lastDisplay[client])
+            return;
+
+        SetHudTextParams(-1.0, -1.0, 0.25, 250, 128, 114, 128, 0, 0.1, 0.1, 0.1);
+    }
+
+    //ShowSyncHudText(client, t_hHudSync[3], "◞　◟\n◝　◜");
+    ShowSyncHudText(client, t_hHudSync[3], "＼ ／\n／ ＼");
 }

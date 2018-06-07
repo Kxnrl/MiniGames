@@ -313,11 +313,12 @@ public void Event_PlayerHurts(Event event, const char[] name, bool dontBroadcast
     int client = GetClientOfUserId(event.GetInt("userid"));
     int attacker = GetClientOfUserId(event.GetInt("attacker"));
     int damage = event.GetInt("dmg_health");
-    //int hitgroup = event.GetInt("hitgroup");
+    int hitgroup = event.GetInt("hitgroup");
     char weapon[32];
     event.GetString("weapon", weapon, 32, "");
 
     Stats_PlayerHurts(client, attacker, damage, weapon);
+    Games_PlayerHurts(attacker, hitgroup);
 }
 
 public Action Event_PlayerTeams(Event event, const char[] name, bool dontBroadcast)
