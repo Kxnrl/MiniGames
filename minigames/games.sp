@@ -18,6 +18,7 @@
 static int  t_iWallHackCD = -1;
 static int  iLastSpecTarget[MAXPLAYERS+1];
 static bool bLastDisplayHud[MAXPLAYERS+1];
+static bool bVACHudPosition[MAXPLAYERS+1];
 static Handle t_hHudSync[4] = null;
 static Handle t_tRoundTimer = null;
 
@@ -89,7 +90,12 @@ public Action Games_UpdateGameHUD(Handle timer)
         needClear = true;
         SetHudTextParams(-1.0, 0.975, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+            if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+                ShowSyncHudText(client, t_hHudSync[1], ">>>距离VAC还有%d秒<<<", t_iWallHackCD);
+
+        SetHudTextParams(-1.0, 0.000, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
+        for(int client = 1; client <= MaxClients; ++client)
+            if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
                 ShowSyncHudText(client, t_hHudSync[1], ">>>距离VAC还有%d秒<<<", t_iWallHackCD);
     }
     else if(t_iWallHackCD != -1)
@@ -97,7 +103,12 @@ public Action Games_UpdateGameHUD(Handle timer)
         needClear = true;
         SetHudTextParams(-1.0, 0.975, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+            if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+                ShowSyncHudText(client, t_hHudSync[1], "*** VAC已激活 ***");
+            
+        SetHudTextParams(-1.0, 0.000, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
+        for(int client = 1; client <= MaxClients; ++client)
+            if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
                 ShowSyncHudText(client, t_hHudSync[1], "*** VAC已激活 ***");
     }
     else if(needClear)
@@ -273,6 +284,17 @@ void Games_OnRoundStarted()
     if(t_tRoundTimer != null)
         KillTimer(t_tRoundTimer);
     t_tRoundTimer = CreateTimer(1.0, Games_RoundTimer, _, TIMER_REPEAT);
+    
+    for(int client = 1; client <= MaxClients; ++client)
+        if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+            if(QueryClientConVar(client, "cl_hud_playercount_pos", Games_HudPosition, 0) == QUERYCOOKIE_FAILED)
+                bVACHudPosition[client] = false;
+}
+
+public void Games_HudPosition(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
+{
+    int val = StringToInt(cvarValue);
+    bVACHudPosition[client] = view_as<bool>(val);
 }
 
 public Action Games_RoundTimer(Handle timer)
