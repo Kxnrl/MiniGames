@@ -18,8 +18,8 @@
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "1.3.<commit_counts>"
-#define PI_URL      "https://kxnrl.com/git/MiniGames"
+#define PI_VERSION  "1.4.<commit_counts>"
+#define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
 {
@@ -139,16 +139,6 @@ stock void GetWeaponClassname(int weapon, int index, char[] classname, int maxLe
         case 63: strcopy(classname, maxLen, "weapon_cz75a");
         case 64: strcopy(classname, maxLen, "weapon_revolver");
     }
-}
-
-stock int RandomArray(ArrayList array)
-{
-    int x = array.Length - 1;
-
-    if(x < 0)
-        return -1;
-
-    return RandomInt(0, x);
 }
 
 stock int RandomInt(int min, int max)

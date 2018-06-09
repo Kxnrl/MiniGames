@@ -45,7 +45,7 @@ public Action Games_UpdateGameHUD(Handle timer)
 {
     // spec hud
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && !IsPlayerAlive(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+        if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !IsPlayerAlive(client))
         {
             // client is in - menu?
             if(GetClientMenu(client, null) != MenuSource_None)
@@ -75,11 +75,11 @@ public Action Games_UpdateGameHUD(Handle timer)
             iLastSpecTarget[client] = target;
 
             char message[512];
-            FormatEx(message, 512, "【Lv.%d】 %N\n总排名: %d\n杀敌数: %d\n死亡数: %d\n助攻数: %d\n杀亡比: %.2f\n爆头率: %.2f%%\n总得分: %d", Ranks_GetLevel(target), target, Ranks_GetRank(client), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target));
+            FormatEx(message, 512, "【Lv.%d】 %N\n总排名: %d\n杀敌数: %d\n死亡数: %d\n助攻数: %d\n杀亡比: %.2f\n爆头率: %.2f%%\n总得分: %d", Ranks_GetLevel(target), target, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target));
             ReplaceString(message, 512, "#", "＃");
             
             // setup hud
-            SetHudTextParamsEx(0.01, 0.35, 200.0, {255,130,171,255}, {255,165,0,255}, 0, 10.0, 5.0, 5.0);
+            SetHudTextParamsEx(0.01, 0.35, 200.0, {175,238,238,255}, {135,206,235,255}, 0, 10.0, 5.0, 5.0);
             ShowSyncHudText(client, t_hHudSync[0], message);
         }
     
@@ -349,4 +349,33 @@ void Games_PlayerHurts(int client, int hitgroup)
 
     //ShowSyncHudText(client, t_hHudSync[3], "◞　◟\n◝　◜");
     ShowSyncHudText(client, t_hHudSync[3], "＼ ／\n／ ＼");
+}
+
+void Games_OnPlayerBlind(DataPack pack)
+{
+    int victim = GetClientOfUserId(pack.ReadCell());
+    int client = GetClientOfUserId(pack.ReadCell());
+    float time = pack.ReadFloat();
+    
+    if(!victim || !IsClientInGame(victim) || !client || !IsClientInGame(client))
+        return;
+
+    if(victim == client)
+    {
+        ChatAll("\x07%N \x0A这个沙雕把自己闪白了...", victim);
+        SlapPlayer(client, 1, true);
+        return;
+    }
+
+    // Anti Team flash, fucking idiot teammate. just fucking retarded.
+    if(g_iTeam[victim] == g_iTeam[client])
+    {
+        SetEntPropFloat(client, Prop_Send, "m_flFlashMaxAlpha", 0.5);
+        int damage = RoundToCeil(time * 10);
+        ChatAll("\x07%N \x0A这个狗篮子把 \x10%N \x0A闪白了, 被掌嘴付出了\x07%dHP\x0A的代价", client, victim, damage);
+        SlapPlayer(client, damage, true);
+    }
+
+    Chat(victim, "\x0A你被 \x07%N \x0A丢的闪光白了\x05%.1f\x0A秒", client, time);
+    Chat(client, "\x0A你的闪光把 \x07%N \x0A白了\x05%.1f\x0A秒", victim, time);
 }

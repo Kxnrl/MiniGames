@@ -68,6 +68,7 @@ public void OnPluginStart()
     HookEventEx("player_death",         Event_PlayerDeath,      EventHookMode_Post);
     HookEventEx("player_hurt",          Event_PlayerHurts,      EventHookMode_Post);
     HookEventEx("player_team",          Event_PlayerTeams,      EventHookMode_Pre);
+    HookEventEx("player_blind",         Event_PlayerBlind,      EventHookMode_Post);
     HookEventEx("player_disconnect",    Event_PlayerDisconnect, EventHookMode_Pre);
     HookEventEx("player_connect_full",  Event_PlayerConnected,  EventHookMode_Post);
     HookEventEx("weapon_fire",          Event_WeaponFire,       EventHookMode_Post);
@@ -330,6 +331,18 @@ public Action Event_PlayerTeams(Event event, const char[] name, bool dontBroadca
 
     SetEventBroadcast(event, true);
     return Plugin_Changed;
+}
+
+public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast)
+{
+    // 1 frame delay
+    DataPack pack = new DataPack();
+    pack.WriteCell(event.GetInt("userid"));
+    pack.WriteCell(event.GetInt("attacker"));
+    pack.WriteFloat(event.GetFloat("blind_duration"));
+    pack.Reset();
+    
+    RequestFrame(Games_OnPlayerBlind, pack);
 }
 
 public Action Event_PlayerDisconnect(Event event, const char[] name, bool dontBroadcast)

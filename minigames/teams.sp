@@ -73,7 +73,7 @@ public Action Teams_RandomTeam(Handle timer)
 {
     if(g_tWarmup != null)
         return Plugin_Stop;
-    
+
     if(GetTeamClientCount(TEAM_TE) <= 1 && GetTeamClientCount(TEAM_CT) <= 1)
     {
         ChatAll("\x04当前玩家人数不足,随机组队已取消");
@@ -84,20 +84,20 @@ public Action Teams_RandomTeam(Handle timer)
 
     // push all client to random pool
     for(int x = 1; x <= MaxClients; ++x)
-        if(IsClientInGame(x) && !IsFakeClient(x) && !IsClientSourceTV(x) && g_iTeam[x] > TEAM_OB)
+        if(IsClientInGame(x) && !IsFakeClient(x) && !IsClientSourceTV(x) && GetClientTeam(x) > TEAM_OB)
         {
-            t_iNextTeam[x] = TEAM_TE;
+            t_iNextTeam[x] = TEAM_CT;
             array_players.Push(x);
         }
 
-    int counts = RoundToCeil(array_players.Length*0.5);
+    int counts = array_players.Length/2;
 
-    while(--counts > 0 && array_players.Length > 0)
+    while(counts-- > 0)
     {
         int random = RandomInt(0, array_players.Length-1);
         int client = array_players.Get(random);
         array_players.Erase(random);
-        t_iNextTeam[client] = TEAM_CT;
+        t_iNextTeam[client] = TEAM_TE;
     }
 
     delete array_players;
