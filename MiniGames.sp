@@ -397,3 +397,11 @@ public void Event_AnnouncePhaseEnd(Event event, const char[] name, bool dontBroa
     if(StartMessageAll("ServerRankRevealAll") != null)
         EndMessage();
 }
+
+public Action CS_OnCSWeaponDrop(int client, int weapon)
+{
+    char classname[32];
+    GetWeaponClassname(weapon, -1, classname, 32);
+    
+    return (strcmp(classname, "weapon_taser") == 0) ? Plugin_Stop : Plugin_Continue;
+}
