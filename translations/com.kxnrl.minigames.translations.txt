@@ -207,7 +207,7 @@
     
     "restrict awp"
     {
-        "en"        "{red}Current map restrictions on the use of Awp..."
+        "en"        "{red}Awp is restricted in current map."
         "chi"       "{red}当前地图限制Awp的使用..."
     }
     
