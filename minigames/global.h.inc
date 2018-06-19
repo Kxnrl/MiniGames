@@ -150,3 +150,30 @@ stock int RandomInt(int min, int max)
 
     return RoundToCeil(float(random) / (float(2147483647) / float(max - min + 1))) + min - 1;
 }
+
+stock void ConVar_Easy_SetInt(const char[] name, int val, bool replicate = true, bool notify = false)
+{
+    ConVar cvar = FindConVar(name);
+    if(cvar != null)
+    {
+        cvar.SetInt(val, replicate, notify);
+    }
+}
+
+stock void ConVar_Easy_SetFlo(const char[] name, float val, bool replicate = true, bool notify = false)
+{
+    ConVar cvar = FindConVar(name);
+    if(cvar != null)
+    {
+        cvar.SetFloat(val, replicate, notify);
+    }
+}
+
+stock void ConVar_Easy_SetStr(const char[] name, const char[] val, bool replicate = true, bool notify = false)
+{
+    ConVar cvar = FindConVar(name);
+    if(cvar != null)
+    {
+        cvar.SetString(val, replicate, notify);
+    }
+}
