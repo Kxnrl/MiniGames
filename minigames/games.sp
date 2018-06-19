@@ -176,17 +176,29 @@ void Games_OnEquipPost(DataPack pack)
     if(mg_restrictawp.BoolValue && strcmp(classname, "weapon_awp") == 0)
     {
         Chat(client, "\x07当前地图限制Awp的使用");
+        
+        if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == weapon)
+        {
+            int knife = GetPlayerWeaponSlot(client, 2);
+            if(knife != -1)
+                SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", knife);
+        }
+
         RemovePlayerItem(client, weapon);
-        AcceptEntityInput(weapon, "Kill");
+        AcceptEntityInput(weapon, "KillHierarchy");
+
         return;
     }
 
     // force slay player who uses gaygun
     if(mg_slaygaygun.BoolValue && (strcmp(classname, "weapon_scar20") == 0 || strcmp(classname, "weapon_g3sg1") == 0))
     {
+
+        RemovePlayerItem(client, weapon);
+        AcceptEntityInput(weapon, "KillHierarchy");
         ForcePlayerSuicide(client);
         ChatAll("\x0B%N\x01使用\x09连狙\x01时遭遇天谴", client);
-        AcceptEntityInput(weapon, "Kill");
+
         return;
     }
 
