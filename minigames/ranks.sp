@@ -69,7 +69,7 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
 
         // rank menu.
         t_RankMenu = new Menu(MenuHandler_RankingTop);
-        t_RankMenu.SetTitle("[MG] Top - 100\n ");
+        t_RankMenu.SetTitle("undef title");
 
         // process data
         char name[64], pidstr[16], buffer[128];
@@ -91,7 +91,7 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
             float KD = (float(iKill) / float(iDeath+1));
 
             IntToString(pid, pidstr, 16);
-            FormatEx(buffer, 128, " #%02d  %s  [K/D: %.2f 得分: %d]", index, name, KD, iScore);
+            FormatEx(buffer, 128, " #%02d  %s  [K/D: %.2f (%dp)]", index, name, KD, iScore);
             t_RankMenu.AddItem(pidstr, buffer);
         }
     }
@@ -132,14 +132,14 @@ public void RankDetailsCallback(Database db, DBResultSet results, const char[] e
     if(results == null || error[0])
     {
         LogError("RankDetailsCallback -> %L -> %s", client, error);
-        Chat(client, "加载排行榜发生异常错误 \x07Code:000");
+        Chat(client, "%T \x07Code:0x6B", "failed to load rank detail", client);
         Command_Rank(client, 0);
         return;
     }
-    
+
     if(results.RowCount == 0 || !results.FetchRow())
     {
-        Chat(client, "加载排行榜发生异常错误 \x07Code:001");
+        Chat(client, "%T \x07Code:0x6A", "failed to load rank detail", client);
         Command_Rank(client, 0);
         return;
     }
@@ -170,24 +170,27 @@ void DisplayRankDetails(int client, const char[] username, DataPack pack)
     // using panel instead of menu
     Panel panel = new Panel();
     
-    panel.SetTitle("▽ Ranking ▽");
+    FormatEx(buffer, 128, "▽ %T ▽", "ranking title", client);
+    panel.SetTitle(buffer);
+    
     panel.DrawText("    ");
     panel.DrawText(username);
     panel.DrawText("    ");
 
-    FormatEx(buffer, 128, "杀敌: %d  |  死亡: %d  |  助攻: %d", data[iKills], data[iDeaths], data[iAssists]);panel.DrawText(buffer);
-    FormatEx(buffer, 128, "开火: %d  |  命中: %d  |  爆头: %d  |  总伤害: %d", data[iShots], data[iHits], data[iHeadshots], data[iTotalDamage]);panel.DrawText(buffer);
-    FormatEx(buffer, 128, "杀亡比: %.2f  |  爆头率: %.2f%%  |  命中率: %.2f%%", float(data[iKills])/float(data[iDeaths]+1), float(data[iHeadshots] * 100)/float(data[iKills] - data[iKnifeKills] - data[iTaserKills] +1), float(data[iHits])/float(data[iShots]+1));panel.DrawText(buffer);
-    FormatEx(buffer, 128, "刀杀: %d  |  电死: %d  |  雷杀: %d  |  烧死: %d", data[iKnifeKills], data[iTaserKills], data[iGrenadeKills], data[iMolotovKills]);panel.DrawText(buffer);
-    FormatEx(buffer, 128, "回合: %d  |  存活: %d  ", data[iPlayRounds], data[iSurvivals]);panel.DrawText(buffer);
-    FormatEx(buffer, 128, "得分: %d  |  在线: %d小时  ", data[iTotalScores], data[iTotalOnline] / 3600);panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 1", client, data[iKills], data[iDeaths], data[iAssists]);                                                                                                                                             panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 2", client, data[iShots], data[iHits], data[iHeadshots], data[iTotalDamage]);                                                                                                                         panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 3", client, float(data[iKills])/float(data[iDeaths]+1), float(data[iHeadshots] * 100)/float(data[iKills] - data[iKnifeKills] - data[iTaserKills] +1), float(data[iHits])/float(data[iShots]+1));      panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 4", client, data[iKnifeKills], data[iTaserKills], data[iGrenadeKills], data[iMolotovKills]);                                                                                                          panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 5", client, data[iPlayRounds], data[iSurvivals]);                                                                                                                                                     panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 6", client, data[iTotalScores], data[iTotalOnline] / 3600);                                                                                                                                           panel.DrawText(buffer);
     
     panel.DrawText("    ");
     panel.DrawText("    ");
     panel.DrawText("    ");
-    panel.DrawItem("返回");
-    panel.DrawItem("退出");
     
+    FormatEx(buffer, 128, "%T", "back", client); panel.DrawItem(buffer);
+    FormatEx(buffer, 128, "%T", "exit", client); panel.DrawItem(buffer);
+
     // display 
     panel.Send(client, MenuHandler_RankDetails, 15);
 }
@@ -197,18 +200,28 @@ public int MenuHandler_RankDetails(Menu menu, MenuAction action, int param1, int
     if(action == MenuAction_End)
         delete menu;
     else if(action == MenuAction_Select && param2 == 0)
+    {
+        t_RankMenu.SetTitle("%T\n ", "top 100 title", param1);
         t_RankMenu.Display(param1, 60);
+    }
 }
 
 public Action Command_Rank(int client, int args)
 {
-    if(!client || t_RankMenu == null)
+    if(!client)
         return Plugin_Handled;
 
-    Chat(client, "要查看自己的统计数据,请输入\x04!stats");
-
-    t_RankMenu.Display(client, 60);
+    Chat(client, "%T", "chat type stats", client);
     
+    if(t_RankMenu == null)
+    {
+        Chat(client, "%T", "ranking unavailable", client);
+        return Plugin_Handled;
+    }
+
+    t_RankMenu.SetTitle("%T\n ", "top 100 title", client);
+    t_RankMenu.Display(client, 60);
+
     return Plugin_Handled;
 }
 

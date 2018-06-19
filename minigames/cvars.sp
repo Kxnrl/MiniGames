@@ -332,7 +332,7 @@ public Action Command_SetBhopAllow(int args)
     {
        t_LastEBhop = true;
        sv_enablebunnyhopping.SetInt(0, true, true);
-       ChatAll("\x0A地图已临时 \x07关闭\x0A \x0E连跳加速");
+       ChatAll("%t", "map config toggle", "bunnyhopping", "color disabled");
     }
     else if(StringToInt(buffer) == 1 || 
             strcmp(buffer, "true", false) == 0 || 
@@ -341,13 +341,13 @@ public Action Command_SetBhopAllow(int args)
     {
         t_LastEBhop = true;
         sv_enablebunnyhopping.SetInt(1, true, true);
-        ChatAll("\x0A地图已临时 \x04开启\x0A \x0E连跳加速");
+        ChatAll("%t", "map config toggle", "bunnyhopping", "color enabled");
     }
     else
     {
         LogError("Error trigger command mg_setbhop_allow! arg[1]: %s", buffer);
     }
-    
+
     return Plugin_Handled;
 }
 
@@ -368,7 +368,7 @@ public Action Command_SetBhopAuto(int args)
     {
        t_LastABhop = true;
        sv_autobunnyhopping.SetInt(0, true, true);
-       ChatAll("\x0A地图已临时 \x07关闭\x0A \x0E自动连跳");
+       ChatAll("%t", "map config toggle", "autobhop", "color disabled");
     }
     else if(StringToInt(buffer) == 1 || 
             strcmp(buffer, "true", false) == 0 || 
@@ -377,7 +377,7 @@ public Action Command_SetBhopAuto(int args)
     {
         t_LastABhop = true;
         sv_autobunnyhopping.SetInt(1, true, true);
-        ChatAll("\x0A地图已临时 \x04开启\x0A \x0E自动连跳");
+        ChatAll("%t", "map config toggle", "autobhop", "color enabled");
     }
     else
     {
@@ -407,8 +407,8 @@ public Action Command_SetBhopSpeed(int args)
     
     t_LastSpeed = mg_bhopspeed.FloatValue;
     mg_bhopspeed.FloatValue = speed;
-    
-    ChatAll("\x0A地图已临时 \x07更改\x0A \x0E地速上限 \x0A为 \x04%.1f", mg_bhopspeed.FloatValue);
+
+    ChatAll("%t", "map config changed float", "bhop speed", mg_bhopspeed.FloatValue);
 
     return Plugin_Handled;
 }

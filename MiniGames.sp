@@ -74,12 +74,13 @@ public void OnPluginStart()
     HookEventEx("weapon_fire",          Event_WeaponFire,       EventHookMode_Post);
     HookEventEx("cs_win_panel_match",   Event_WinPanel,         EventHookMode_Post);
     HookEventEx("announce_phase_end",   Event_AnnouncePhaseEnd, EventHookMode_Post);
-    
-    
+
     // for noblock
     g_offsetNoBlock = FindSendPropInfo("CBaseEntity", "m_CollisionGroup");
     if(g_offsetNoBlock == -1)
         SetFailState("NoBlock offset -> not found.");
+
+    LoadTranslations("com.kxnrl.minigames.translations");
 }
 
 public void OnPluginEnd()

@@ -83,50 +83,82 @@ ConVar sv_enablebunnyhopping    = null;
 // stock functions
 stock void Chat(int client, const char[] buffer, any ...)
 {
-    Handle SayText2 = StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
-    if(SayText2 == null)
-    {
-        LogError("StartMessageOne -> SayText2 is null");
-        return;
-    }
-
-    char msg[256];
-    VFormat(msg, 256, buffer, 3);
-    Format(msg, 256, "[\x04MG\x01]   %s", msg);
-
-    Protobuf pb = UserMessageToProtobuf(SayText2);
-    pb.SetInt("ent_idx", 0);
-    pb.SetBool("chat", true); // force trigger sound and console log
-    pb.SetString("msg_name", msg);
-    pb.AddString("params", "");
-    pb.AddString("params", "");
-    pb.AddString("params", "");
-    pb.AddString("params", "");
-    EndMessage();
-}
-
-stock void ChatAll(const char[] buffer, any ...)
-{
-    Handle SayText2 = StartMessageAll("SayText2", USERMSG_RELIABLE|USERMSG_BLOCKHOOKS);
+    Protobuf SayText2 = view_as<Protobuf>(StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
     if(SayText2 == null)
     {
         LogError("StartMessageAll -> SayText2 is null");
         return;
     }
-    
-    char msg[256];
-    VFormat(msg, 256, buffer, 2);
-    Format(msg, 256, "[\x04MG\x01]   %s", msg);
 
-    Protobuf pb = UserMessageToProtobuf(SayText2);
-    pb.SetInt("ent_idx", 0);
-    pb.SetBool("chat", true); // force trigger sound and console log
-    pb.SetString("msg_name", msg);
-    pb.AddString("params", "");
-    pb.AddString("params", "");
-    pb.AddString("params", "");
-    pb.AddString("params", "");
+    char msg[256];
+    VFormat(msg, 256, buffer, 3);
+    ProcessColorString(msg, 256);
+
+    SayText2.SetInt("ent_idx", 0);
+    SayText2.SetBool("chat", true); // force trigger sound and console log
+    SayText2.SetString("msg_name", msg);
+    SayText2.AddString("params", "");
+    SayText2.AddString("params", "");
+    SayText2.AddString("params", "");
+    SayText2.AddString("params", "");
     EndMessage();
+}
+
+stock void ChatAll(const char[] buffer, any ...)
+{
+    char msg[256];
+    for(int client = 1; client <= MaxClients; ++client)
+        if(IsClientInGame(client) && !IsFakeClient(client))
+        {
+            SetGlobalTransTarget(client);
+
+            VFormat(msg, 256, buffer, 2);
+            ProcessColorString(msg, 256);
+
+            Protobuf SayText2 = view_as<Protobuf>(StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
+            if(SayText2 == null)
+            {
+                LogError("StartMessageOne -> SayText2 is null");
+                continue;
+            }
+
+            SayText2.SetInt("ent_idx", 0);
+            SayText2.SetBool("chat", true);
+            SayText2.SetString("msg_name", msg);
+            SayText2.AddString("params", "");
+            SayText2.AddString("params", "");
+            SayText2.AddString("params", "");
+            SayText2.AddString("params", "");
+            EndMessage();
+        }
+
+    SetGlobalTransTarget(LANG_SERVER);
+}
+
+stock void ProcessColorString(char[] message, int maxLen)
+{
+    ReplaceString(message, maxLen, "{normal}",      "\x01", false);
+    ReplaceString(message, maxLen, "{default}",     "\x01", false);
+    ReplaceString(message, maxLen, "{white}",       "\x01", false);
+    ReplaceString(message, maxLen, "{darkred}",     "\x02", false);
+    ReplaceString(message, maxLen, "{pink}",        "\x03", false);
+    ReplaceString(message, maxLen, "{green}",       "\x04", false);
+    ReplaceString(message, maxLen, "{lime}",        "\x05", false);
+    ReplaceString(message, maxLen, "{yellow}",      "\x05", false);
+    ReplaceString(message, maxLen, "{lightgreen}",  "\x06", false);
+    ReplaceString(message, maxLen, "{lightred}",    "\x07", false);
+    ReplaceString(message, maxLen, "{red}",         "\x07", false);
+    ReplaceString(message, maxLen, "{gray}",        "\x08", false);
+    ReplaceString(message, maxLen, "{grey}",        "\x08", false);
+    ReplaceString(message, maxLen, "{olive}",       "\x09", false);
+    ReplaceString(message, maxLen, "{orange}",      "\x10", false);
+    ReplaceString(message, maxLen, "{silver}",      "\x0A", false);
+    ReplaceString(message, maxLen, "{lightblue}",   "\x0B", false);
+    ReplaceString(message, maxLen, "{blue}",        "\x0C", false);
+    ReplaceString(message, maxLen, "{purple}",      "\x0E", false);
+    ReplaceString(message, maxLen, "{darkorange}",  "\x0F", false);
+
+    Format(message, maxLen, "[\x04MG\x01]   %s", message);
 }
 
 stock int GetWeaponClassname(int weapon, int index, char[] classname, int maxLen)
@@ -154,6 +186,35 @@ stock int GetWeaponClassname(int weapon, int index, char[] classname, int maxLen
 
     return strlen(classname);
 }
+
+stock void TextAll(const char[] buffer, any ...)
+{
+    char msg[256];
+    for(int client = 1; client <= MaxClients; ++client)
+        if(IsClientInGame(client) && !IsFakeClient(client))
+        {
+            Protobuf TextMsg = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
+            if(TextMsg == null)
+            {
+                LogError("StartMessageOne -> TextMsg is null");
+                continue;
+            }
+
+            SetGlobalTransTarget(client);
+
+            VFormat(msg, 256, buffer, 3);
+
+            TextMsg.SetInt("msg_dst", 4);
+            TextMsg.AddString("params", msg);
+            TextMsg.AddString("params", "");
+            TextMsg.AddString("params", "");
+            TextMsg.AddString("params", "");
+            TextMsg.AddString("params", "");
+
+            EndMessage();
+        }
+
+    SetGlobalTransTarget(LANG_SERVER);
 }
 
 stock int RandomInt(int min, int max)

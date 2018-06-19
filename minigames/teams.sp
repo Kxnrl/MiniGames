@@ -45,7 +45,7 @@ public Action Timer_FullConnected(Handle timer, int userid)
         return Plugin_Stop;
 
     int newteam = Teams_GetAllowTeam();
-    Chat(client, "你没有选择队伍,已把你随机分配到%s", newteam == TEAM_CT ? "\x0C反恐精英" : "\x05恐怖分子");
+    Chat(client, "%T %T", "switch team on full connected", client, newteam == TEAM_CT ? "color team ct" : "color team te", client);
     ChangeClientTeam(client, newteam);
 
     return Plugin_Stop;
@@ -76,7 +76,7 @@ public Action Teams_RandomTeam(Handle timer)
 
     if(GetTeamClientCount(TEAM_TE) <= 1 && GetTeamClientCount(TEAM_CT) <= 1)
     {
-        ChatAll("\x04当前玩家人数不足,随机组队已取消");
+        ChatAll("%t", "cancel random team");
         return Plugin_Stop;
     }
 
@@ -105,8 +105,8 @@ public Action Teams_RandomTeam(Handle timer)
     // timer countdown
     t_iSwitchCD = 3;
     CreateTimer(1.0, Timer_ChangeTeam, _, TIMER_REPEAT);
-    ChatAll("\x04当前地图已开启随机组队,新的队伍已经分配...");
-    PrintCenterTextAll("<font color='#0066CC' size='20'>25仔将于</font><font color='#B15700' size='25'>   3s   </font><font color='#0066CC' size='20'>后出现!</font>");
+    ChatAll("%t", "broadcast random team chat");
+    TextAll("%t", "broadcast random team text", t_iSwitchCD);
 
     return Plugin_Stop;
 }
@@ -130,7 +130,7 @@ public Action Timer_ChangeTeam(Handle timer)
 
                 CS_SwitchTeam(x, t_iNextTeam[x]);
                 t_iNextTeam[x] = TEAM_US;
-                PrintCenterText(x, "当前地图已经开启随机组队\n 你已被随机到 <font color='#%s' size='20'>%s", (t_iNextTeam[x] == TEAM_CT) ? "0066CC" : "FF0000", (t_iNextTeam[x] == TEAM_CT) ? "反恐精英" : "恐怖分子");
+                PrintCenterText(x, "%T", "self random team text", x, (t_iNextTeam[x] == TEAM_CT) ? "0066CC" : "FF0000", (t_iNextTeam[x] == TEAM_CT) ? "team ct" : "team te", x);
             }   
 
         t_iSwitchCD = -1;
@@ -139,7 +139,7 @@ public Action Timer_ChangeTeam(Handle timer)
         return Plugin_Stop;
     }
 
-    PrintCenterTextAll("<font color='#0066CC' size='20'>25仔将于</font><font color='#B15700' size='25'>   %ds   </font><font color='#0066CC' size='20'>后出现!</font>", t_iSwitchCD);
+    TextAll("%t", "broadcast random team text", t_iSwitchCD);
 
     return Plugin_Continue;
 }
@@ -170,7 +170,7 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
     {
         ChangeClientTeam(client, t_iNextTeam[client]);
         t_iNextTeam[client] = TEAM_US;
-        Chat(client, "\x02随机组队切换队伍中...");
+        Chat(client, "%T", "processing team switching", client);
         return Plugin_Handled;
     }
 

@@ -34,7 +34,7 @@ public Action Command_Stats(int client, int args)
     
     if(!t_bLoaded[client])
     {
-        Chat(client, "请等待你的数据加载完毕...");
+        Chat(client, "%T", "stats loading", client);
         return Plugin_Handled;
     }
     
@@ -252,19 +252,19 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
 void Stats_PublicMessage(int client, bool disconnected = false)
 {
     // public message
-    ChatAll("\x04%N\x01%s了游戏  \x01排名\x04%d  \x0C杀亡比\x04%.2f  \x0C爆头率\x04%.2f%%  \x0C得分\x04%d  \x0C在线\x04%d\x01小时", 
+    ChatAll("%t", "public message",
             client, 
-            disconnected ? "离开" : "进入",
+            disconnected ? "disconnect" : "join",
             Ranks_GetRank(client), 
             Stats_GetKDA(client),
             Stats_GetHSP(client),
             t_StatsDB[client][iTotalScores],
             t_StatsDB[client][iTotalOnline]/3600
-            );
+           );
 
     // private message
     if(!disconnected)
-    CreateTimer(15.0, Stats_PrivateMessage, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+    CreateTimer(6.88, Stats_PrivateMessage, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Stats_PrivateMessage(Handle timer, int userid)
@@ -274,10 +274,10 @@ public Action Stats_PrivateMessage(Handle timer, int userid)
         return Plugin_Stop;
 
     Chat(client, "\x04*****************************************");
-    Chat(client, "\x04欢迎来到MagicGirl娱乐世界,祝您游戏愉快...");
-    Chat(client, "\x05程序版本 \x01[\x04%s\x01] \x05by \x10%s", PI_VERSION, PI_AUTHOR);
-    Chat(client, "\x05常用指令 \x04!rank !stats !top !music !shop !store");
-    Chat(client, "\x05程序链接 \x04%s", PI_URL);
+    Chat(client, "\x04%T", "private message line 1", client);
+    Chat(client, "\x05%T", "private message line 2", client, PI_VERSION, PI_AUTHOR);
+    Chat(client, "\x05%T", "private message line 3", client);
+    Chat(client, "\x05%T", "private message line 4", client, PI_URL);
 
     return Plugin_Stop;
 }
@@ -318,7 +318,7 @@ void Stats_OnClientDeath(int client, int attacker, int assister, bool headshot, 
         t_Session[attacker][iTotalScores]+=2;
     }
     
-    if(StrContains(weapon, "knife", false) != -1)
+    if(StrContains(weapon, "knife", false) != -1 || StrContains(weapon, "bayonet", false) != -1)
         t_Session[attacker][iKnifeKills]++;
     else if(StrContains(weapon, "taser", false) != -1)
         t_Session[attacker][iTaserKills]++;
@@ -335,7 +335,7 @@ void Stats_PlayerHurts(int client, int attacker, int damage, const char[] weapon
 
     t_Session[attacker][iTotalDamage] += damage;
     
-    if(StrContains(weapon, "knife", false) != -1 || StrContains(weapon, "inferno", false) != -1)
+    if(StrContains(weapon, "knife", false) != -1 || StrContains(weapon, "bayonet", false) != -1 || StrContains(weapon, "inferno", false) != -1)
         return;
     
     t_Session[attacker][iHits]++;
@@ -343,7 +343,7 @@ void Stats_PlayerHurts(int client, int attacker, int damage, const char[] weapon
 
 void Stats_OnWeaponFire(int attacker, const char[] weapon)
 {
-    if(!t_bEnabled || StrContains(weapon, "knife", false) != -1 || StrContains(weapon, "inferno", false) != -1)
+    if(StrContains(weapon, "knife", false) != -1 || StrContains(weapon, "bayonet", false) != -1 || StrContains(weapon, "inferno", false) != -1)
         return;
 
     t_Session[attacker][iShots]++;

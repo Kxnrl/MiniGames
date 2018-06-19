@@ -75,14 +75,14 @@ public Action Games_UpdateGameHUD(Handle timer)
             iLastSpecTarget[client] = target;
 
             char message[512];
-            FormatEx(message, 512, "【Lv.%d】 %N\n总排名: %d\n杀敌数: %d\n死亡数: %d\n助攻数: %d\n杀亡比: %.2f\n爆头率: %.2f%%\n总得分: %d", Ranks_GetLevel(target), target, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target));
+            FormatEx(message, 512, "【Lv.%d】 %N\n%T", "spec hud", client, Ranks_GetLevel(target), target, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target));
             ReplaceString(message, 512, "#", "＃");
-            
+
             // setup hud
             SetHudTextParamsEx(0.01, 0.35, 200.0, {175,238,238,255}, {135,206,235,255}, 0, 10.0, 5.0, 5.0);
             ShowSyncHudText(client, t_hHudSync[0], message);
         }
-    
+
     // countdown wallhack
     static bool needClear;
     if(t_iWallHackCD > 0)
@@ -91,12 +91,12 @@ public Action Games_UpdateGameHUD(Handle timer)
         SetHudTextParams(-1.0, 0.975, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
-                ShowSyncHudText(client, t_hHudSync[1], ">>>距离VAC还有%d秒<<<", t_iWallHackCD);
+                ShowSyncHudText(client, t_hHudSync[1], "%T", "vac timer", client, t_iWallHackCD);
 
         SetHudTextParams(-1.0, 0.000, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
-                ShowSyncHudText(client, t_hHudSync[1], ">>>距离VAC还有%d秒<<<", t_iWallHackCD);
+                ShowSyncHudText(client, t_hHudSync[1], "%T", "vac timer", client, t_iWallHackCD);
     }
     else if(t_iWallHackCD != -1)
     {
@@ -104,12 +104,12 @@ public Action Games_UpdateGameHUD(Handle timer)
         SetHudTextParams(-1.0, 0.975, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
-                ShowSyncHudText(client, t_hHudSync[1], "*** VAC已激活 ***");
+                ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
             
         SetHudTextParams(-1.0, 0.000, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
-                ShowSyncHudText(client, t_hHudSync[1], "*** VAC已激活 ***");
+                ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
     }
     else if(needClear)
     {
@@ -167,7 +167,7 @@ void Games_OnEquipPost(DataPack pack)
 
     char classname[32];
     GetWeaponClassname(weapon, index, classname, 32);
-    
+
     // ignore taser
     if(StrContains(classname, "taser", false) != -1)
         return;
@@ -175,7 +175,7 @@ void Games_OnEquipPost(DataPack pack)
     // restrict AWP
     if(mg_restrictawp.BoolValue && strcmp(classname, "weapon_awp") == 0)
     {
-        Chat(client, "\x07当前地图限制Awp的使用");
+        Chat(client, "%T", "restrict awp", client);
         
         if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == weapon)
         {
@@ -193,11 +193,11 @@ void Games_OnEquipPost(DataPack pack)
     // force slay player who uses gaygun
     if(mg_slaygaygun.BoolValue && (strcmp(classname, "weapon_scar20") == 0 || strcmp(classname, "weapon_g3sg1") == 0))
     {
+        ChatAll("%t", "slay gaygun", client, classname[7]);
 
         RemovePlayerItem(client, weapon);
         AcceptEntityInput(weapon, "KillHierarchy");
         ForcePlayerSuicide(client);
-        ChatAll("\x0B%N\x01使用\x09连狙\x01时遭遇天谴", client);
 
         return;
     }
@@ -374,20 +374,20 @@ void Games_OnPlayerBlind(DataPack pack)
 
     if(victim == client)
     {
-        ChatAll("\x07%N \x0A这个沙雕把自己闪白了...", victim);
+        ChatAll("%t", "flashing self", victim);
         SlapPlayer(client, 1, true);
         return;
     }
+    
+    Chat(victim, "%T", "flashing notice victim",   victim, client, time);
+    Chat(client, "%T", "flashing notice attacker", client, victim, time);
 
     // Anti Team flash, fucking idiot teammate. just fucking retarded.
     if(g_iTeam[victim] == g_iTeam[client])
     {
         SetEntPropFloat(client, Prop_Send, "m_flFlashMaxAlpha", 0.5);
         int damage = RoundToCeil(time * 10);
-        ChatAll("\x07%N \x0A这个狗篮子把 \x10%N \x0A闪白了, 被掌嘴付出了\x07%dHP\x0A的代价", client, victim, damage);
+        ChatAll("%t", "flashing target", client, victim, damage);
         SlapPlayer(client, damage, true);
     }
-
-    Chat(victim, "\x0A你被 \x07%N \x0A丢的闪光白了\x05%.1f\x0A秒", client, time);
-    Chat(client, "\x0A你的闪光把 \x07%N \x0A白了\x05%.1f\x0A秒", victim, time);
 }
