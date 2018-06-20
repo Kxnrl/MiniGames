@@ -122,7 +122,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     }
 }
 
-public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+public void Cvars_OnLateSpawnChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
     if(convar == mp_freezetime)
     {
