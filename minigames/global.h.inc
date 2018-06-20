@@ -187,6 +187,28 @@ stock int GetWeaponClassname(int weapon, int index, char[] classname, int maxLen
     return strlen(classname);
 }
 
+stock void Text(int client, const char[] buffer, any ...)
+{
+    Protobuf TextMsg = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
+    if(TextMsg == null)
+    {
+        LogError("StartMessageOne -> TextMsg is null");
+        return;
+    }
+
+    char msg[256];
+    VFormat(msg, 256, buffer, 3);
+
+    TextMsg.SetInt("msg_dst", 4);
+    TextMsg.AddString("params", msg);
+    TextMsg.AddString("params", "");
+    TextMsg.AddString("params", "");
+    TextMsg.AddString("params", "");
+    TextMsg.AddString("params", "");
+
+    EndMessage();
+}
+
 stock void TextAll(const char[] buffer, any ...)
 {
     char msg[256];
