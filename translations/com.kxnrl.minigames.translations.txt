@@ -17,253 +17,253 @@
         "en"    "Ranking Detail"
 		"chi"   "统计数据"
     }
-    
+
     "ranking line 1"
     {
         "#format"   "{1:d},{2:d},{3:d}"
 		"en"        "Kills: {1}  |  Deaths: {2}  |  Assists: {3}"
 		"chi"       "杀敌: {1}  |  死亡: {2}  |  助攻: {3}"
     }
-    
+
     "ranking line 2"
     {
         "#format"   "{1:d},{2:d},{3:d},{4:d}"
 		"en"        "Shoots: {1}  |  Hits: {2}  |  Headshots: {3}  |  Damage: {4}"
 		"chi"       "开火: {1}  |  命中: {2}  |  爆头: {3}  |  总伤害: {4}"
     }
-    
+
     "ranking line 3"
     {
         "#format"   "{1:.2f},{2:.2f},{3:.2f}"
 		"en"        "KD: {1}  |  HSRatio: {2}  |  HitRatio: {3}"
 		"chi"       "杀亡比: {1}  |  爆头率: {2}  |  命中率: {3}"
     }
-    
+
     "ranking line 4"
     {
         "#format"   "{1:d},{2:d},{3:d},{4:d}"
 		"en"        "Knife Kill: {1}  |  Taser Kill: {2}  |  Nade Kill: {3}  |  Molotov Kill: {4}"
 		"chi"       "刀杀: {1}  |  电死: {2}  |  雷杀: {3}  |  烧死: {4}"
     }
-    
+
     "ranking line 5"
     {
         "#format"   "{1:d},{2:d}"
 		"en"        "Rounds: {1}  |  Survivals: {2}"
 		"chi"       "回合: {1}  |  存活: {2}"
     }
-    
+
     "ranking line 6"
     {
         "#format"   "{1:d},{2:d}"
 		"en"        "Scores: {1}p  |  Onlines: {2}h"
 		"chi"       "得分: {1}分  |  在线: {2}小时"
     }
-    
+
     "back"
     {
         "en"    "Back"
 		"chi"   "返回"
     }
-    
+
     "exit"
     {
         "en"    "Exit"
 		"chi"   "退出"
     }
-    
+
     "stats loading"
     {
         "en"    "Your data hasn't been load yet."
 		"chi"   "请等待你的数据加载完毕..."
     }
-    
+
     "public message"
     {
         "#format"   "{1:N},{2:t},{3:d},{4:.2f},{5:.2f},{6:d},{7:d}"
         "en"        "{green}{1} {normal}{2} the game, {blue}Rank:{green}{3}  {blue}KD: {green}{4}  {blue}HSRatio: {green}{5}{normal}%%  {blue}Scores: {green}{6}{normal}p  {blue}Onlines: {green}{7}{normal}hours"
         "chi"       "{green}{1}{normal}{2}了游戏, {blue}排名: {green}{3}  {blue}杀亡比: {green}{4}  {blue}爆头率: {green}{5}{normal}%%  {blue}得分: {green}{6}  {blue}在线: {green}{7}{normal}小时"
     }
-    
+
     "join"
     {
         "en"    "Join"
 		"chi"   "进入"
     }
-    
+
     "disconnect"
     {
         "en"    "Disconnect"
 		"chi"   "离开"
     }
-    
+
     "private message line 1"
     {
         "en"    "Welcome to MiniGames Server, Enjoy..."
         "chi"   "欢迎来到MagicGirl娱乐世界,祝您游戏愉快..."
     }
-    
+
     "private message line 2"
     {
         "#format"   "{1:s},{2:s}"
         "en"        "Version  {normal}[{green}{1}{normal}] {yellow}by {orange}{2}"
         "chi"       "程序版本 {normal}[{green}{1}{normal}] {yellow}by {orange}{2}"
     }
-    
+
     "private message line 3"
     {
         "en"        "Command  {green}!rank !stats !top !music !shop !store"
         "chi"       "常用指令 {green}!rank !stats !top !music !shop !store"
     }
-    
+
     "private message line 4"
     {
         "#format"   "{1:s}"
         "en"        "Program  {green}{1}"
         "chi"       "程序链接 {green}{1}"
     }
-    
+
     "switch team on full connected"
     {
         "en"    "{orange}Randomly your team to"
         "chi"   "{orange}你没有选择队伍,已把你随机分配到"
     }
-    
+
     "color team ct"
     {
         "en"    "{lightblue}Counter-Terrorist"
         "chi"   "{lightblue}反恐精英"
     }
-    
+
     "color team te"
     {
         "en"    "{yellow}Terrorist"
         "chi"   "{yellow}恐怖分子"
     }
-    
+
     "cancel random team"
     {
         "en"    "{green}No enough players to randomly team switch."
         "chi"   "{green}当前玩家人数不足,随机组队已取消."
     }
-    
+
     "broadcast random team chat"
     {
         "en"    "{green}The new team has been allocated..."
         "chi"   "{green}当前地图已开启随机组队,新的队伍已经分配..."
     }
-    
+
     "broadcast random team text"
     {
         "#format"   "{1:d}"
         "en"        "<font color='#0066CC' size='20'>The traitor will appear in</font><font color='#B15700' size='25'>   {1}s   </font>"
         "chi"       "<font color='#0066CC' size='20'>25仔将于</font><font color='#B15700' size='25'>   {1}s   </font><font color='#0066CC' size='20'>后出现!</font>"
     }
-    
+
     "self random team text"
     {
         "#format"   "{1:s},{2:T}"
         "en"        "Randomly team switched\n You are assigned to <font color='#{1}' size='20'>{2}"
         "chi"       "当前地图已经开启随机组队\n 你已被随机到 <font color='#{1}' size='20'>{2}"
     }
-    
+
     "team ct"
     {
         "en"    "Counter-Terrorist"
         "chi"   "反恐精英"
     }
-    
+
     "team te"
     {
         "en"    "Terrorist"
         "chi"   "恐怖分子"
     }
-    
+
     "processing team switching"
     {
         "en"    "{darkred}Processing team switching..."
         "chi"   "{darkred}随机组队切换队伍中..."
     }
-    
+
     "spec hud"
     {
         "#format"   "{1:d},{2:d},{3:d},{4:d},{5:.2f},{6:.2f},{7:d}"
-        "en"        "Rank   : {1}\nKills  : {2}\nDeaths  : {3}\nAssists: {4}\nKD     : {5}\nHSRatio: {6}%%\nScores : {7}"
+        "en"        "Rank: {1}\nKills: {2}\nDeaths: {3}\nAssists: {4}\nKDR: {5}\nHSR: {6}%%\nScores: {7}"
         "chi"       "总排名: {1}\n杀敌数: {2}\n死亡数: {3}\n助攻数: {4}\n杀亡比: {5}\n爆头率: {6}%%\n总得分: {7}"
     }
-    
+
     "vac timer"
     {
         "#format"   "{1:d}"
         "en"        ">>> VAC Timer {1} Seconds <<<"
         "chi"       ">>>距离VAC还有{1}秒<<<"
     }
-    
+
     "vac activated"
     {
         "en"        "*** VAC activated ***"
         "chi"       "*** VAC已激活 ***"
     }
-    
+
     "restrict awp"
     {
         "en"        "{red}Awp is restricted in current map."
         "chi"       "{red}当前地图限制Awp的使用..."
     }
-    
+
     "slay gaygun"
     {
         "#format"   "{1:N},{2:s}"
         "en"        "{lightblue}{1} {normal}has been slain by using [{red}{2}{normal}]"
         "chi"       "{lightblue}{1} {normal}使用[{red}{2}{normal}]时遭遇天谴"
     }
-    
+
     "flashing self"
     {
         "#format"   "{1:N}"
         "en"        "{red}{1} {normal}has been blinded by himself..."
         "chi"       "{red}{1} {normal}这个沙雕把自己闪白了..."
     }
-    
+
     "flashing target"
     {
         "#format"   "{1:N},{2:N},{3:d}"
         "en"        "{red}{2} {normal}has been blinded by {orange}{2} {normal}, he slapped attacker {red}{3}HP{normal}."
         "chi"       "{red}{1} {normal}这个狗篮子把 {orange}{2} {normal}闪白了, 被掌嘴付出了{red}{3}HP{normal}的代价."
     }
-    
+
     "flashing notice victim"
     {
         "#format"   "{1:N},{2:.1f}"
         "en"        "You have been blinded {yellow}{2}{normal} seconds by {red}{1}{normal} ..."
         "chi"       "你被 {red}{1}{normal} 丢的闪光白了{yellow}{2}{normal}秒"
     }
-    
+
     "flashing notice attacker"
     {
         "#format"   "{1:N},{2:.1f}"
         "en"        "You have been blinding {yellow}{2}{normal} seconds to {red}{1}{normal} ..."
         "chi"       "你的闪光把 {red}{1}{normal} 白了{yellow}{2}{normal}秒"
     }
-    
+
     "color enabled"
     {
         "en"    "{green}Enabled{normal}"
         "chi"   "{green}开启{normal}"
     }
-    
+
     "color disabled"
     {
         "en"    "{red}Disabled{normal}"
         "chi"   "{red}关闭{normal}"
     }
-    
+
     "color changed"
     {
         "en"    "{red}Changed{normal}"
         "chi"   "{red}更改{normal}"
     }
-    
+
     "map config toggle"
     {
         "#format"   "{1:t},{2:t}" // 1 = name , 2 = state
@@ -277,19 +277,19 @@
         "en"        "{silver}Map config:  {red}Changed {purple}{1} {silver}to {green}{2}"
         "chi"       "{silver}地图已临时 {red}更改 {purple}{1} {silver}为 {green}{2}"
     }
-    
+
     "bunnyhopping"
     {
         "en"    "Bunny Hopping"
         "chi"   "连跳加速"
     }
-    
+
     "autobhop"
     {
         "en"    "Auto-Bhop"
         "chi"   "自动连跳"
     }
-    
+
     "bhop speed"
     {
         "en"    "Bhop Speed"
