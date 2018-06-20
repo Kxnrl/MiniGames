@@ -1,81 +1,87 @@
 "Phrases"
 {
+    "chat type stats"
+    {
+        "en"    "Type {green}!stats {normal}to see your stats."
+        "chi"   "输入 {green}!stats {normal}可以查看你的数据统计."
+    }
+
     "ranking unavailable"
     {
         "en"    "Ranking is unavailable at the moment."
-		"chi"   "排行榜当前不可用"
+        "chi"   "排行榜当前不可用"
     }
 
     "top 100 title"
     {
         "en"    "[Ranking] Top 100"
-		"chi"   "[排行榜]  Top 100"
+        "chi"   "[排行榜]  Top 100"
     }
 
     "ranking title"
     {
         "en"    "Ranking Detail"
-		"chi"   "统计数据"
+        "chi"   "统计数据"
     }
 
     "ranking line 1"
     {
         "#format"   "{1:d},{2:d},{3:d}"
-		"en"        "Kills: {1}  |  Deaths: {2}  |  Assists: {3}"
-		"chi"       "杀敌: {1}  |  死亡: {2}  |  助攻: {3}"
+        "en"        "Kills: {1}  |  Deaths: {2}  |  Assists: {3}"
+        "chi"       "杀敌: {1}  |  死亡: {2}  |  助攻: {3}"
     }
 
     "ranking line 2"
     {
         "#format"   "{1:d},{2:d},{3:d},{4:d}"
-		"en"        "Shoots: {1}  |  Hits: {2}  |  Headshots: {3}  |  Damage: {4}"
-		"chi"       "开火: {1}  |  命中: {2}  |  爆头: {3}  |  总伤害: {4}"
+        "en"        "Shoots: {1}  |  Hits: {2}  |  Headshots: {3}  |  Damage: {4}"
+        "chi"       "开火: {1}  |  命中: {2}  |  爆头: {3}  |  总伤害: {4}"
     }
 
     "ranking line 3"
     {
         "#format"   "{1:.2f},{2:.2f},{3:.2f}"
-		"en"        "KD: {1}  |  HSRatio: {2}  |  HitRatio: {3}"
-		"chi"       "杀亡比: {1}  |  爆头率: {2}  |  命中率: {3}"
+        "en"        "KD: {1}  |  HSRatio: {2}  |  HitRatio: {3}"
+        "chi"       "杀亡比: {1}  |  爆头率: {2}  |  命中率: {3}"
     }
 
     "ranking line 4"
     {
         "#format"   "{1:d},{2:d},{3:d},{4:d}"
-		"en"        "Knife Kill: {1}  |  Taser Kill: {2}  |  Nade Kill: {3}  |  Molotov Kill: {4}"
-		"chi"       "刀杀: {1}  |  电死: {2}  |  雷杀: {3}  |  烧死: {4}"
+        "en"        "Knife Kill: {1}  |  Taser Kill: {2}  |  Nade Kill: {3}  |  Molotov Kill: {4}"
+        "chi"       "刀杀: {1}  |  电死: {2}  |  雷杀: {3}  |  烧死: {4}"
     }
 
     "ranking line 5"
     {
         "#format"   "{1:d},{2:d}"
-		"en"        "Rounds: {1}  |  Survivals: {2}"
-		"chi"       "回合: {1}  |  存活: {2}"
+        "en"        "Rounds: {1}  |  Survivals: {2}"
+        "chi"       "回合: {1}  |  存活: {2}"
     }
 
     "ranking line 6"
     {
         "#format"   "{1:d},{2:d}"
-		"en"        "Scores: {1}p  |  Onlines: {2}h"
-		"chi"       "得分: {1}分  |  在线: {2}小时"
+        "en"        "Scores: {1}p  |  Onlines: {2}h"
+        "chi"       "得分: {1}分  |  在线: {2}小时"
     }
 
     "back"
     {
         "en"    "Back"
-		"chi"   "返回"
+        "chi"   "返回"
     }
 
     "exit"
     {
         "en"    "Exit"
-		"chi"   "退出"
+        "chi"   "退出"
     }
 
     "stats loading"
     {
         "en"    "Your data hasn't been load yet."
-		"chi"   "请等待你的数据加载完毕..."
+        "chi"   "请等待你的数据加载完毕..."
     }
 
     "public message"
@@ -88,13 +94,13 @@
     "join"
     {
         "en"    "Join"
-		"chi"   "进入"
+        "chi"   "进入"
     }
 
     "disconnect"
     {
         "en"    "Disconnect"
-		"chi"   "离开"
+        "chi"   "离开"
     }
 
     "private message line 1"

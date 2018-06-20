@@ -83,16 +83,16 @@ ConVar sv_enablebunnyhopping    = null;
 // stock functions
 stock void Chat(int client, const char[] buffer, any ...)
 {
+    char msg[256];
+    VFormat(msg, 256, buffer, 3);
+    ProcessColorString(msg, 256);
+
     Protobuf SayText2 = view_as<Protobuf>(StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
     if(SayText2 == null)
     {
         LogError("StartMessageAll -> SayText2 is null");
         return;
     }
-
-    char msg[256];
-    VFormat(msg, 256, buffer, 3);
-    ProcessColorString(msg, 256);
 
     SayText2.SetInt("ent_idx", 0);
     SayText2.SetBool("chat", true); // force trigger sound and console log
@@ -111,7 +111,6 @@ stock void ChatAll(const char[] buffer, any ...)
         if(IsClientInGame(client) && !IsFakeClient(client))
         {
             SetGlobalTransTarget(client);
-
             VFormat(msg, 256, buffer, 2);
             ProcessColorString(msg, 256);
 
@@ -189,15 +188,15 @@ stock int GetWeaponClassname(int weapon, int index, char[] classname, int maxLen
 
 stock void Text(int client, const char[] buffer, any ...)
 {
+    char msg[256];
+    VFormat(msg, 256, buffer, 3);
+    
     Protobuf TextMsg = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
     if(TextMsg == null)
     {
         LogError("StartMessageOne -> TextMsg is null");
         return;
     }
-
-    char msg[256];
-    VFormat(msg, 256, buffer, 3);
 
     TextMsg.SetInt("msg_dst", 4);
     TextMsg.AddString("params", msg);
@@ -215,16 +214,15 @@ stock void TextAll(const char[] buffer, any ...)
     for(int client = 1; client <= MaxClients; ++client)
         if(IsClientInGame(client) && !IsFakeClient(client))
         {
+            SetGlobalTransTarget(client);
+            VFormat(msg, 256, buffer, 2);
+
             Protobuf TextMsg = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
             if(TextMsg == null)
             {
                 LogError("StartMessageOne -> TextMsg is null");
                 continue;
             }
-
-            SetGlobalTransTarget(client);
-
-            VFormat(msg, 256, buffer, 2);
 
             TextMsg.SetInt("msg_dst", 4);
             TextMsg.AddString("params", msg);
