@@ -202,7 +202,7 @@ stock void TextAll(const char[] buffer, any ...)
 
             SetGlobalTransTarget(client);
 
-            VFormat(msg, 256, buffer, 3);
+            VFormat(msg, 256, buffer, 2);
 
             TextMsg.SetInt("msg_dst", 4);
             TextMsg.AddString("params", msg);
