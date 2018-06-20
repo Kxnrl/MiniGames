@@ -166,6 +166,12 @@
         "en"        "Randomly team switched\n You are assigned to <font color='#{1}' size='20'>{2}"
         "chi"       "当前地图已经开启随机组队\n 你已被随机到 <font color='#{1}' size='20'>{2}"
     }
+    
+    "self random not change text"
+    {
+        "en"        "<font color='#0066CC' size='28'>Randomly team switched"
+        "chi"       "当前地图已经开启随机组队\n <font color='#0066CC' size='25'>25仔已经出现"
+    }
 
     "team ct"
     {
