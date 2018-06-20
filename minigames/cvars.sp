@@ -28,6 +28,9 @@ static ConVar sv_staminalandcost;
 static ConVar sv_staminarecoveryrate;
 static ConVar sv_autobunnyhopping;
 
+static ConVar mp_join_grace_time;
+static ConVar mp_freezetime;
+
 static bool  t_LastEBhop;
 static bool  t_LastABhop;
 static float t_LastSpeed;
@@ -68,6 +71,9 @@ void Cvars_OnPluginStart()
     mp_t_default_secondary.AddChangeHook(Cvars_OnSettingChanged);
     
     sv_autobunnyhopping.AddChangeHook(Cvars_OnSettingChanged);
+    
+    mp_join_grace_time.AddChangeHook(Cvars_OnLateSpawnChanged);
+    mp_freezetime.AddChangeHook(Cvars_OnLateSpawnChanged);
 
     AutoExecConfig(true, "minigames");
     
@@ -92,18 +98,13 @@ void Cvars_OnPluginStart()
 
 public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-    Cvars_LockedConVar();
-}
-
-static void Cvars_LockedConVar()
-{
     mp_ct_default_melee.SetString("", true, false);
     mp_ct_default_primary.SetString("", true, false);
     mp_ct_default_secondary.SetString("", true, false);
     mp_t_default_melee.SetString("", true, false);
     mp_t_default_primary.SetString("", true, false);
     mp_t_default_secondary.SetString("", true, false);
-    sv_tags.SetString("MG,MiniGames,MultiGames,Shop", false, false);
+    sv_tags.SetString("MG,MiniGames,Shop,Store,Skin,WeaponSkin", false, false);
 
     if(sv_autobunnyhopping.IntValue == 1)
     {
@@ -117,7 +118,30 @@ static void Cvars_LockedConVar()
         sv_staminamax.SetFloat(100.0, true, false);
         sv_staminajumpcost.SetFloat(0.10, true, false);
         sv_staminalandcost.SetFloat(0.05, true, false);
-        sv_staminarecoveryrate.SetFloat(100.0, true, false);
+        sv_staminarecoveryrate.SetFloat(50.0, true, false);
+    }
+}
+
+public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+    if(convar == mp_freezetime)
+    {
+        float newVal = StringToFloat(newValue);
+        if(newVal < 3.0)
+        {
+            newVal = 3.0;
+            ConVar_Easy_SetFlo("mp_freezetime", newVal, true, false);
+        }
+        
+        ConVar_Easy_SetFlo("mp_join_grace_time", newVal, true, false);
+    }
+    else if(convar == mp_join_grace_time)
+    {
+        float newVal = StringToFloat(newValue);
+        if(newVal != mp_freezetime.FloatValue)
+        {
+            ConVar_Easy_SetFlo("mp_join_grace_time", mp_freezetime.FloatValue, true, false);
+        }
     }
 }
 
@@ -139,6 +163,34 @@ static void Cvars_SetCvarDefault()
     sv_staminarecoveryrate.SetFloat(50.0, true, false);
 
     sv_autobunnyhopping.SetInt(0, true, false);
+    
+    mp_join_grace_time.SetInt(3, true, false);
+    mp_freezetime.SetInt(3, true, false);
+}
+
+static void Cvars_EnforceOptions()
+{
+    // network
+    ConVar_Easy_SetInt("sv_maxrate", 128000, true, false); 
+    ConVar_Easy_SetInt("sv_minrate", 128000, true, false); 
+    ConVar_Easy_SetInt("sv_minupdaterate", 128, true, false);
+    ConVar_Easy_SetInt("sv_mincmdrate", 128, true, false);
+    
+    // optimized
+    ConVar_Easy_SetInt("net_splitrate", 2, true, false); 
+    ConVar_Easy_SetInt("sv_parallel_sendsnapshot", 1, true, false); 
+    ConVar_Easy_SetInt("sv_enable_delta_packing", 1, true, false); 
+    ConVar_Easy_SetFlo("sv_maxunlag", 0.1, true, false);
+
+    // phys
+    ConVar_Easy_SetInt("phys_enable_experimental_optimizations", 1, true, false);
+
+    // sv var
+    ConVar_Easy_SetInt("sv_alternateticks", 1, true, false);
+    ConVar_Easy_SetInt("sv_forcepreload", 1, true, false);
+    ConVar_Easy_SetInt("sv_force_transmit_players", 0, true, false);
+    ConVar_Easy_SetInt("sv_force_transmit_ents", 0, true, false);
+    ConVar_Easy_SetInt("sv_occlude_players", 0, true, false);
 }
 
 void Cvars_OnAutoConfigsBuffered()
@@ -167,32 +219,7 @@ void Cvars_OnAutoConfigsBuffered()
     LogMessage("Executed %s", mapconfig);
 }
 
-void Cvars_EnforceOptions()
-{
-    // network
-    ConVar_Easy_SetInt("sv_maxrate", 128000, true, false); 
-    ConVar_Easy_SetInt("sv_minrate", 128000, true, false); 
-    ConVar_Easy_SetInt("sv_minupdaterate", 128, true, false);
-    ConVar_Easy_SetInt("sv_mincmdrate", 128, true, false);
-    
-    // optimized
-    ConVar_Easy_SetInt("net_splitrate", 2, true, false); 
-    ConVar_Easy_SetInt("sv_parallel_sendsnapshot", 1, true, false); 
-    ConVar_Easy_SetInt("sv_enable_delta_packing", 1, true, false); 
-    ConVar_Easy_SetFlo("sv_maxunlag", 0.1, true, false);
-
-    // phys
-    ConVar_Easy_SetInt("phys_enable_experimental_optimizations", 1, true, false);
-
-    // sv var
-    ConVar_Easy_SetInt("sv_alternateticks", 1, true, false);
-    ConVar_Easy_SetInt("sv_forcepreload", 1, true, false);
-    ConVar_Easy_SetInt("sv_force_transmit_players", 0, true, false);
-    ConVar_Easy_SetInt("sv_force_transmit_ents", 0, true, false);
-    ConVar_Easy_SetInt("sv_occlude_players", 0, true, false);
-}
-
-void GenerateMapConfigs(const char[] path)
+static void GenerateMapConfigs(const char[] path)
 {
     File file = OpenFile(path, "w+");
 
