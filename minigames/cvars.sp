@@ -62,6 +62,9 @@ void Cvars_OnPluginStart()
     sv_staminajumpcost     = FindConVar("sv_staminajumpcost");
     sv_staminalandcost     = FindConVar("sv_staminalandcost");
     sv_staminarecoveryrate = FindConVar("sv_staminarecoveryrate");
+    
+    mp_join_grace_time  = FindConVar("mp_join_grace_time");
+    mp_freezetime       = FindConVar("mp_freezetime");
 
     mp_ct_default_melee.AddChangeHook(Cvars_OnSettingChanged);
     mp_ct_default_primary.AddChangeHook(Cvars_OnSettingChanged);
@@ -71,7 +74,7 @@ void Cvars_OnPluginStart()
     mp_t_default_secondary.AddChangeHook(Cvars_OnSettingChanged);
     
     sv_autobunnyhopping.AddChangeHook(Cvars_OnSettingChanged);
-    
+
     mp_join_grace_time.AddChangeHook(Cvars_OnLateSpawnChanged);
     mp_freezetime.AddChangeHook(Cvars_OnLateSpawnChanged);
 
