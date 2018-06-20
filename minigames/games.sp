@@ -75,7 +75,7 @@ public Action Games_UpdateGameHUD(Handle timer)
             iLastSpecTarget[client] = target;
 
             char message[512];
-            FormatEx(message, 512, "【Lv.%d】 %N\n%T", Ranks_GetLevel(target), "spec hud", client, target, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target));
+            FormatEx(message, 512, "【Lv.%d】 %N\n%T", Ranks_GetLevel(target), target, "spec hud", client, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target));
             ReplaceString(message, 512, "#", "＃");
 
             // setup hud
