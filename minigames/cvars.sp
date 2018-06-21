@@ -37,15 +37,15 @@ static float t_LastSpeed;
 
 void Cvars_OnPluginStart()
 {
-    mg_restrictawp      = CreateConVar("mg_restrictawp", "0", "", _, true, 0.0, true, 1.0);
-    mg_slaygaygun       = CreateConVar("mg_slaygaygun", "1", "", _, true, 0.0, true, 1.0);
-    mg_spawn_knife      = CreateConVar("mg_spawn_knife", "0", "", _, true, 0.0, true, 1.0);
-    mg_spawn_pistol     = CreateConVar("mg_spawn_pistol", "0", "", _, true, 0.0, true, 1.0);
-    mg_spawn_kevlar     = CreateConVar("mg_spawn_kevlar", "0", "", _, true, 0.0, true, 100.0);
-    mg_spawn_helmet     = CreateConVar("mg_spawn_helmet", "0", "", _, true, 0.0, true, 1.0);
-    mg_bhopspeed        = CreateConVar("mg_bhopspeed", "250.0", "bhop speed limit", _, true, 200.0, true, 3500.0);
-    mg_randomteam       = CreateConVar("mg_randomteam", "1", "scrable team", _, true, 0.0, true, 1.0);
-    mg_wallhack_delay   = CreateConVar("mg_wallhack_delay", "150.0", "how many seconds wallhack all after round start", _, true, 60.0, true, 150.0);
+    mg_restrictawp      = CreateConVar("mg_restrictawp", "0", "Restrict use AWP", _, true, 0.0, true, 1.0);
+    mg_slaygaygun       = CreateConVar("mg_slaygaygun", "1", "Slay player who uses gaygun", _, true, 0.0, true, 1.0);
+    mg_spawn_knife      = CreateConVar("mg_spawn_knife", "0", "Give knife On player spawn", _, true, 0.0, true, 1.0);
+    mg_spawn_pistol     = CreateConVar("mg_spawn_pistol", "0", "Give pistol On player spawn", _, true, 0.0, true, 1.0);
+    mg_spawn_kevlar     = CreateConVar("mg_spawn_kevlar", "0", "Give kevlar On player spawn", _, true, 0.0, true, 100.0);
+    mg_spawn_helmet     = CreateConVar("mg_spawn_helmet", "0", "Give helmet On player spawn", _, true, 0.0, true, 1.0);
+    mg_bhopspeed        = CreateConVar("mg_bhopspeed", "250.0", "Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)", _, true, 200.0, true, 3500.0);
+    mg_randomteam       = CreateConVar("mg_randomteam", "1", "Scramble Team after Round End", _, true, 0.0, true, 1.0);
+    mg_wallhack_delay   = CreateConVar("mg_wallhack_delay", "150.0", "VAC WALLHACK timer (Seconds)", _, true, 60.0, true, 150.0);
 
     mp_ct_default_melee     = FindConVar("mp_ct_default_melee");
     mp_ct_default_primary   = FindConVar("mp_ct_default_primary");
@@ -78,14 +78,14 @@ void Cvars_OnPluginStart()
     mp_join_grace_time.AddChangeHook(Cvars_OnLateSpawnChanged);
     mp_freezetime.AddChangeHook(Cvars_OnLateSpawnChanged);
 
-    AutoExecConfig(true, "minigames");
-    
     if(!DirExists("cfg/sourcemod/map-configs"))
     {
         LogMessage("Create cfg/sourcemod/map-configs");
         CreateDirectory("cfg/sourcemod/map-configs", 511);
     }
-    
+
+    AutoExecConfig(true, "com.kxnrl.minigames");
+
     // you need add these to bspcvar_whitelist.cfg
     
     // Bhop
