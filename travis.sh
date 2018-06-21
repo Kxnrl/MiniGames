@@ -21,20 +21,22 @@ done
 
 mkdir build
 mkdir build/plugins
-mkdir build/scripts
+mkdir build/scriptings
 
-cp -rf include/*            addons/sourcemod/scripting/include
-cp -rf minigames            addons/sourcemod/scripting
-cp -rf MiniGames.sp         addons/sourcemod/scripting
+cp -rf include/*            addons/sourcemod/scriptings/include
+cp -rf minigames            addons/sourcemod/scriptings
+cp -rf MiniGames.sp         addons/sourcemod/scriptings
 
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/MiniGames.sp        -o"build/plugins/MiniGames.smx"
 
 mv LICENSE build
-mv minigames/*          build/scripts
-mv MiniGames.sp         build/scripts
+mv include              build/scriptings
+mv minigames            build/scriptings
+mv MiniGames.sp         build/scriptings
+mv translations         build
 
 cd build
-7z a $FILE -t7z -mx9 LICENSE plugins scripts >nul
+7z a $FILE -t7z -mx9 LICENSE plugins scriptings translations >nul
 
 echo -e "Upload file RSYNC ..."
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./$FILE $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/$1/
