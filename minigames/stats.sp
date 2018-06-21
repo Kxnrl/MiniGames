@@ -99,9 +99,8 @@ void Stats_OnClientPutInServer(int client)
     // ignore bot and gotv
     if(IsFakeClient(client) || IsClientSourceTV(client))
         return;
-    
-    // load uid first
-    
+
+    // load client data
     char steamid[32];
     GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
 

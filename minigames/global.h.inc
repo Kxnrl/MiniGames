@@ -18,7 +18,7 @@
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "1.4.<commit_counts>"
+#define PI_VERSION  "1.4." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
@@ -52,6 +52,13 @@ enum Analytics
 
 // staic var
 char g_szBlockRadio[27][16] = {"kill", "explode", "coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", "needbackup", "sectorclear", "inposition", "reportingin","getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment"};
+
+// library 
+bool g_extA2SFirewall;
+
+// temp
+native bool A2SFirewall_IsClientChecked(int client);
+native void A2SFirewall_GetClientTicket(int client, char[] ticket, int maxLen);
 
 // vars
 Database g_hMySQL  = null;

@@ -23,6 +23,9 @@
 #include <sdkhooks>
 #include <cstrike>
 
+// myself
+#include <minigames>
+
 // header
 #include "minigames/global.h"
 
@@ -36,6 +39,12 @@
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
     g_bLateLoad = late;
+
+    RegPluginLibrary("MiniGames");
+    
+    // A2SFirewall
+    MarkNativeAsOptional("A2SFirewall_GetClientTicket");
+    MarkNativeAsOptional("A2SFirewall_IsClientChecked");
 
     return APLRes_Success;
 }
@@ -87,6 +96,18 @@ public void OnPluginEnd()
 {
     // save all when unload plugin
     Stats_OnPluginEnd();
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+    if(strcmp(name, "A2SFirewall") == 0)
+        g_extA2SFirewall = true;
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+    if(strcmp(name, "A2SFirewall") == 0)
+        g_extA2SFirewall = false;
 }
 
 static void ConnectToDatabase(int retry)
@@ -212,6 +233,14 @@ public void OnClientConnected(int client)
 
 public void OnClientPutInServer(int client)
 {
+    // checking cluent
+    if(g_extA2SFirewall && !A2SFirewall_IsClientChecked(client))
+    {
+        LogMessage("A2SFirewall does not check \"%L\"");
+        KickClient(client, "Something wrong!\n Please re-connect to server!");
+        return;
+    }
+
     // fire to module
     Ranks_OnClientPutInServer(client);
     Stats_OnClientPutInServer(client);
@@ -226,6 +255,10 @@ public void OnClientDisconnect(int client)
     if(!IsClientInGame(client))
         return;
     
+    // if client is not passed.
+    if(g_extA2SFirewall && !A2SFirewall_IsClientChecked(client))
+        return;
+
     // fire to module
     Ranks_OnClientDisconnect(client);
     Stats_OnClientDisconnect(client);
