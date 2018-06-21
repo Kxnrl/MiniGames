@@ -307,4 +307,67 @@
         "en"    "Bhop Speed"
         "chi"   "地速上限"
     }
+    
+    "store bonus assist"
+    {
+        "#format"   "{1:N},{2:d}"
+        "en"        "You earned {orange}{2}{normal} credits for {silver}assisting kill {red}{1}"
+        "chi"       "你获得了{orange}{2}{normal}点数  来自{silver}助攻击杀 {red}{1}"
+    }
+    
+    "store bonus knife"
+    {
+        "#format"   "{1:N},{2:d}"
+        "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with Knife"
+        "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}刀杀 {red}{1}"
+    }
+    
+    "store bonus kill"
+    {
+        "#format"   "{1:N},{2:d}"
+        "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1}"
+        "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}击杀 {red}{1}"
+    }
+    
+    "store bonus headshot"
+    {
+        "#format"   "{1:N},{2:d}"
+        "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with Headshot"
+        "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}爆头击杀 {red}{1}"
+    }
+    
+    "store bonus dodgeball"
+    {
+        "#format"   "{1:N},{2:d}"
+        "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with DodgeBall"
+        "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}丢雷老谋砸死 {red}{1}"
+    }
+    
+    "store bonus taser"
+    {
+        "#format"   "{1:N},{2:d}"
+        "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with Taser"
+        "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}电击枪击毙 {red}{1}"
+    }
+    
+    "store bonus inferno"
+    {
+        "#format"   "{1:N},{2:d}"
+        "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with Molotov/Incendiary"
+        "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}放火烧死 {red}{1}"
+    }
+    
+    "store bonus grenade"
+    {
+        "#format"   "{1:N},{2:d}"
+        "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with HEGrenade"
+        "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}丢雷老谋炸死 {red}{1}"
+    }
+    
+    "store bonus survival"
+    {
+        "#format"   "{1:d}"
+        "en"        "You earned {orange}{1}{normal} credits for {silver}surviving"
+        "chi"       "你获得了{orange}{1}{normal}点数,来自{silver}本局苟活于世"
+    }
 }

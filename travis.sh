@@ -7,12 +7,13 @@ FILE=MiniGames-git$COUNT-$2.7z
 echo " "
 echo "*** Trigger build ***"
 echo " "
-wget "http://www.sourcemod.net/latest.php?version=$1&os=linux" -q -O sourcemod.tar.gz
+wget "https://github.com/Kxnrl/Store/raw/master/include/store.inc" -q -O include/store.inc
+wget "https://www.sourcemod.net/latest.php?version=$1&os=linux" -q -O sourcemod.tar.gz
 tar -xzf sourcemod.tar.gz
 
 chmod +x addons/sourcemod/scripting/spcomp
 
-for file in minigames/global.h.inc
+for file in include/minigames.inc
 do
   sed -i "s%<commit_counts>%$COUNT%g" $file > output.txt
   rm output.txt
@@ -22,6 +23,7 @@ mkdir build
 mkdir build/plugins
 mkdir build/scripts
 
+cp -rf include/*            addons/sourcemod/scripting/include
 cp -rf minigames            addons/sourcemod/scripting
 cp -rf MiniGames.sp         addons/sourcemod/scripting
 

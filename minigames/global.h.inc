@@ -54,6 +54,7 @@ enum Analytics
 char g_szBlockRadio[27][16] = {"kill", "explode", "coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", "needbackup", "sectorclear", "inposition", "reportingin","getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment"};
 
 // library 
+bool g_smxStore;
 bool g_extA2SFirewall;
 
 // temp
@@ -73,6 +74,8 @@ bool g_bLateLoad = false;
 
 // convars
 ConVar mp_warmuptime            = null;
+ConVar sv_enablebunnyhopping    = null;
+ConVar mp_damage_headshot_only  = null;
 
 ConVar mg_bhopspeed             = null;
 ConVar mg_restrictawp           = null;
@@ -83,9 +86,16 @@ ConVar mg_spawn_kevlar          = null;
 ConVar mg_spawn_helmet          = null;
 ConVar mg_randomteam            = null;
 ConVar mg_wallhack_delay        = null;
-ConVar sv_enablebunnyhopping    = null;
 
-
+ConVar mg_bonus_kill_via_gun     = null;
+ConVar mg_bonus_kill_via_gun_hs  = null;
+ConVar mg_bonus_kill_via_knife   = null;
+ConVar mg_bonus_kill_via_taser   = null;
+ConVar mg_bonus_kill_via_inferno = null;
+ConVar mg_bonus_kill_via_grenade = null;
+ConVar mg_bonus_kill_via_dodge   = null;
+ConVar mg_bonus_survival         = null;
+ConVar mg_bonus_assist           = null;
 
 // stock functions
 stock void Chat(int client, const char[] buffer, any ...)
@@ -279,4 +289,29 @@ stock void ConVar_Easy_SetStr(const char[] name, const char[] val, bool replicat
     {
         cvar.SetString(val, replicate, notify);
     }
+}
+
+stock bool IsWeaponKnife(const char[] weapon)
+{
+    return (StrContains(weapon, "knife", false) != -1 || StrContains(weapon, "bayonet", false) != -1);
+}
+
+stock bool IsWeaponTaser(const char[] weapon)
+{
+    return (StrContains(weapon, "taser", false) != -1);
+}
+
+stock bool IsWeaponInferno(const char[] weapon)
+{
+    return (StrContains(weapon, "inferno", false) != -1 || StrContains(weapon, "molotov", false) != -1 || StrContains(weapon, "incendiary", false) != -1);
+}
+
+stock bool IsWeaponGrenade(const char[] weapon)
+{
+    return (StrContains(weapon, "hegrenade", false) != -1);
+}
+
+stock bool IsWeaponDodgeBall(const char[] weapon)
+{
+    return (StrContains(weapon, "decoy", false) != -1 || StrContains(weapon, "smokegrenade", false) != -1);
 }

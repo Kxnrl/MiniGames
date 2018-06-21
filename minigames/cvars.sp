@@ -37,15 +37,25 @@ static float t_LastSpeed;
 
 void Cvars_OnPluginStart()
 {
-    mg_restrictawp      = CreateConVar("mg_restrictawp", "0", "Restrict use AWP", _, true, 0.0, true, 1.0);
-    mg_slaygaygun       = CreateConVar("mg_slaygaygun", "1", "Slay player who uses gaygun", _, true, 0.0, true, 1.0);
-    mg_spawn_knife      = CreateConVar("mg_spawn_knife", "0", "Give knife On player spawn", _, true, 0.0, true, 1.0);
-    mg_spawn_pistol     = CreateConVar("mg_spawn_pistol", "0", "Give pistol On player spawn", _, true, 0.0, true, 1.0);
-    mg_spawn_kevlar     = CreateConVar("mg_spawn_kevlar", "0", "Give kevlar On player spawn", _, true, 0.0, true, 100.0);
-    mg_spawn_helmet     = CreateConVar("mg_spawn_helmet", "0", "Give helmet On player spawn", _, true, 0.0, true, 1.0);
-    mg_bhopspeed        = CreateConVar("mg_bhopspeed", "250.0", "Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)", _, true, 200.0, true, 3500.0);
-    mg_randomteam       = CreateConVar("mg_randomteam", "1", "Scramble Team after Round End", _, true, 0.0, true, 1.0);
-    mg_wallhack_delay   = CreateConVar("mg_wallhack_delay", "150.0", "VAC WALLHACK timer (Seconds)", _, true, 60.0, true, 150.0);
+    mg_restrictawp      = CreateConVar("mg_restrictawp",    "0",        "Restrict use AWP",                                                 _, true, 0.0,   true, 1.0);
+    mg_slaygaygun       = CreateConVar("mg_slaygaygun",     "1",        "Slay player who uses gaygun",                                      _, true, 0.0,   true, 1.0);
+    mg_spawn_knife      = CreateConVar("mg_spawn_knife",    "0",        "Give knife On player spawn",                                       _, true, 0.0,   true, 1.0);
+    mg_spawn_pistol     = CreateConVar("mg_spawn_pistol",   "0",        "Give pistol On player spawn",                                      _, true, 0.0,   true, 1.0);
+    mg_spawn_kevlar     = CreateConVar("mg_spawn_kevlar",   "0",        "Give kevlar On player spawn",                                      _, true, 0.0,   true, 100.0);
+    mg_spawn_helmet     = CreateConVar("mg_spawn_helmet",   "0",        "Give helmet On player spawn",                                      _, true, 0.0,   true, 1.0);
+    mg_bhopspeed        = CreateConVar("mg_bhopspeed",      "250.0",    "Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)",  _, true, 200.0, true, 3500.0);
+    mg_randomteam       = CreateConVar("mg_randomteam",     "1",        "Scramble Team after Round End",                                    _, true, 0.0,   true, 1.0);
+    mg_wallhack_delay   = CreateConVar("mg_wallhack_delay", "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 150.0);
+
+    mg_bonus_kill_via_gun     = CreateConVar("mg_bonus_kill_via_gun",       "3", "How many credits to earn when player kill enemy with gun",                _, true, 0.0, true, 1000.0);
+    mg_bonus_kill_via_gun_hs  = CreateConVar("mg_bonus_kill_via_gun_hs",    "4", "How many credits to earn when player kill enemy with gun and headshot",   _, true, 0.0, true, 1000.0);
+    mg_bonus_kill_via_knife   = CreateConVar("mg_bonus_kill_via_knife",     "3", "How many credits to earn when player kill enemy with knife",              _, true, 0.0, true, 1000.0);
+    mg_bonus_kill_via_taser   = CreateConVar("mg_bonus_kill_via_taser",     "5", "How many credits to earn when player kill enemy with taser",              _, true, 0.0, true, 1000.0);
+    mg_bonus_kill_via_inferno = CreateConVar("mg_bonus_kill_via_inferno",   "3", "How many credits to earn when player kill enemy with molotov/incendiary", _, true, 0.0, true, 1000.0);
+    mg_bonus_kill_via_grenade = CreateConVar("mg_bonus_kill_via_grenade",   "3", "How many credits to earn when player kill enemy with HE grenade",         _, true, 0.0, true, 1000.0);
+    mg_bonus_kill_via_dodge   = CreateConVar("mg_bonus_kill_via_dodge",     "5", "How many credits to earn when player kill enemy with Dodge ball",         _, true, 0.0, true, 1000.0);
+    mg_bonus_survival         = CreateConVar("mg_bonus_survival",           "2", "How many credits to earn when player survive",                            _, true, 0.0, true, 1000.0);
+    mg_bonus_assist           = CreateConVar("mg_bonus_assist",             "1", "How many credits to earn when player assist kills",                       _, true, 0.0, true, 1000.0);
 
     mp_ct_default_melee     = FindConVar("mp_ct_default_melee");
     mp_ct_default_primary   = FindConVar("mp_ct_default_primary");
@@ -54,17 +64,16 @@ void Cvars_OnPluginStart()
     mp_t_default_primary    = FindConVar("mp_t_default_primary");
     mp_t_default_secondary  = FindConVar("mp_t_default_secondary");
     mp_warmuptime           = FindConVar("mp_warmuptime");
-
-    sv_tags                = FindConVar("sv_tags");
-    sv_enablebunnyhopping  = FindConVar("sv_enablebunnyhopping");
-    sv_autobunnyhopping    = FindConVar("sv_autobunnyhopping");
-    sv_staminamax          = FindConVar("sv_staminamax");
-    sv_staminajumpcost     = FindConVar("sv_staminajumpcost");
-    sv_staminalandcost     = FindConVar("sv_staminalandcost");
-    sv_staminarecoveryrate = FindConVar("sv_staminarecoveryrate");
-    
-    mp_join_grace_time  = FindConVar("mp_join_grace_time");
-    mp_freezetime       = FindConVar("mp_freezetime");
+    sv_tags                 = FindConVar("sv_tags");
+    sv_enablebunnyhopping   = FindConVar("sv_enablebunnyhopping");
+    sv_autobunnyhopping     = FindConVar("sv_autobunnyhopping");
+    sv_staminamax           = FindConVar("sv_staminamax");
+    sv_staminajumpcost      = FindConVar("sv_staminajumpcost");
+    sv_staminalandcost      = FindConVar("sv_staminalandcost");
+    sv_staminarecoveryrate  = FindConVar("sv_staminarecoveryrate");
+    mp_join_grace_time      = FindConVar("mp_join_grace_time");
+    mp_freezetime           = FindConVar("mp_freezetime");
+    mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
 
     mp_ct_default_melee.AddChangeHook(Cvars_OnSettingChanged);
     mp_ct_default_primary.AddChangeHook(Cvars_OnSettingChanged);
@@ -72,7 +81,6 @@ void Cvars_OnPluginStart()
     mp_t_default_melee.AddChangeHook(Cvars_OnSettingChanged);
     mp_t_default_primary.AddChangeHook(Cvars_OnSettingChanged);
     mp_t_default_secondary.AddChangeHook(Cvars_OnSettingChanged);
-    
     sv_autobunnyhopping.AddChangeHook(Cvars_OnSettingChanged);
 
     mp_join_grace_time.AddChangeHook(Cvars_OnLateSpawnChanged);
@@ -87,7 +95,7 @@ void Cvars_OnPluginStart()
     AutoExecConfig(true, "com.kxnrl.minigames");
 
     // you need add these to bspcvar_whitelist.cfg
-    
+
     // Bhop
     RegServerCmd("mg_setbhop_allow", Command_SetBhopAllow);
     RegServerCmd("mg_setbhop_auto",  Command_SetBhopAuto);

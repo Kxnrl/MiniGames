@@ -26,6 +26,11 @@
 // myself
 #include <minigames>
 
+// Store library
+#undef REQUIRE_PLUGIN
+#include <store>
+#define REQUIRE_PLUGIN
+
 // header
 #include "minigames/global.h"
 
@@ -41,7 +46,11 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     g_bLateLoad = late;
 
     RegPluginLibrary("MiniGames");
-    
+
+    // Store
+    MarkNativeAsOptional("Store_GetClientCredits");
+    MarkNativeAsOptional("Store_SetClientCredits");
+
     // A2SFirewall
     MarkNativeAsOptional("A2SFirewall_GetClientTicket");
     MarkNativeAsOptional("A2SFirewall_IsClientChecked");
@@ -102,12 +111,16 @@ public void OnLibraryAdded(const char[] name)
 {
     if(strcmp(name, "A2SFirewall") == 0)
         g_extA2SFirewall = true;
+    else if(strcmp(name, "Store") == 0)
+        g_smxStore = true;
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
     if(strcmp(name, "A2SFirewall") == 0)
         g_extA2SFirewall = false;
+    else if(strcmp(name, "Store") == 0)
+        g_smxStore = false;
 }
 
 static void ConnectToDatabase(int retry)
