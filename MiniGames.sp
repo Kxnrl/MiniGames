@@ -428,7 +428,7 @@ public void Event_WeaponFire(Event event, const char[] name, bool dontBroadcast)
     int client = GetClientOfUserId(event.GetInt("userid"));
     char weapon[32];
     event.GetString("weapon", weapon, 32, "");
-    
+
     Stats_OnWeaponFire(client, weapon);
 }
 
