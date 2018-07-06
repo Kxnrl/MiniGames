@@ -21,22 +21,22 @@ done
 
 mkdir build
 mkdir build/plugins
-mkdir build/scriptings
+mkdir build/scripting
 
-cp -rf include/*            addons/sourcemod/scriptings/include
-cp -rf minigames            addons/sourcemod/scriptings
-cp -rf MiniGames.sp         addons/sourcemod/scriptings
+cp -rf include/*            addons/sourcemod/scripting/include
+cp -rf minigames            addons/sourcemod/scripting
+cp -rf MiniGames.sp         addons/sourcemod/scripting
 
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/MiniGames.sp        -o"build/plugins/MiniGames.smx"
 
 mv LICENSE build
-mv include              build/scriptings
-mv minigames            build/scriptings
-mv MiniGames.sp         build/scriptings
+mv include              build/scripting
+mv minigames            build/scripting
+mv MiniGames.sp         build/scripting
 mv translations         build
 
 cd build
-7z a $FILE -t7z -mx9 LICENSE plugins scriptings translations >nul
+7z a $FILE -t7z -mx9 LICENSE plugins scripting translations >nul
 
 echo -e "Upload file RSYNC ..."
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./$FILE $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/$1/
@@ -44,5 +44,5 @@ RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./$FILE $RSYNC_USER@$RS
 if [ "$1" = "1.8" ]; then
 echo "Upload RAW RSYNC ..."
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/MiniGames.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/_Raw/
-RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./translations/com.kxnrl.amp.translations.txt $RSYNC_USER@$RSYNC_HOST::TravisCI/_Raw/translations/
+RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./translations/com.kxnrl.minigames.translations.txt $RSYNC_USER@$RSYNC_HOST::TravisCI/_Raw/translations/
 fi
