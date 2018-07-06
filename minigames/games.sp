@@ -113,7 +113,7 @@ public Action Games_UpdateGameHUD(Handle timer)
             if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
     }
-    else if(needClear)
+    else if(needClear || t_iWallHackCD == -2)
     {
         needClear = false;
         for(int client = 1; client <= MaxClients; ++client)
@@ -319,13 +319,25 @@ public void Games_HudPosition(QueryCookie cookie, int client, ConVarQueryResult 
 public Action Games_RoundTimer(Handle timer)
 {
     // wallhack timer
-    if(t_iWallHackCD > 0)
+    if(t_iWallHackCD > 0 && --t_iWallHackCD == 0)
     {
-        t_iWallHackCD--;
-        if(t_iWallHackCD == 0)
-            for(int client = 1; client <= MaxClients; ++client)
-                if(IsClientInGame(client) && IsPlayerAlive(client))
-                    SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 9999999.0);
+        int tt, ct, te;
+        GetAlives(tt, te, ct);
+
+        bool block = false;
+        Call_StartForward(g_fwdOnVacEnabled);
+        Call_PushCell(te);
+        Call_PushCell(ct);
+        Call_Finish(block);
+        if(block)
+        {
+            t_iWallHackCD = -2;
+            return Plugin_Continue;
+        }
+
+        for(int client = 1; client <= MaxClients; ++client)
+            if(IsClientInGame(client) && IsPlayerAlive(client))
+                SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 9999999.0);
     }
 
     return Plugin_Continue;
@@ -402,10 +414,10 @@ void Games_OnPlayerBlind(DataPack pack)
 /*******************************************************/
 /********************** Local API **********************/
 /*******************************************************/
-bool Games_SetSpecHudContent(int client, const char[] content)
+int Games_SetSpecHudContent(int client, const char[] content)
 {
     if(strlen(content) >= 255)
         return false;
 
-    return view_as<bool>(strcopy(t_szSpecHudContent[client], 256, content));
+    return strcopy(t_szSpecHudContent[client], 256, content);
 }

@@ -91,6 +91,21 @@ public Action Teams_RandomTeam(Handle timer)
         }
 
     int counts = array_players.Length/2;
+    
+    bool block = false;
+    Call_StartForward(g_fwdOnRandomTeam);
+    Call_PushCell(counts);
+    Call_PushCell(array_players.Length - counts);
+    Call_Finish(block);
+    if(block)
+    {
+        delete array_players;
+        
+        for(int x = 1; x <= MaxClients; ++x)
+            t_iNextTeam[x] = TEAM_US;
+
+        return Plugin_Stop;
+    }
 
     while(counts-- > 0)
     {

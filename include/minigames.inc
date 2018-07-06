@@ -28,3 +28,6 @@ native int MG_GetTotalKnifeKills(int client);
 native int MG_GetTotalTaserKills(int client);
 native int MG_GetRanks(int client);
 native int MG_GetLevel(int client);
+
+forward bool MG_OnRandomTeam(int       terrorists, int       counterTerrorists);
+forward bool MG_OnVacEnabled(int Alive_terrorists, int Alive_counterTerrorists);

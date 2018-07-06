@@ -57,6 +57,10 @@ char g_szBlockRadio[27][16] = {"kill", "explode", "coverme", "takepoint", "holdp
 bool g_smxStore;
 bool g_extA2SFirewall;
 
+// forwards
+Handle g_fwdOnRandomTeam;
+Handle g_fwdOnVacEnabled;
+
 // temp
 native bool A2SFirewall_IsClientChecked(int client);
 native void A2SFirewall_GetClientTicket(int client, char[] ticket, int maxLen);
@@ -314,4 +318,21 @@ stock bool IsWeaponGrenade(const char[] weapon)
 stock bool IsWeaponDodgeBall(const char[] weapon)
 {
     return (StrContains(weapon, "decoy", false) != -1 || StrContains(weapon, "smokegrenade", false) != -1);
+}
+
+stock void GetAlives(int &tt, int &te, int &ct)
+{
+    tt = 0;
+    ct = 0;
+    te = 0;
+
+    for(int client = 1; client <= MaxClients; ++client)
+        if(IsClientInGame(client) && IsPlayerAlive(client))
+        {
+            tt++;
+            if(g_iTeam[client] == 3)
+                ct++;
+            else if(g_iTeam[client] == 2)
+                te++;
+        }
 }

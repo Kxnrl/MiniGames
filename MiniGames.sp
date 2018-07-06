@@ -130,10 +130,14 @@ public void OnPluginStart()
 {
     if(GetEngineVersion() != Engine_CSGO)
         SetFailState("This plugin only for CSGO!");
+    
+    // Forwards
+    g_fwdOnRandomTeam = CreateGlobalForward("MG_OnRandomTeam", ET_Event, Param_Cell, Param_Cell);
+    g_fwdOnVacEnabled = CreateGlobalForward("MG_OnVacEnabled", ET_Event, Param_Cell, Param_Cell);
 
     // Database
     ConnectToDatabase(0);
-    
+
     // fire to module
     Cvars_OnPluginStart();
     Ranks_OnPluginStart();
