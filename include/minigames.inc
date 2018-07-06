@@ -18,3 +18,13 @@ public SharedPlugin __pl_MiniGames =
 #endif
 };
 
+native int MG_SetSpecHudContent(int client, const char[] vformat, any ...);
+native int MG_GetTotalScores(int client);
+native int MG_GetTotalKills(int client);
+native int MG_GetTotalAssists(int client);
+native int MG_GetTotalDeaths(int client);
+native int MG_GetTotalHeadshots(int client);
+native int MG_GetTotalKnifeKills(int client);
+native int MG_GetTotalTaserKills(int client);
+native int MG_GetRanks(int client);
+native int MG_GetLevel(int client);
