@@ -46,6 +46,18 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     g_bLateLoad = late;
 
     RegPluginLibrary("MiniGames");
+    
+    // Natives
+    CreateNative("MG_SetSpecHudContent",    NativeCall_SetSpecHudContent);
+    CreateNative("MG_GetTotalScores",       NativeCall_GetTotalScores);
+    CreateNative("MG_GetTotalKills",        NativeCall_GetTotalKills);
+    CreateNative("MG_GetTotalAssists",      NativeCall_GetTotalAssists);
+    CreateNative("MG_GetTotalDeaths",       NativeCall_GetTotalDeaths);
+    CreateNative("MG_GetTotalHeadshots",    NativeCall_GetTotalHeadshots);
+    CreateNative("MG_GetTotalKnifeKills",   NativeCall_GetTotalKnifeKills);
+    CreateNative("MG_GetTotalTaserKills",   NativeCall_GetTotalTaserKills);
+    CreateNative("MG_GetRanks",             NativeCall_GetRanks);
+    CreateNative("MG_GetLevel",             NativeCall_GetLevel);
 
     // Store
     MarkNativeAsOptional("Store_GetClientCredits");
@@ -56,6 +68,62 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     MarkNativeAsOptional("A2SFirewall_IsClientChecked");
 
     return APLRes_Success;
+}
+
+public int NativeCall_SetSpecHudContent(Handle plugin, int numParams)
+{
+    int client = GetNativeCell(1);
+    
+    char buffer[256], vformat[256];
+    GetNativeString(2, buffer, 256);
+    FormatNativeString(0, 0, 3, 256, _, vformat, buffer);
+    
+    return Games_SetSpecHudContent(client, vformat);
+}
+
+public int NativeCall_GetTotalScores(Handle plugin, int numParams)
+{
+    return Stats_GetTotalScore(GetNativeCell(1));
+}
+
+public int NativeCall_GetTotalKills(Handle plugin, int numParams)
+{
+    return Stats_GetKills(GetNativeCell(1));
+}
+
+public int NativeCall_GetTotalAssists(Handle plugin, int numParams)
+{
+    return Stats_GetAssists(GetNativeCell(1));
+}
+
+public int NativeCall_GetTotalDeaths(Handle plugin, int numParams)
+{
+    return Stats_GetDeaths(GetNativeCell(1));
+}
+
+public int NativeCall_GetTotalHeadshots(Handle plugin, int numParams)
+{
+    return Stats_GetHeadShots(GetNativeCell(1));
+}
+
+public int NativeCall_GetTotalKnifeKills(Handle plugin, int numParams)
+{
+    return Stats_GetKnifeKills(GetNativeCell(1));
+}
+
+public int NativeCall_GetTotalTaserKills(Handle plugin, int numParams)
+{
+    return Stats_GetTaserKills(GetNativeCell(1));
+}
+
+public int NativeCall_GetRanks(Handle plugin, int numParams)
+{
+    return Ranks_GetLevel(GetNativeCell(1));
+}
+
+public int NativeCall_GetLevel(Handle plugin, int numParams)
+{
+    return Ranks_GetLevel(GetNativeCell(1));
 }
 
 public void OnPluginStart()
@@ -240,6 +308,7 @@ public void OnClientConnected(int client)
     g_iTeam[client] = 0;
     
     // fire to module
+    Games_OnClientConnected(client);
     Stats_OnClientConnected(client);
     Teams_OnClientConnected(client);
 }

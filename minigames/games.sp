@@ -22,6 +22,8 @@ static bool bVACHudPosition[MAXPLAYERS+1];
 static Handle t_hHudSync[4] = null;
 static Handle t_tRoundTimer = null;
 
+static char t_szSpecHudContent[MAXPLAYERS+1][256];
+
 void Games_OnMapStart()
 {
     // init hud synchronizer ...
@@ -75,7 +77,7 @@ public Action Games_UpdateGameHUD(Handle timer)
             iLastSpecTarget[client] = target;
 
             char message[512];
-            FormatEx(message, 512, "【Lv.%d】 %N\n%T", Ranks_GetLevel(target), target, "spec hud", client, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target));
+            FormatEx(message, 512, "【Lv.%d】 %N\n%T\n%s", Ranks_GetLevel(target), target, "spec hud", client, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target), t_szSpecHudContent[target]);
             ReplaceString(message, 512, "#", "＃");
 
             // setup hud
@@ -209,6 +211,11 @@ void Games_OnEquipPost(DataPack pack)
         return;
 
     SetEntProp(client, Prop_Send, "m_iAmmo", 233, _, amtype);
+}
+
+void Games_OnClientConnected(int client)
+{
+    t_szSpecHudContent[client][0] = '\0';
 }
 
 void Games_OnPlayerRunCmd(int client)
@@ -390,4 +397,15 @@ void Games_OnPlayerBlind(DataPack pack)
         ChatAll("%t", "flashing target", client, victim, damage);
         SlapPlayer(client, damage, true);
     }
+}
+
+/*******************************************************/
+/********************** Local API **********************/
+/*******************************************************/
+bool Games_SetSpecHudContent(int client, const char[] content)
+{
+    if(strlen(content) >= 255)
+        return false;
+
+    return view_as<bool>(strcopy(t_szSpecHudContent[client], 256, content));
 }
