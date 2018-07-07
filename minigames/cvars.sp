@@ -194,7 +194,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("sv_friction",                       5, true, false);
     ConVar_Easy_SetInt("sv_ignoregrenaderadio",             1, true, false);
     ConVar_Easy_SetInt("sv_infinite_ammo",                  0, true, false);
-    ConVar_Easy_SetInt("weapon_reticle_knife_show"          1, true, false);
+    ConVar_Easy_SetInt("weapon_reticle_knife_show",         1, true, false);
 
     sv_staminamax.SetFloat(         100.0, true, false);
     sv_staminajumpcost.SetFloat(     0.16, true, false);
