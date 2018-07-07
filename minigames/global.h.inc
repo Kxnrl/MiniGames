@@ -18,7 +18,7 @@
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "1.5." ... MYBUILD
+#define PI_VERSION  "1.6." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
@@ -71,7 +71,7 @@ enum kOptions
     kO_HudChat,
     kO_HudText
 }
-bool t_kOptions[MAXPLAYERS+1][kOptions];
+bool g_kOptions[MAXPLAYERS+1][kOptions];
 
 // temp
 native bool A2SFirewall_IsClientChecked(int client);
@@ -116,6 +116,9 @@ ConVar mg_bonus_assist           = null;
 // stock functions
 stock void Chat(int client, const char[] buffer, any ...)
 {
+    if(g_kOptions[client][kO_HudChat])
+        return;
+
     char msg[256];
     VFormat(msg, 256, buffer, 3);
     ProcessColorString(msg, 256);
@@ -141,7 +144,7 @@ stock void ChatAll(const char[] buffer, any ...)
 {
     char msg[256];
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && !IsFakeClient(client))
+        if(IsClientInGame(client) && !IsFakeClient(client) && !g_kOptions[client][kO_HudChat])
         {
             SetGlobalTransTarget(client);
             VFormat(msg, 256, buffer, 2);
@@ -221,6 +224,9 @@ stock int GetWeaponClassname(int weapon, int index, char[] classname, int maxLen
 
 stock void Text(int client, const char[] buffer, any ...)
 {
+    if(g_kOptions[client][kO_HudText])
+        return;
+    
     char msg[256];
     VFormat(msg, 256, buffer, 3);
     
@@ -245,7 +251,7 @@ stock void TextAll(const char[] buffer, any ...)
 {
     char msg[256];
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && !IsFakeClient(client))
+        if(IsClientInGame(client) && !IsFakeClient(client) && !g_kOptions[client][kO_HudText])
         {
             SetGlobalTransTarget(client);
             VFormat(msg, 256, buffer, 2);

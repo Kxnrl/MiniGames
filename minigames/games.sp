@@ -37,6 +37,8 @@ void Games_OnPluginStart()
     }
 
     RegConsoleCmd("sm_mg",      Command_Main);
+    RegConsoleCmd("sm_menu",    Command_Main);
+    RegConsoleCmd("buyammo2",   Command_Main);
     RegConsoleCmd("sm_options", Command_Options);
 }
 
@@ -112,22 +114,22 @@ public Action Command_Options(int client, int args)
     FormatEx(line, 32, "%T", "options title", client);
     options.SetTitle("[MG]  %s\n ", line);
     
-    FormatEx(line, 32, "%T:  %T", "options hudspec", client, t_kOptions[client][kO_HudSpec] ? "menu item Off" : "menu item On", client);
+    FormatEx(line, 32, "%T:  %T", "options hudspec", client, g_kOptions[client][kO_HudSpec] ? "menu item Off" : "menu item On", client);
     options.AddItem("s", line);
     
-    FormatEx(line, 32, "%T:  %T", "options hudvac", client, t_kOptions[client][kO_HudVac] ? "menu item Off" : "menu item On", client);
+    FormatEx(line, 32, "%T:  %T", "options hudvac", client, g_kOptions[client][kO_HudVac] ? "menu item Off" : "menu item On", client);
     options.AddItem("a", line);
     
-    FormatEx(line, 32, "%T:  %T", "options hudspeed", client, t_kOptions[client][kO_HudSpeed] ? "menu item Off" : "menu item On", client);
+    FormatEx(line, 32, "%T:  %T", "options hudspeed", client, g_kOptions[client][kO_HudSpeed] ? "menu item Off" : "menu item On", client);
     options.AddItem("s", line);
     
-    FormatEx(line, 32, "%T:  %T", "options hudhurt", client, t_kOptions[client][kO_HudHurt] ? "menu item Off" : "menu item On", client);
+    FormatEx(line, 32, "%T:  %T", "options hudhurt", client, g_kOptions[client][kO_HudHurt] ? "menu item Off" : "menu item On", client);
     options.AddItem("u", line);
 
-    FormatEx(line, 32, "%T:  %T", "options hudchat", client, t_kOptions[client][kO_HudChat] ? "menu item Off" : "menu item On", client);
+    FormatEx(line, 32, "%T:  %T", "options hudchat", client, g_kOptions[client][kO_HudChat] ? "menu item Off" : "menu item On", client);
     options.AddItem("s", line);
     
-    FormatEx(line, 32, "%T:  %T", "options hudtext", client, t_kOptions[client][kO_HudText] ? "menu item Off" : "menu item On", client);
+    FormatEx(line, 32, "%T:  %T", "options hudtext", client, g_kOptions[client][kO_HudText] ? "menu item Off" : "menu item On", client);
     options.AddItem("o", line);
 
     options.ExitButton = false;
@@ -147,8 +149,8 @@ public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int
     else if(action == MenuAction_Select)
     {
         kOptions options = view_as<kOptions>(slot);
-        t_kOptions[client][options] = !t_kOptions[client][options];
-        SetClientCookie(client, t_kOCookies[options], t_kOptions[client][options] ? "1" : "0");
+        g_kOptions[client][options] = !g_kOptions[client][options];
+        SetClientCookie(client, t_kOCookies[options], g_kOptions[client][options] ? "1" : "0");
         Command_Options(client, 0);
     }
 }
@@ -176,7 +178,7 @@ public Action Games_UpdateGameHUD(Handle timer)
 {
     // spec hud
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !IsPlayerAlive(client))
+        if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && IsClientObserver(client))
         {
             // client is in - menu?
             if(GetClientMenu(client, null) != MenuSource_None)
@@ -186,6 +188,10 @@ public Action Games_UpdateGameHUD(Handle timer)
                     ClearSyncHud(client, t_hHudSync[0]);
                 continue;
             }
+            
+            // disabled by client options
+            if(g_kOptions[client][kO_HudSpec])
+                continue;
 
             // free look
             if(!(4 <= GetEntProp(client, Prop_Send, "m_iObserverMode") <= 5))
@@ -221,12 +227,12 @@ public Action Games_UpdateGameHUD(Handle timer)
         needClear = true;
         SetHudTextParams(-1.0, 0.975, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+            if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac timer", client, t_iWallHackCD);
 
         SetHudTextParams(-1.0, 0.000, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+            if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac timer", client, t_iWallHackCD);
     }
     else if(t_iWallHackCD != -1)
@@ -234,12 +240,12 @@ public Action Games_UpdateGameHUD(Handle timer)
         needClear = true;
         SetHudTextParams(-1.0, 0.975, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+            if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
             
         SetHudTextParams(-1.0, 0.000, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+            if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
     }
     else if(needClear || t_iWallHackCD == -2)
@@ -347,7 +353,7 @@ void Games_OnClientConnected(int client)
     t_szSpecHudContent[client][0] = '\0';
     
     for(int i = 0; i < view_as<int>(kOptions); ++i)
-        t_kOptions[client][view_as<kOptions>(i)] = false;
+        g_kOptions[client][view_as<kOptions>(i)] = false;
 }
 
 void Games_OnClientCookiesCached(int client)
@@ -356,7 +362,7 @@ void Games_OnClientCookiesCached(int client)
     for(int i = 0; i < view_as<int>(kOptions); ++i)
     {
         GetClientCookie(client, t_kOCookies[view_as<kOptions>(i)], buffer, 4);
-        t_kOptions[client][view_as<kOptions>(i)] = (StringToInt(buffer) == 1);
+        g_kOptions[client][view_as<kOptions>(i)] = (StringToInt(buffer) == 1);
     }
 }
 
@@ -365,12 +371,9 @@ void Games_OnPlayerRunCmd(int client)
     if(!IsPlayerAlive(client))
         return;
 
-    if(!sv_enablebunnyhopping.BoolValue)
-        return;
-    
     float CurVelVec[3];
     GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
-    
+
     // show speed hud
     Games_ShowCurrentSpeed(client, SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0)));
 
@@ -381,6 +384,9 @@ void Games_OnPlayerRunCmd(int client)
 // code from KZTimer by 1NutWunDeR -> https://github.com/1NutWunDeR/KZTimerOffical
 static void Games_LimitPreSpeed(int client, bool bOnGround, float curVelvec[3])
 {
+    if(!sv_enablebunnyhopping.BoolValue)
+        return;
+
     static bool IsOnGround[MAXPLAYERS+1];
 
     if(bOnGround)
@@ -496,15 +502,19 @@ void Games_OnRoundEnd()
 
 static void Games_ShowCurrentSpeed(int client, float speed)
 {
+    // disabled by client options
+    if(g_kOptions[client][kO_HudSpeed])
+        return;
+
     SetHudTextParams(-1.0, 0.785, 0.1, 0, 191, 255, 200, 0, 0.0, 0.0, 0.0);
     ShowSyncHudText(client, t_hHudSync[2], "%.3f", speed);
 }
 
 void Games_PlayerHurts(int client, int hitgroup)
 {
-    if(!client)
+    if(!client || g_kOptions[client][kO_HudHurt])
         return;
-    
+
     static float lastDisplay[MAXPLAYERS+1];
 
     if(hitgroup == 1)

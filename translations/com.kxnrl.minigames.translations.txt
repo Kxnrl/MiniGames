@@ -118,8 +118,8 @@
 
     "private message line 3"
     {
-        "en"        "Command  {green}!rank !stats !top !music !store"
-        "chi"       "常用指令 {green}!rank !stats !top !music !store"
+        "en"        "Command  {green}!mg !rank !stats !options"
+        "chi"       "常用指令 {green}!mg !rank !stats !options"
     }
 
     "private message line 4"
