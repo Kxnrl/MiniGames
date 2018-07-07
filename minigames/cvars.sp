@@ -27,6 +27,7 @@ static ConVar sv_staminajumpcost;
 static ConVar sv_staminalandcost;
 static ConVar sv_staminarecoveryrate;
 static ConVar sv_autobunnyhopping;
+static ConVar sv_timebetweenducks;
 
 static ConVar mp_join_grace_time;
 static ConVar mp_freezetime;
@@ -67,6 +68,7 @@ void Cvars_OnPluginStart()
     sv_tags                 = FindConVar("sv_tags");
     sv_enablebunnyhopping   = FindConVar("sv_enablebunnyhopping");
     sv_autobunnyhopping     = FindConVar("sv_autobunnyhopping");
+    sv_timebetweenducks     = FindConVar("sv_timebetweenducks");
     sv_staminamax           = FindConVar("sv_staminamax");
     sv_staminajumpcost      = FindConVar("sv_staminajumpcost");
     sv_staminalandcost      = FindConVar("sv_staminalandcost");
@@ -124,6 +126,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
         sv_staminajumpcost.SetInt(0, true, false);
         sv_staminalandcost.SetInt(0, true, false);
         sv_staminarecoveryrate.SetInt(0, true, false);
+        sv_timebetweenducks.SetInt(0, true, false);
     }
     else
     {
@@ -131,6 +134,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
         sv_staminajumpcost.SetFloat(0.10, true, false);
         sv_staminalandcost.SetFloat(0.05, true, false);
         sv_staminarecoveryrate.SetFloat(50.0, true, false);
+        sv_timebetweenducks.SetInt(1, true, false);
     }
 }
 
@@ -159,50 +163,75 @@ public void Cvars_OnLateSpawnChanged(ConVar convar, const char[] oldValue, const
 
 static void Cvars_SetCvarDefault()
 {
-    ConVar_Easy_SetInt("phys_pushscale", 3, true, false);
-    ConVar_Easy_SetInt("phys_timescale", 1, true, false);
-    ConVar_Easy_SetInt("sv_damage_print_enable", 1, true, false);
-    ConVar_Easy_SetInt("sv_airaccelerate", 9999, true, false);
-    ConVar_Easy_SetInt("sv_accelerate_use_weapon_speed", 0, true, false);
-    ConVar_Easy_SetInt("sv_maxvelocity", 3500, true, false);
-    ConVar_Easy_SetInt("sv_full_alltalk", 1, true, false);
-    ConVar_Easy_SetInt("mp_limitteams", 0, true, false);
-    ConVar_Easy_SetInt("mp_autoteambalance", 0, true, false);
+    ConVar_Easy_SetInt("mp_buytime",                       60, true, false);
+    ConVar_Easy_SetInt("mp_roundtime_hostage",              0, true, false);
+    ConVar_Easy_SetInt("mp_roundtime_defuse",               0, true, false);
+    ConVar_Easy_SetInt("mp_death_drop_defuser",             0, true, false);
+    ConVar_Easy_SetInt("mp_death_drop_grenade",             0, true, false);
+    ConVar_Easy_SetInt("mp_death_drop_gun",                 0, true, false);
+    ConVar_Easy_SetInt("mp_defuser_allocation",             0, true, false);
+    ConVar_Easy_SetInt("mp_playercashawards",               0, true, false);
+    ConVar_Easy_SetInt("mp_weapons_allow_zeus",             1, true, false);
+    ConVar_Easy_SetInt("mp_weapons_allow_map_placed",       1, true, false);
+    ConVar_Easy_SetInt("mp_friendlyfire",                   0, true, false);
+    ConVar_Easy_SetInt("mp_autoteambalance",                0, true, false);
+    ConVar_Easy_SetInt("mp_force_pick_time",                1, true, false);
+    ConVar_Easy_SetInt("mp_display_kill_assists",           0, true, false);
+    ConVar_Easy_SetInt("mp_maxrounds",                      0, true, false);
+    ConVar_Easy_SetInt("mp_match_can_clinch",               0, true, false);
+    ConVar_Easy_SetInt("mp_playerid",                       2, true, false);
+    ConVar_Easy_SetInt("phys_pushscale",                    3, true, false);
+    ConVar_Easy_SetInt("phys_timescale",                    1, true, false);
+    ConVar_Easy_SetInt("sv_damage_print_enable",            1, true, false);
+    ConVar_Easy_SetInt("sv_airaccelerate",               9999, true, false);
+    ConVar_Easy_SetInt("sv_accelerate_use_weapon_speed",    0, true, false);
+    ConVar_Easy_SetInt("sv_maxvelocity",                 3500, true, false);
+    ConVar_Easy_SetInt("sv_allow_votes",                    0, true, false);
+    ConVar_Easy_SetInt("sv_full_alltalk",                   1, true, false);
+    ConVar_Easy_SetInt("sv_talk_enemy_living",              1, true, false);
+    ConVar_Easy_SetInt("sv_talk_enemy_dead",                1, true, false);
+    ConVar_Easy_SetInt("sv_clamp_unsafe_velocities",        1, true, false);
+    ConVar_Easy_SetInt("sv_friction",                       5, true, false);
+    ConVar_Easy_SetInt("sv_ignoregrenaderadio",             1, true, false);
+    ConVar_Easy_SetInt("sv_infinite_ammo",                  0, true, false);
+    ConVar_Easy_SetInt("weapon_reticle_knife_show"          1, true, false);
 
-    sv_staminamax.SetFloat(100.0, true, false);
-    sv_staminajumpcost.SetFloat(0.16, true, false);
-    sv_staminalandcost.SetFloat(0.10, true, false);
-    sv_staminarecoveryrate.SetFloat(50.0, true, false);
+    sv_staminamax.SetFloat(         100.0, true, false);
+    sv_staminajumpcost.SetFloat(     0.16, true, false);
+    sv_staminalandcost.SetFloat(     0.10, true, false);
+    sv_staminarecoveryrate.SetFloat( 50.0, true, false);
 
     sv_autobunnyhopping.SetInt(0, true, false);
-    
-    mp_join_grace_time.SetInt(3, true, false);
-    mp_freezetime.SetInt(3, true, false);
+
+    mp_join_grace_time.SetInt(  3, true, false);
+    mp_freezetime.SetInt(       3, true, false);
+
+    sv_tags.SetString("MG,MiniGames,Shop,Store,Skin,WeaponSkin", false, false);
 }
 
 static void Cvars_EnforceOptions()
 {
     // network
-    ConVar_Easy_SetInt("sv_maxrate", 128000, true, false); 
-    ConVar_Easy_SetInt("sv_minrate", 128000, true, false); 
-    ConVar_Easy_SetInt("sv_minupdaterate", 128, true, false);
-    ConVar_Easy_SetInt("sv_mincmdrate", 128, true, false);
-    
+    ConVar_Easy_SetInt("sv_maxrate",        128000, true, false); 
+    ConVar_Easy_SetInt("sv_minrate",        128000, true, false); 
+    ConVar_Easy_SetInt("sv_minupdaterate",     128, true, false);
+    ConVar_Easy_SetInt("sv_mincmdrate",        128, true, false);
+
     // optimized
-    ConVar_Easy_SetInt("net_splitrate", 2, true, false); 
-    ConVar_Easy_SetInt("sv_parallel_sendsnapshot", 1, true, false); 
-    ConVar_Easy_SetInt("sv_enable_delta_packing", 1, true, false); 
+    ConVar_Easy_SetInt("net_splitrate",             2, true, false); 
+    ConVar_Easy_SetInt("sv_parallel_sendsnapshot",  1, true, false); 
+    ConVar_Easy_SetInt("sv_enable_delta_packing",   1, true, false); 
     ConVar_Easy_SetFlo("sv_maxunlag", 0.1, true, false);
 
     // phys
     ConVar_Easy_SetInt("phys_enable_experimental_optimizations", 1, true, false);
 
     // sv var
-    ConVar_Easy_SetInt("sv_alternateticks", 1, true, false);
-    ConVar_Easy_SetInt("sv_forcepreload", 1, true, false);
+    ConVar_Easy_SetInt("sv_alternateticks",         1, true, false);
+    ConVar_Easy_SetInt("sv_forcepreload",           1, true, false);
     ConVar_Easy_SetInt("sv_force_transmit_players", 0, true, false);
-    ConVar_Easy_SetInt("sv_force_transmit_ents", 0, true, false);
-    ConVar_Easy_SetInt("sv_occlude_players", 0, true, false);
+    ConVar_Easy_SetInt("sv_force_transmit_ents",    0, true, false);
+    ConVar_Easy_SetInt("sv_occlude_players",        0, true, false);
 }
 
 void Cvars_OnAutoConfigsBuffered()
