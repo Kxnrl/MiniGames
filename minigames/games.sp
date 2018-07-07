@@ -22,7 +22,136 @@ static bool bVACHudPosition[MAXPLAYERS+1];
 static Handle t_hHudSync[4] = null;
 static Handle t_tRoundTimer = null;
 
+
+static Handle t_kOCookies[kOptions];
+
 static char t_szSpecHudContent[MAXPLAYERS+1][256];
+
+void Games_OnPluginStart()
+{
+    for(int i = 0; i < view_as<int>(kOptions); ++i)
+    {
+        char cookieName[16];
+        FormatEx(cookieName, 16, "MiniGames_Options_%d", i);
+        t_kOCookies[view_as<kOptions>(i)] = RegClientCookie(cookieName, cookieName, CookieAccess_Private);
+    }
+
+    RegConsoleCmd("sm_mg",      Command_Main);
+    RegConsoleCmd("sm_options", Command_Options);
+}
+
+public Action Command_Main(int client, int args)
+{
+    if(!client || !IsClientInGame(client))
+        return Plugin_Handled;
+    
+    char line[32];
+
+    Menu main = new Menu(MenuHandler_MenuMain);
+    
+    // sasusi
+    
+    FormatEx(line, 32, "%T", "main title", client);
+    main.SetTitle("[MG]  %s\n ", line);
+
+    FormatEx(line, 32, "%T", "main rank", client);
+    main.AddItem("s", line);
+    
+    FormatEx(line, 32, "%T", "main stats", client);
+    main.AddItem("a", line);
+    
+    FormatEx(line, 32, "%T", "main options", client);
+    main.AddItem("s", line);
+    
+    FormatEx(line, 32, "%T", "main mapmusic", client);
+    main.AddItem("u", line);
+    
+    FormatEx(line, 32, "%T", "main ampmusic", client);
+    main.AddItem("s", line);
+    
+    FormatEx(line, 32, "%T", "main store", client);
+    main.AddItem("i", line);
+    
+    main.ExitButton = true;
+    main.ExitBackButton = false;
+    
+    main.Display(client, 15);
+
+    return Plugin_Handled;
+}
+
+public int MenuHandler_MenuMain(Menu menu, MenuAction action, int client, int slot)
+{
+    if(action == MenuAction_End)
+        delete menu;
+    else if(action == MenuAction_Select)
+    {
+        switch(slot)
+        {
+            case 0: Command_Rank(   client, slot);
+            case 1: Command_Stats(  client, slot);
+            case 2: Command_Options(client, slot);
+            case 3: FakeClientCommandEx(client, "sm_mapmusic");
+            case 4: FakeClientCommandEx(client, "sm_music");
+            case 5: FakeClientCommandEx(client, "sm_store");
+        }
+    }
+}
+
+public Action Command_Options(int client, int args)
+{
+    if(!client || !IsClientInGame(client))
+        return Plugin_Handled;
+    
+    char line[32];
+
+    Menu options = new Menu(MenuHandler_MenuOptions);
+
+    // sasusi
+
+    FormatEx(line, 32, "%T", "options title", client);
+    options.SetTitle("[MG]  %s\n ", line);
+    
+    FormatEx(line, 32, "%T:  %T", "options hudspec", client, t_kOptions[client][kO_HudSpec] ? "menu item Off" : "menu item On", client);
+    options.AddItem("s", line);
+    
+    FormatEx(line, 32, "%T:  %T", "options hudvac", client, t_kOptions[client][kO_HudVac] ? "menu item Off" : "menu item On", client);
+    options.AddItem("a", line);
+    
+    FormatEx(line, 32, "%T:  %T", "options hudspeed", client, t_kOptions[client][kO_HudSpeed] ? "menu item Off" : "menu item On", client);
+    options.AddItem("s", line);
+    
+    FormatEx(line, 32, "%T:  %T", "options hudhurt", client, t_kOptions[client][kO_HudHurt] ? "menu item Off" : "menu item On", client);
+    options.AddItem("u", line);
+
+    FormatEx(line, 32, "%T:  %T", "options hudchat", client, t_kOptions[client][kO_HudChat] ? "menu item Off" : "menu item On", client);
+    options.AddItem("s", line);
+    
+    FormatEx(line, 32, "%T:  %T", "options hudtext", client, t_kOptions[client][kO_HudText] ? "menu item Off" : "menu item On", client);
+    options.AddItem("o", line);
+
+    options.ExitButton = false;
+    options.ExitBackButton = true;
+    
+    options.Display(client, 15);
+    
+    return Plugin_Handled;
+}
+
+public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int slot)
+{
+    if(action == MenuAction_End)
+        delete menu;
+    else if(action == MenuAction_Cancel && slot == MenuCancel_ExitBack)
+        Command_Main(client, slot);
+    else if(action == MenuAction_Select)
+    {
+        kOptions options = view_as<kOptions>(slot);
+        t_kOptions[client][options] = !t_kOptions[client][options];
+        SetClientCookie(client, t_kOCookies[options], t_kOptions[client][options] ? "1" : "0");
+        Command_Options(client, 0);
+    }
+}
 
 void Games_OnMapStart()
 {
@@ -216,6 +345,19 @@ void Games_OnEquipPost(DataPack pack)
 void Games_OnClientConnected(int client)
 {
     t_szSpecHudContent[client][0] = '\0';
+    
+    for(int i = 0; i < view_as<int>(kOptions); ++i)
+        t_kOptions[client][view_as<kOptions>(i)] = false;
+}
+
+void Games_OnClientCookiesCached(int client)
+{
+    char buffer[4];
+    for(int i = 0; i < view_as<int>(kOptions); ++i)
+    {
+        GetClientCookie(client, t_kOCookies[view_as<kOptions>(i)], buffer, 4);
+        t_kOptions[client][view_as<kOptions>(i)] = (StringToInt(buffer) == 1);
+    }
 }
 
 void Games_OnPlayerRunCmd(int client)

@@ -37,7 +37,7 @@ public Action Command_Stats(int client, int args)
         Chat(client, "%T", "stats loading", client);
         return Plugin_Handled;
     }
-    
+
     char username[32];
     GetClientName(client, username, 32);
     

@@ -18,15 +18,16 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-// libraries
+// extensions
 #include <sdktools>
 #include <sdkhooks>
 #include <cstrike>
+#include <clientprefs>
 
 // myself
 #include <minigames>
 
-// Store library
+// plugin
 #undef REQUIRE_PLUGIN
 #include <store>
 #define REQUIRE_PLUGIN
@@ -139,6 +140,7 @@ public void OnPluginStart()
     ConnectToDatabase(0);
 
     // fire to module
+    Games_OnPluginStart();
     Cvars_OnPluginStart();
     Ranks_OnPluginStart();
     Stats_OnPluginStart();
@@ -333,6 +335,11 @@ public void OnClientPutInServer(int client)
     
     // hook this to check weapon
     SDKHookEx(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
+}
+
+public void OnClientCookiesCached(int client)
+{
+    Games_OnClientCookiesCached(client);
 }
 
 public void OnClientDisconnect(int client)

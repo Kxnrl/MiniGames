@@ -61,6 +61,18 @@ bool g_extA2SFirewall;
 Handle g_fwdOnRandomTeam;
 Handle g_fwdOnVacEnabled;
 
+// options
+enum kOptions
+{
+    kO_HudSpec,
+    kO_HudVac,
+    kO_HudSpeed,
+    kO_HudHurt,
+    kO_HudChat,
+    kO_HudText
+}
+bool t_kOptions[MAXPLAYERS+1][kOptions];
+
 // temp
 native bool A2SFirewall_IsClientChecked(int client);
 native void A2SFirewall_GetClientTicket(int client, char[] ticket, int maxLen);

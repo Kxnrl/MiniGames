@@ -70,6 +70,8 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
         // rank menu.
         t_RankMenu = new Menu(MenuHandler_RankingTop);
         t_RankMenu.SetTitle("undef title");
+        t_RankMenu.ExitButton = false;
+        t_RankMenu.ExitBackButton = true;
 
         // process data
         char name[64], pidstr[16], buffer[128];
@@ -121,6 +123,8 @@ public int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int 
         FormatEx(m_szQuery, 128, "SELECT * FROM `k_minigames` WHERE uid = '%d';", StringToInt(info));
         g_hMySQL.Query(RankDetailsCallback, m_szQuery, GetClientUserId(param1));
     }
+    else if(action == MenuAction_Cancel && param2 == MenuCancel_ExitBack)
+        Command_Main(param1, param2);
 }
 
 public void RankDetailsCallback(Database db, DBResultSet results, const char[] error, int userid)

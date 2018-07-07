@@ -118,8 +118,8 @@
 
     "private message line 3"
     {
-        "en"        "Command  {green}!rank !stats !top !music !shop !store"
-        "chi"       "常用指令 {green}!rank !stats !top !music !shop !store"
+        "en"        "Command  {green}!rank !stats !top !music !store"
+        "chi"       "常用指令 {green}!rank !stats !top !music !store"
     }
 
     "private message line 4"
@@ -307,67 +307,169 @@
         "en"    "Bhop Speed"
         "chi"   "地速上限"
     }
-    
+
     "store bonus assist"
     {
         "#format"   "{1:N},{2:d}"
         "en"        "You earned {orange}{2}{normal} credits for {silver}assisting kill {red}{1}"
         "chi"       "你获得了{orange}{2}{normal}点数  来自{silver}助攻击杀 {red}{1}"
     }
-    
+
     "store bonus knife"
     {
         "#format"   "{1:N},{2:d}"
         "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with Knife"
         "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}刀杀 {red}{1}"
     }
-    
+
     "store bonus kill"
     {
         "#format"   "{1:N},{2:d}"
         "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1}"
         "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}击杀 {red}{1}"
     }
-    
+
     "store bonus headshot"
     {
         "#format"   "{1:N},{2:d}"
         "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with Headshot"
         "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}爆头击杀 {red}{1}"
     }
-    
+
     "store bonus dodgeball"
     {
         "#format"   "{1:N},{2:d}"
         "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with DodgeBall"
         "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}丢雷老谋砸死 {red}{1}"
     }
-    
+
     "store bonus taser"
     {
         "#format"   "{1:N},{2:d}"
         "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with Taser"
         "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}电击枪击毙 {red}{1}"
     }
-    
+
     "store bonus inferno"
     {
         "#format"   "{1:N},{2:d}"
         "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with Molotov/Incendiary"
         "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}放火烧死 {red}{1}"
     }
-    
+
     "store bonus grenade"
     {
         "#format"   "{1:N},{2:d}"
         "en"        "You earned {orange}{2}{normal} credits for {silver}Killing {red}{1} {silver} with HEGrenade"
         "chi"       "你获得了{orange}{2}{normal}点数,来自{silver}丢雷老谋炸死 {red}{1}"
     }
-    
+
     "store bonus survival"
     {
         "#format"   "{1:d}"
         "en"        "You earned {orange}{1}{normal} credits for {silver}surviving"
         "chi"       "你获得了{orange}{1}{normal}点数,来自{silver}本局苟活于世"
+    }
+
+    "main title"
+    {
+        "en"        "Main menu"
+        "chi"       "主菜单"
+    }
+
+    "main rank"
+    {
+        "en"        "Ranking"
+        "chi"       "排行榜"
+    }
+
+    "main stats"
+    {
+        "en"        "My Stats"
+        "chi"       "数据统计"
+    }
+
+    "main options"
+    {
+        "en"        "Options"
+        "chi"       "设置"
+    }
+
+    "main options"
+    {
+        "en"        "Options"
+        "chi"       "设置"
+    }
+
+    "main mapmusic"
+    {
+        "en"        "Map BGM"
+        "chi"       "地图音乐"
+    }
+
+    "main ampmusic"
+    {
+        "en"        "Media System"
+        "chi"       "点播音乐"
+    }
+
+    "main store"
+    {
+        "en"        "Mall"
+        "chi"       "商城"
+    }
+
+    "options title"
+    {
+        "en"        "Options"
+        "chi"       "设置"
+    }
+    
+    "menu item Off"
+    {
+        "en"        "Disabled"
+        "chi"       "屏蔽"
+    }
+    
+    "menu item On"
+    {
+        "en"        "Enabled"
+        "chi"       "显示"
+    }
+    
+    "options hudspec"
+    {
+        "en"        "HUD [Observer]"
+        "chi"       "HUD [观察]"
+    }
+
+    "options hudvac"
+    {
+        "en"        "HUD [VACTimer]"
+        "chi"       "HUD [计时]"
+    }
+
+    "options hudspeed"
+    {
+        "en"        "HUD [Speed]"
+        "chi"       "HUD [速度]"
+    }
+
+    "options hudhurt"
+    {
+        "en"        "HUD [Hit]"
+        "chi"       "HUD [命中提示]"
+    }
+
+    "options hudchat"
+    {
+        "en"        "HUD [Chat]"
+        "chi"       "HUD [提示]"
+    }
+
+    "options hudtext"
+    {
+        "en"        "HUD [Text]"
+        "chi"       "HUD [文本]"
     }
 }
