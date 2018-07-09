@@ -131,10 +131,10 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     else
     {
         sv_staminamax.SetFloat(100.0, true, false);
-        sv_staminajumpcost.SetFloat(0.10, true, false);
-        sv_staminalandcost.SetFloat(0.05, true, false);
-        sv_staminarecoveryrate.SetFloat(50.0, true, false);
-        sv_timebetweenducks.SetInt(1, true, false);
+        sv_staminajumpcost.SetFloat(0.06, true, false);
+        sv_staminalandcost.SetFloat(0.03, true, false);
+        sv_staminarecoveryrate.SetFloat(66.0, true, false);
+        sv_timebetweenducks.SetFloat(0,5, true, false);
     }
 }
 
@@ -171,6 +171,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_death_drop_gun",                 0, true, false);
     ConVar_Easy_SetInt("mp_defuser_allocation",             0, true, false);
     ConVar_Easy_SetInt("mp_playercashawards",               0, true, false);
+    ConVar_Easy_SetInt("mp_teamcashawards",                 0, true, false);
     ConVar_Easy_SetInt("mp_weapons_allow_zeus",             1, true, false);
     ConVar_Easy_SetInt("mp_weapons_allow_map_placed",       1, true, false);
     ConVar_Easy_SetInt("mp_friendlyfire",                   0, true, false);
@@ -178,6 +179,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_force_pick_time",                1, true, false);
     ConVar_Easy_SetInt("mp_display_kill_assists",           0, true, false);
     ConVar_Easy_SetInt("mp_maxrounds",                      0, true, false);
+    ConVar_Easy_SetInt("mp_halftime",                       0, true, false);
     ConVar_Easy_SetInt("mp_match_can_clinch",               0, true, false);
     ConVar_Easy_SetInt("mp_playerid",                       2, true, false);
     ConVar_Easy_SetInt("phys_pushscale",                    3, true, false);
