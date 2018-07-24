@@ -236,12 +236,16 @@ static void Cvars_EnforceOptions()
     ConVar_Easy_SetInt("sv_occlude_players",        0, true, false);
 }
 
-void Cvars_OnAutoConfigsBuffered()
+void Cvars_OnConfigsExecuted()
 {
     // set default convars
     Cvars_SetCvarDefault();
     Cvars_EnforceOptions();
-    
+    Cvars_LoadMapConfigs();
+}
+
+static void Cvars_LoadMapConfigs()
+{
     // load map config
     char mapconfig[256];
     GetCurrentMap(mapconfig, 256);

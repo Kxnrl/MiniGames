@@ -281,14 +281,11 @@ public void OnMapStart()
     Teams_OnMapStart();
 }
 
-public void OnAutoConfigsBuffered()
-{
-    // fire to module
-    Cvars_OnAutoConfigsBuffered();
-}
-
 public void OnConfigsExecuted()
 {
+    // fire to module
+    Cvars_OnConfigsExecuted();
+
     // set up warmup timer
     if(g_tWarmup != null)
         KillTimer(g_tWarmup);
