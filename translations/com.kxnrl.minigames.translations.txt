@@ -200,6 +200,8 @@
     "spec hud"
     {
         "#format"   "{1:d},{2:d},{3:d},{4:d},{5:.2f},{6:.2f},{7:d}"
+        "en"        "Rank:\t\t\t{1}\nKills:\t\t\t{2}\nDeaths:\t\t{3}\nAssists:\t\t{4}\nKDR:\t\t\t{5}\nHSR:\t\t\t{6}%\nScores:\t\t{7}"
+        "chi"       "总排名:\t{1}\n杀敌数:\t{2}\n死亡数:\t{3}\n助攻数:\t{4}\n杀亡比:\t{5}\n爆头率:\t{6}%\n总得分:\t{7}"
     }
 
     "vac timer"
