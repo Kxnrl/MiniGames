@@ -168,7 +168,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_roundtime_defuse",               0, true, false);
     ConVar_Easy_SetInt("mp_death_drop_defuser",             0, true, false);
     ConVar_Easy_SetInt("mp_death_drop_grenade",             0, true, false);
-    ConVar_Easy_SetInt("mp_death_drop_gun",                 0, true, false);
+    ConVar_Easy_SetInt("mp_death_drop_gun",                 1, true, false);
     ConVar_Easy_SetInt("mp_defuser_allocation",             0, true, false);
     ConVar_Easy_SetInt("mp_playercashawards",               0, true, false);
     ConVar_Easy_SetInt("mp_teamcashawards",                 0, true, false);
@@ -176,7 +176,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_weapons_allow_map_placed",       1, true, false);
     ConVar_Easy_SetInt("mp_friendlyfire",                   0, true, false);
     ConVar_Easy_SetInt("mp_autoteambalance",                0, true, false);
-    ConVar_Easy_SetInt("mp_force_pick_time",                1, true, false);
+    ConVar_Easy_SetInt("mp_force_pick_time",                3, true, false);
     ConVar_Easy_SetInt("mp_display_kill_assists",           0, true, false);
     ConVar_Easy_SetInt("mp_maxrounds",                      0, true, false);
     ConVar_Easy_SetInt("mp_halftime",                       0, true, false);
@@ -192,7 +192,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("sv_full_alltalk",                   1, true, false);
     ConVar_Easy_SetInt("sv_talk_enemy_living",              1, true, false);
     ConVar_Easy_SetInt("sv_talk_enemy_dead",                1, true, false);
-    ConVar_Easy_SetInt("sv_clamp_unsafe_velocities",        1, true, false);
+    ConVar_Easy_SetInt("sv_clamp_unsafe_velocities",        0, true, false);
     ConVar_Easy_SetInt("sv_friction",                       5, true, false);
     ConVar_Easy_SetInt("sv_ignoregrenaderadio",             1, true, false);
     ConVar_Easy_SetInt("sv_infinite_ammo",                  0, true, false);
