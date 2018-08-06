@@ -345,7 +345,7 @@ void Games_OnEquipPost(DataPack pack)
     if(amtype == -1)
         return;
 
-    SetEntProp(client, Prop_Send, "m_iAmmo", 233, _, amtype);
+    SetEntProp(client, Prop_Send, "m_iAmmo", 416, _, amtype);
 }
 
 void Games_OnClientConnected(int client)
