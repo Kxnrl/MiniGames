@@ -536,7 +536,7 @@ public Action Command_Reload(int client, const char[] command, int argc)
     if(!client || !IsClientInGame(client) || !IsPlayerAlive(client))
         return Plugin_Continue;
     
-    int weapon == GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+    int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
     
     if(weapon == -1 || !IsValidEdict(weapon))
         return Plugin_Continue;
@@ -554,7 +554,7 @@ public Action Command_Reload(int client, const char[] command, int argc)
     // ignore taser
     if(StrContains(classname, "taser", false) != -1)
         return Plugin_Continue;
-    
+
     int amtype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
 
     if(amtype == -1)
