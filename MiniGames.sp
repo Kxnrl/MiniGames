@@ -151,7 +151,6 @@ public void OnPluginStart()
 
     // team controller
     AddCommandListener(Command_Jointeam, "jointeam");
-    AddCommandListener(Command_Reload,   "+reload");
 
     // game events
     HookEventEx("round_prestart",       Event_RoundStart,       EventHookMode_Post);
@@ -397,13 +396,11 @@ public Action Command_BlockRadio(int client, const char[] command, int args)
     return Plugin_Handled;
 }
 
-public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3], float angles[3], int &weapon, int &subtype, int &cmdnum, int &tickcount, int &seed, int mouse[2])
+public void OnPlayerRunCmdPost(int client, int buttons, int impulse, const float vel[3], const float angles[3], int weapon, int subtype, int cmdnum, int tickcount, int seed, const int mouse[2])
 {
     // fire to module
-    Games_OnPlayerRunCmd(client);
+    Games_OnPlayerRunCmd(client, buttons);
     Ranks_OnPlayerRunCmd(client, buttons);
-    
-    return Plugin_Continue;
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
@@ -529,38 +526,4 @@ public Action CS_OnCSWeaponDrop(int client, int weapon)
     GetWeaponClassname(weapon, -1, classname, 32);
     
     return (strcmp(classname, "weapon_taser") == 0) ? Plugin_Stop : Plugin_Continue;
-}
-
-public Action Command_Reload(int client, const char[] command, int argc)
-{
-    if(!client || !IsClientInGame(client) || !IsPlayerAlive(client))
-        return Plugin_Continue;
-    
-    int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-    
-    if(weapon == -1 || !IsValidEdict(weapon))
-        return Plugin_Continue;
-    
-    // get item defindex
-    int index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
-
-    // ignore knife, grenade and special item
-    if(500 <= index <= 515 || 42 < index < 50 || index == 0)
-        return Plugin_Continue;
-
-    char classname[32];
-    GetWeaponClassname(weapon, index, classname, 32);
-
-    // ignore taser
-    if(StrContains(classname, "taser", false) != -1)
-        return Plugin_Continue;
-
-    int amtype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
-
-    if(amtype == -1)
-        return Plugin_Continue;
-
-    SetEntProp(client, Prop_Send, "m_iAmmo", 416, _, amtype);
-
-    return Plugin_Continue;
 }

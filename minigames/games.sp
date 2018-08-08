@@ -366,7 +366,7 @@ void Games_OnClientCookiesCached(int client)
     }
 }
 
-void Games_OnPlayerRunCmd(int client)
+void Games_OnPlayerRunCmd(int client, int buttons)
 {
     if(!IsPlayerAlive(client))
         return;
@@ -379,6 +379,51 @@ void Games_OnPlayerRunCmd(int client)
 
     // limit pref speed
     Games_LimitPreSpeed(client, view_as<bool>(GetEntityFlags(client) & FL_ONGROUND), CurVelVec);
+    
+    // Reserve Ammo
+    Games_ReserveAmmo(client, buttons);
+}
+
+static void Games_ReserveAmmo(int client, int buttons)
+{
+    // not in reloading
+    if(!(buttons & IN_RELOAD))
+        return;
+
+    static int nextTime[MAXPLAYERS+1];
+    
+    int currentTime = GetTime();
+
+    if(currentTime >= nextTime[client])
+        return;
+
+    nextTime[client] = currentTime + 30;
+
+    int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+    
+    if(weapon == -1 || !IsValidEdict(weapon))
+        return;
+
+    // get item defindex
+    int index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
+
+    // ignore knife, grenade and special item
+    if(500 <= index <= 515 || 42 < index < 50 || index == 0)
+        return;
+
+    char classname[32];
+    GetWeaponClassname(weapon, index, classname, 32);
+
+    // ignore taser
+    if(StrContains(classname, "taser", false) != -1)
+        return;
+
+    int amtype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
+
+    if(amtype == -1)
+        return;
+
+    SetEntProp(client, Prop_Send, "m_iAmmo", 416, _, amtype);
 }
 
 // code from KZTimer by 1NutWunDeR -> https://github.com/1NutWunDeR/KZTimerOffical
