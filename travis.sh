@@ -26,7 +26,7 @@ mkdir build/scripting
 cp -rf include/*            addons/sourcemod/scripting/include
 cp -rf minigames            addons/sourcemod/scripting
 cp -rf MiniGames.sp         addons/sourcemod/scripting
-cp -rf inputkill_hotfix.  addons/sourcemod/scripting
+cp -rf inputkill_hotfix.sp  addons/sourcemod/scripting
 
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/MiniGames.sp -o"build/plugins/MiniGames.smx"
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/inputkill_hotfix.sp -o"build/plugins/inputkill_hotfix.smx"

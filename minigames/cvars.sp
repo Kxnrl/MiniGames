@@ -118,7 +118,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     mp_t_default_melee.SetString("", true, false);
     mp_t_default_primary.SetString("", true, false);
     mp_t_default_secondary.SetString("", true, false);
-    sv_tags.SetString("MG,MiniGames,Shop,Store,Skin,WeaponSkin", false, false);
+    sv_tags.SetString("MG,MiniGames,Shop,Store,Skin,WeaponSkin", true, true);
 
     if(sv_autobunnyhopping.IntValue == 1)
     {
@@ -131,10 +131,10 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     else
     {
         sv_staminamax.SetFloat(100.0, true, false);
-        sv_staminajumpcost.SetFloat(0.06, true, false);
-        sv_staminalandcost.SetFloat(0.03, true, false);
-        sv_staminarecoveryrate.SetFloat(66.0, true, false);
-        sv_timebetweenducks.SetFloat(0.5, true, false);
+        sv_staminajumpcost.SetFloat(0.04, true, false);
+        sv_staminalandcost.SetFloat(0.02, true, false);
+        sv_staminarecoveryrate.SetFloat(100.0, true, false);
+        sv_timebetweenducks.SetFloat(0.3, true, false);
     }
 }
 
