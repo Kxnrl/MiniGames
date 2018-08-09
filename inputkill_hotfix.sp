@@ -78,7 +78,7 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
     if(strcmp(command, "Kill", false) == 0 || strcmp(command, "KillHierarchy", false) == 0)
     {
         DHookSetReturn(hReturn, false);
-        return MRES_Override;
+        return MRES_Supercede;
     }
 
     return MRES_Ignored;
