@@ -382,6 +382,18 @@ void Games_OnPlayerRunCmd(int client, int buttons)
     
     // Reserve Ammo
     Games_ReserveAmmo(client, buttons);
+
+    // Duck spaming
+    Games_DuckSpam(client);
+}
+
+static void Games_DuckSpam(int client)
+{
+    // fixes crouch spamming
+    if(GetEntPropFloat(client, Prop_Data, "m_flDuckSpeed") < 7.0)
+    {
+        SetEntPropFloat(client, Prop_Send, "m_flDuckSpeed", 7.0, 0);
+    }
 }
 
 static void Games_ReserveAmmo(int client, int buttons)

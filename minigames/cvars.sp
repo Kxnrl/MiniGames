@@ -126,7 +126,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
         sv_staminajumpcost.SetInt(0, true, false);
         sv_staminalandcost.SetInt(0, true, false);
         sv_staminarecoveryrate.SetInt(0, true, false);
-        sv_timebetweenducks.SetInt(0, true, false);
+        sv_timebetweenducks.SetFloat(0.2, true, false);
     }
     else
     {
@@ -134,7 +134,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
         sv_staminajumpcost.SetFloat(0.04, true, false);
         sv_staminalandcost.SetFloat(0.02, true, false);
         sv_staminarecoveryrate.SetFloat(100.0, true, false);
-        sv_timebetweenducks.SetFloat(0.3, true, false);
+        sv_timebetweenducks.SetFloat(0.4, true, false);
     }
 }
 
@@ -167,7 +167,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_roundtime_hostage",              0, true, false);
     ConVar_Easy_SetInt("mp_roundtime_defuse",               0, true, false);
     ConVar_Easy_SetInt("mp_death_drop_defuser",             0, true, false);
-    ConVar_Easy_SetInt("mp_death_drop_grenade",             0, true, false);
+    ConVar_Easy_SetInt("mp_death_drop_grenade",             1, true, false);
     ConVar_Easy_SetInt("mp_death_drop_gun",                 1, true, false);
     ConVar_Easy_SetInt("mp_defuser_allocation",             0, true, false);
     ConVar_Easy_SetInt("mp_playercashawards",               0, true, false);
@@ -506,6 +506,10 @@ void Cvars_OnRoundStart()
         mg_bhopspeed.FloatValue = t_LastSpeed;
         t_LastSpeed = -1.0;
     }
+
+    ConVar_Easy_SetInt("sv_full_alltalk",                   1, true, false);
+    ConVar_Easy_SetInt("sv_talk_enemy_living",              1, true, false);
+    ConVar_Easy_SetInt("sv_talk_enemy_dead",                1, true, false);
 }
 
 public Action Command_SetCvar(int args)
@@ -598,10 +602,10 @@ static void Cvars_CreateWhitelist(ArrayList list)
     file.WriteLine("\"convars\"");
     file.WriteLine("{");
     
-    char line[128];
+    char line[512];
     for(int i = 0; i < list.Length; ++i)
     {
-        list.GetString(i, line, 128);
+        list.GetString(i, line, 512);
         file.WriteLine("    %s    1", line);
     }
 
