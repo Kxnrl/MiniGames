@@ -55,7 +55,7 @@ public void OnClientPutInServer(int client)
     if(IsFakeClient(client))
         return;
 
-    DHookEntity(AcceptInput, false, client);
+    g_HookId[client] = DHookEntity(AcceptInput, false, client);
 }
 
 public void OnClientDisconnect(int client)
