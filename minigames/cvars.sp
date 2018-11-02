@@ -38,6 +38,8 @@ static float t_LastSpeed;
 
 void Cvars_OnPluginStart()
 {
+    CreateConVar("sm_pugsetup_version", PI_VERSION, "Current MiniGames version", FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
+    
     mg_restrictawp      = CreateConVar("mg_restrictawp",    "0",        "Restrict use AWP",                                                 _, true, 0.0,   true, 1.0);
     mg_slaygaygun       = CreateConVar("mg_slaygaygun",     "1",        "Slay player who uses gaygun",                                      _, true, 0.0,   true, 1.0);
     mg_spawn_knife      = CreateConVar("mg_spawn_knife",    "0",        "Give knife On player spawn",                                       _, true, 0.0,   true, 1.0);
