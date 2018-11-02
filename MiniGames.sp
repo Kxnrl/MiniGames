@@ -47,7 +47,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     g_bLateLoad = late;
 
     RegPluginLibrary("MiniGames");
-    
+
     // Natives
     CreateNative("MG_SetSpecHudContent",    NativeCall_SetSpecHudContent);
     CreateNative("MG_GetTotalScores",       NativeCall_GetTotalScores);
@@ -74,11 +74,11 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 public int NativeCall_SetSpecHudContent(Handle plugin, int numParams)
 {
     int client = GetNativeCell(1);
-    
+
     char buffer[256], vformat[256];
     GetNativeString(2, buffer, 256);
     FormatNativeString(0, 0, 3, 256, _, vformat, buffer);
-    
+
     return Games_SetSpecHudContent(client, vformat);
 }
 
@@ -131,7 +131,7 @@ public void OnPluginStart()
 {
     if(GetEngineVersion() != Engine_CSGO)
         SetFailState("This plugin only for CSGO!");
-    
+
     // Forwards
     g_fwdOnRandomTeam = CreateGlobalForward("MG_OnRandomTeam", ET_Event, Param_Cell, Param_Cell);
     g_fwdOnVacEnabled = CreateGlobalForward("MG_OnVacEnabled", ET_Event, Param_Cell, Param_Cell);
@@ -253,9 +253,9 @@ public void Database_CreateTable(Database db, DBResultSet results, const char[] 
 {
     if(results == null || error[0])
         SetFailState("Database_CreateTable -> %s -> %d", error, step);
-    
+
     step++;
-    
+
     switch(step)
     {
         case 1:
@@ -353,7 +353,7 @@ public void OnMapEnd()
     // fire to module
     Games_OnMapEnd();
     Ranks_OnMapEnd();
-    
+
     // clear timer
     if(g_tWarmup != null)
         KillTimer(g_tWarmup);
@@ -365,7 +365,7 @@ public void OnClientConnected(int client)
     // reset client vars
     g_iUId [client] = 0;
     g_iTeam[client] = 0;
-    
+
     // fire to module
     Games_OnClientConnected(client);
     Stats_OnClientConnected(client);
@@ -388,14 +388,14 @@ public void OnClientPutInServer(int client)
             char ticket[32];
             A2SFirewall_GetClientTicket(client, ticket, 32);
             strcopy(g_szTicket[client], 32, ticket);
-            Chat(client, )
+            Chat(client, "Your connection ticket is \x04 %s", ticket);
         }
     }
 
     // fire to module
     Ranks_OnClientPutInServer(client);
     Stats_OnClientPutInServer(client);
-    
+
     // hook this to check weapon
     SDKHookEx(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
 }
@@ -410,7 +410,7 @@ public void OnClientDisconnect(int client)
     // if client is not fully in-game
     if(!IsClientInGame(client))
         return;
-    
+
     // if client is not passed.
     if(g_extA2SFirewall && !A2SFirewall_IsClientChecked(client))
         return;
@@ -439,7 +439,7 @@ public Action Timer_WarmupEnd(Handle timer)
 {
     g_tWarmup = null;
     Stats_OnWarmupEnd();
-    
+
     // custom gamemode maybe cause WARMUPTIME 0:01
     CreateTimer(5.0, Timer_CheckWarmupEnd, _, TIMER_FLAG_NO_MAPCHANGE);
     return Plugin_Stop;
@@ -474,7 +474,7 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
 {
     int userid = event.GetInt("userid");
     int client = GetClientOfUserId(userid);
-    
+
     Stats_OnClientSpawn(client);
 
     CreateTimer(0.1, Games_OnClientSpawn, userid);
@@ -530,7 +530,7 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
     pack.WriteCell(event.GetInt("attacker"));
     pack.WriteFloat(event.GetFloat("blind_duration"));
     pack.Reset();
-    
+
     RequestFrame(Games_OnPlayerBlind, pack);
 }
 
@@ -559,7 +559,7 @@ public void Event_RoundStarted(Event event, const char[] name, bool dontBroadcas
 public void Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 {
     //int winner = event.GetInt("winner");
-    
+
     Stats_OnRoundEnd();
     Games_OnRoundEnd();
     Teams_OnRoundEnd();
@@ -591,6 +591,6 @@ public Action CS_OnCSWeaponDrop(int client, int weapon)
 {
     char classname[32];
     GetWeaponClassname(weapon, -1, classname, 32);
-    
+
     return (strcmp(classname, "weapon_taser") == 0) ? Plugin_Stop : Plugin_Continue;
 }

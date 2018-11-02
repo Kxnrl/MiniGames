@@ -31,7 +31,7 @@ public Action Command_Stats(int client, int args)
 {
     if(!client)
         return Plugin_Handled;
-    
+
     if(!t_bLoaded[client])
     {
         Chat(client, "%T", "stats loading", client);
@@ -40,13 +40,13 @@ public Action Command_Stats(int client, int args)
 
     char username[32];
     GetClientName(client, username, 32);
-    
+
     DataPack pack = new DataPack();
     for(int i = 0; i < view_as<int>(Analytics); ++i)
         pack.WriteCell(t_Session[client][i] + t_StatsDB[client][i]);
-    
+
     DisplayRankDetails(client, username, pack);
-    
+
     return Plugin_Handled;
 }
 
@@ -79,7 +79,7 @@ void Stats_OnWarmupEnd()
 void Stats_OnClientConnected(int client)
 {
     // init client
-    
+
     for(int i = 0; i < view_as<int>(Analytics); ++i)
     {
         t_Session[client][i] = 0;
@@ -87,7 +87,7 @@ void Stats_OnClientConnected(int client)
     }
 
     t_bLoaded[client] = false;
-    
+
     t_Session[client][iTotalOnline] = GetTime();
 }
 
@@ -112,52 +112,7 @@ void Stats_OnClientDisconnect(int client)
         return;
 
     Stats_PublicMessage(client, true);
-
-    // saving data - session
-    FormatEx(m_szQuery, 1024,  "INSERT INTO `k_minigames_s` VALUES      \
-                                (                                       \
-                                    DEFAULT,                            \
-                                    %d,                                 \
-                                    '%s',                               \
-                                    '%s',                               \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d,                                 \
-                                    %d                                  \
-                                );                                      \
-                                ",
-                                g_iUId[client],
-                                g_szA2STicket[client],
-                                g_szMap,
-                                t_Session[client][iKills],
-                                t_Session[client][iDeaths],
-                                t_Session[client][iAssists],
-                                t_Session[client][iHits],
-                                t_Session[client][iShots],
-                                t_Session[client][iHeadshots],
-                                t_Session[client][iKnifeKills],
-                                t_Session[client][iTaserKills],
-                                t_Session[client][iGrenadeKills],
-                                t_Session[client][iMolotovKills],
-                                t_Session[client][iTotalDamage],
-                                t_Session[client][iSurvivals],
-                                t_Session[client][iPlayRounds],
-                                t_Session[client][iTotalScores],
-                                GetTime() - t_Session[client][iTotalOnline],
-                                GetTime()
-                                );
+    Stats_SaveClient(client);
 }
 
 /*******************************************************/
@@ -221,15 +176,60 @@ static void Stats_SaveClient(int client)
                                 t_Session[client][iTotalScores],
                                 GetTime() - t_Session[client][iTotalOnline],
                                 g_iUId[client]);
+    MySQL_VoidQuery(m_szQuery);
 
+    // saving data - session
+    FormatEx(m_szQuery, 1024,  "INSERT INTO `k_minigames_s` VALUES      \
+                                (                                       \
+                                    DEFAULT,                            \
+                                    %d,                                 \
+                                    '%s',                               \
+                                    '%s',                               \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d                                  \
+                                )                                       \
+                                ",
+                                g_iUId[client],
+                                g_szTicket[client],
+                                g_szMap,
+                                t_Session[client][iKills],
+                                t_Session[client][iDeaths],
+                                t_Session[client][iAssists],
+                                t_Session[client][iHits],
+                                t_Session[client][iShots],
+                                t_Session[client][iHeadshots],
+                                t_Session[client][iKnifeKills],
+                                t_Session[client][iTaserKills],
+                                t_Session[client][iGrenadeKills],
+                                t_Session[client][iMolotovKills],
+                                t_Session[client][iTotalDamage],
+                                t_Session[client][iSurvivals],
+                                t_Session[client][iPlayRounds],
+                                t_Session[client][iTotalScores],
+                                GetTime() - t_Session[client][iTotalOnline],
+                                GetTime());
     MySQL_VoidQuery(m_szQuery);
 }
 
-static void Stats_TraceClient(int killer, int assister, int victim, bool headshot, const char[] weapon);
+static void Stats_TraceClient(int killer, int assister, int victim, bool headshot, const char[] weapon)
 {
     char model[192];
-    GetClientModel(client, model, 192);
-    
+    GetClientModel(victim, model, 192);
+
     char m_szQuery[1024];
     FormatEx(m_szQuery, 1024,  "INSERT INTO `k_minigames_k` VALUES      \
                                 (                                       \
@@ -255,8 +255,7 @@ static void Stats_TraceClient(int killer, int assister, int victim, bool headsho
                                 weapon,
                                 headshot,
                                 model,
-                                GetTime()
-                                );
+                                GetTime());
     MySQL_VoidQuery(m_szQuery);
 }
 
@@ -272,7 +271,7 @@ public void LoadUserCallback(Database db, DBResultSet results, const char[] erro
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
-    
+
     if(results.RowCount == 0)
     {
         Stats_CreateClient(client);
@@ -285,14 +284,14 @@ public void LoadUserCallback(Database db, DBResultSet results, const char[] erro
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
-    
+
     g_iUId[client] = results.FetchInt(0);
 
     for(int i = 0; i < view_as<int>(Analytics); ++i)
         t_StatsDB[client][i] = results.FetchInt(i+3);
 
     t_bLoaded[client] = true;
-    
+
     Ranks_OnClientLoaded(client);
 }
 
@@ -301,7 +300,7 @@ public Action Stats_ReloadClientData(Handle timer, int userid)
     int client = GetClientOfUserId(userid);
     if(!client)
         return Plugin_Stop;
-    
+
     Stats_OnClientPutInServer(client);
 
     return Plugin_Stop;
@@ -311,7 +310,7 @@ static void Stats_CreateClient(int client)
 {
     char steamid[32];
     GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
-    
+
     char m_szQuery[128];
     FormatEx(m_szQuery, 128, "INSERT INTO `k_minigames` (`uid`, `steamid`) VALUES (DEFAULT, '%s');", steamid);
     g_hMySQL.Query(CreateClientCallback, m_szQuery, GetClientUserId(client), DBPrio_High);
@@ -329,14 +328,14 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
-    
+
     if(results.AffectedRows == 0)
     {
         LogError("CreateClientCallback -> %L -> no affected rows...", client);
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
-    
+
     t_bLoaded[client] = true;
 
     Ranks_OnClientLoaded(client);
@@ -390,11 +389,11 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 {
     if(!t_bEnabled)
         return;
-    
+
     Stats_TraceClient(attacker, assister, victim, headshot, weapon);
-    
+
     t_Session[victim][iDeaths]++;
-    
+
     if(assister != 0)
     {
         t_Session[assister][iAssists]++;
@@ -406,13 +405,13 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
             Chat(assister, "%T", "store bonus assist", assister, victim, mg_bonus_assist.IntValue);
         }
     }
-    
+
     if(attacker == victim || attacker == 0)
         return;
-    
+
     t_Session[attacker][iKills]++;
     t_Session[attacker][iTotalScores]+=3;
-    
+
     if(mp_damage_headshot_only.BoolValue)
     {
         if(IsWeaponKnife(weapon))
@@ -458,7 +457,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         t_Session[attacker][iKnifeKills]++;
         return;
     }
-    
+
     if(IsWeaponDodgeBall(weapon))
     {
         if(g_smxStore && mg_bonus_kill_via_dodge.IntValue > 0)
@@ -468,7 +467,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         }
         return;
     }
-    
+
     if(IsWeaponTaser(weapon))
     {
         if(g_smxStore && mg_bonus_kill_via_taser.IntValue > 0)
@@ -501,7 +500,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         t_Session[attacker][iGrenadeKills]++;
         return;
     }
-    
+
     if(g_smxStore && mg_bonus_kill_via_gun.IntValue > 0)
     {
         Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun.IntValue, "[MiniGames] - normal kill");
@@ -515,7 +514,7 @@ void Stats_PlayerHurts(int victim, int attacker, int damage, const char[] weapon
         return;
 
     t_Session[attacker][iTotalDamage] += damage;
-    
+
     if(IsWeaponKnife(weapon) || IsWeaponInferno(weapon))
         return;
 
@@ -534,7 +533,7 @@ void Stats_OnRoundEnd()
 {
     if(!t_bEnabled)
         return;
-    
+
     for(int client = 1; client <= MaxClients; ++client)
         if(IsClientInGame(client) && IsPlayerAlive(client))
         {
@@ -564,7 +563,7 @@ public void MySQL_VoidQueryCallback(Database db, DBResultSet results, const char
         int maxLen = pack.ReadCell();
         char[] m_szQuery = new char[maxLen];
         pack.ReadString(m_szQuery, maxLen);
-        
+
         char path[256];
         BuildPath(Path_SM, path, 256, "log/MySQL_VoidQueryError.log");
 

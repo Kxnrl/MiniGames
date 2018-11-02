@@ -54,7 +54,7 @@ public Action Timer_FullConnected(Handle timer, int userid)
 void Teams_OnRoundStart()
 {
     t_iSwitchCD = -1;
-    
+
     // reset all player
     for(int i = 0; i <= MaxClients; ++i)
         t_iNextTeam[i] = TEAM_US;
@@ -91,7 +91,7 @@ public Action Teams_RandomTeam(Handle timer)
         }
 
     int counts = array_players.Length/2;
-    
+
     bool block = false;
     Call_StartForward(g_fwdOnRandomTeam);
     Call_PushCell(counts);
@@ -213,7 +213,7 @@ static int Teams_GetAllowTeam()
     // force t side
     if(cts > tes)
         return TEAM_TE;
-    
+
     // ct side
     return TEAM_CT;
 }

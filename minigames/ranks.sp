@@ -162,21 +162,21 @@ public void RankDetailsCallback(Database db, DBResultSet results, const char[] e
 void DisplayRankDetails(int client, const char[] username, DataPack pack)
 {
     pack.Reset();
-    
+
     any data[Analytics];
     for(int i = 0; i < view_as<int>(Analytics); ++i)
         data[i] = pack.ReadCell();
-    
+
     delete pack;
 
     char buffer[128];
 
     // using panel instead of menu
     Panel panel = new Panel();
-    
+
     FormatEx(buffer, 128, "▽ %T ▽", "ranking title", client);
     panel.SetTitle(buffer);
-    
+
     panel.DrawText("    ");
     panel.DrawText(username);
     panel.DrawText("    ");
@@ -187,11 +187,11 @@ void DisplayRankDetails(int client, const char[] username, DataPack pack)
     FormatEx(buffer, 128, "%T", "ranking line 4", client, data[iKnifeKills], data[iTaserKills], data[iGrenadeKills], data[iMolotovKills]);                                                                                                          panel.DrawText(buffer);
     FormatEx(buffer, 128, "%T", "ranking line 5", client, data[iPlayRounds], data[iSurvivals]);                                                                                                                                                     panel.DrawText(buffer);
     FormatEx(buffer, 128, "%T", "ranking line 6", client, data[iTotalScores], data[iTotalOnline] / 3600);                                                                                                                                           panel.DrawText(buffer);
-    
+
     panel.DrawText("    ");
     panel.DrawText("    ");
     panel.DrawText("    ");
-    
+
     FormatEx(buffer, 128, "%T", "back", client); panel.DrawItem(buffer);
     FormatEx(buffer, 128, "%T", "exit", client); panel.DrawItem(buffer);
 
@@ -216,7 +216,7 @@ public Action Command_Rank(int client, int args)
         return Plugin_Handled;
 
     Chat(client, "%T", "chat type stats", client);
-    
+
     if(t_RankMenu == null)
     {
         Chat(client, "%T", "ranking unavailable", client);
@@ -256,7 +256,7 @@ void Ranks_OnClientDisconnect(int client)
 void Ranks_OnPlayerRunCmd(int client, int buttons)
 {
     // process competitive ranking
-    
+
     static bool bLast[MAXPLAYERS+1];
 
     if(!(buttons & IN_SCORE))
@@ -267,7 +267,7 @@ void Ranks_OnPlayerRunCmd(int client, int buttons)
 
     if(bLast[client])
         return;
-    
+
     bLast[client] = true;
 
     if(StartMessageOne("ServerRankRevealAll", client) != null)
@@ -362,7 +362,7 @@ void HookScoreboard(bool hook)
             LogError("HookScoreboard -> %b -> cs_player_manager is not valid.");
             return;
         }
-        
+
         if(bHook)
         {
             SDKUnhook(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
@@ -389,7 +389,7 @@ static void Ranks_FilterName(char[] buffer, int maxLen)
     ReplaceString(buffer, maxLen, "    ", " ");
     ReplaceString(buffer, maxLen, "   ", " ");
     ReplaceString(buffer, maxLen, "  ", " ");
-    
+
     if(strlen(buffer) > 32)
         buffer[32] = '\0';
 }

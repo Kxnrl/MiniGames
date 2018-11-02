@@ -18,7 +18,7 @@
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "1.6." ... MYBUILD
+#define PI_VERSION  "1.7." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
@@ -77,7 +77,7 @@ bool g_kOptions[MAXPLAYERS+1][kOptions];
 native bool A2SFirewall_IsClientChecked(int client);
 native void A2SFirewall_GetClientTicket(int client, char[] ticket, int maxLen);
 
-char g_szA2STicket[MAXPLAYERS+1][32];
+char g_szTicket[MAXPLAYERS+1][32];
 
 // vars
 Database g_hMySQL  = null;
@@ -230,10 +230,10 @@ stock void Text(int client, const char[] buffer, any ...)
 {
     if(g_kOptions[client][kO_HudText])
         return;
-    
+
     char msg[256];
     VFormat(msg, 256, buffer, 3);
-    
+
     Protobuf TextMsg = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
     if(TextMsg == null)
     {
@@ -283,7 +283,7 @@ stock void TextAll(const char[] buffer, any ...)
 stock int RandomInt(int min, int max)
 {
     int random = GetURandomInt();
-    
+
     if(random == 0)
         random++;
 

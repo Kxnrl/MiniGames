@@ -47,37 +47,36 @@ public Action Command_Main(int client, int args)
 {
     if(!client || !IsClientInGame(client))
         return Plugin_Handled;
-    
+
     char line[32];
 
     Menu main = new Menu(MenuHandler_MenuMain);
-    
+
     // sasusi
-    
+
     FormatEx(line, 32, "%T", "main title", client);
     main.SetTitle("[MG]  %s\n ", line);
 
     FormatEx(line, 32, "%T", "main rank", client);
     main.AddItem("s", line);
-    
+
     FormatEx(line, 32, "%T", "main stats", client);
     main.AddItem("a", line);
-    
+
     FormatEx(line, 32, "%T", "main options", client);
     main.AddItem("s", line);
-    
+
     FormatEx(line, 32, "%T", "main mapmusic", client);
     main.AddItem("u", line);
-    
+
     FormatEx(line, 32, "%T", "main ampmusic", client);
     main.AddItem("s", line);
-    
+
     FormatEx(line, 32, "%T", "main store", client);
     main.AddItem("i", line);
-    
+
     main.ExitButton = true;
     main.ExitBackButton = false;
-    
     main.Display(client, 15);
 
     return Plugin_Handled;
@@ -105,7 +104,7 @@ public Action Command_Options(int client, int args)
 {
     if(!client || !IsClientInGame(client))
         return Plugin_Handled;
-    
+
     char line[32];
 
     Menu options = new Menu(MenuHandler_MenuOptions);
@@ -114,30 +113,29 @@ public Action Command_Options(int client, int args)
 
     FormatEx(line, 32, "%T", "options title", client);
     options.SetTitle("[MG]  %s\n ", line);
-    
+
     FormatEx(line, 32, "%T:  %T", "options hudspec", client, g_kOptions[client][kO_HudSpec] ? "menu item Off" : "menu item On", client);
     options.AddItem("s", line);
-    
+
     FormatEx(line, 32, "%T:  %T", "options hudvac", client, g_kOptions[client][kO_HudVac] ? "menu item Off" : "menu item On", client);
     options.AddItem("a", line);
-    
+
     FormatEx(line, 32, "%T:  %T", "options hudspeed", client, g_kOptions[client][kO_HudSpeed] ? "menu item Off" : "menu item On", client);
     options.AddItem("s", line);
-    
+
     FormatEx(line, 32, "%T:  %T", "options hudhurt", client, g_kOptions[client][kO_HudHurt] ? "menu item Off" : "menu item On", client);
     options.AddItem("u", line);
 
     FormatEx(line, 32, "%T:  %T", "options hudchat", client, g_kOptions[client][kO_HudChat] ? "menu item Off" : "menu item On", client);
     options.AddItem("s", line);
-    
+
     FormatEx(line, 32, "%T:  %T", "options hudtext", client, g_kOptions[client][kO_HudText] ? "menu item Off" : "menu item On", client);
     options.AddItem("o", line);
 
     options.ExitButton = false;
     options.ExitBackButton = true;
-    
     options.Display(client, 15);
-    
+
     return Plugin_Handled;
 }
 
@@ -161,13 +159,13 @@ void Games_OnMapStart()
     // init hud synchronizer ...
     if(t_hHudSync[0] == null)
         t_hHudSync[0] = CreateHudSynchronizer();
-    
+
     if(t_hHudSync[1] == null)
         t_hHudSync[1] = CreateHudSynchronizer();
-    
+
     if(t_hHudSync[2] == null)
         t_hHudSync[2] = CreateHudSynchronizer();
-    
+
     if(t_hHudSync[3] == null)
         t_hHudSync[3] = CreateHudSynchronizer();
 
@@ -189,7 +187,7 @@ public Action Games_UpdateGameHUD(Handle timer)
                     ClearSyncHud(client, t_hHudSync[0]);
                 continue;
             }
-            
+
             // disabled by client options
             if(g_kOptions[client][kO_HudSpec])
                 continue;
@@ -243,7 +241,7 @@ public Action Games_UpdateGameHUD(Handle timer)
         for(int client = 1; client <= MaxClients; ++client)
             if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
-            
+
         SetHudTextParams(-1.0, 0.000, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !g_kOptions[client][kO_HudVac])
@@ -263,7 +261,7 @@ public Action Games_UpdateGameHUD(Handle timer)
 void Games_OnMapEnd()
 {
     //free all
-    
+
     if(t_hHudSync[0] != null)
         CloseHandle(t_hHudSync[0]);
     t_hHudSync[0] = null;
@@ -271,11 +269,11 @@ void Games_OnMapEnd()
     if(t_hHudSync[1] != null)
         CloseHandle(t_hHudSync[1]);
     t_hHudSync[1] = null;
-    
+
     if(t_hHudSync[2] != null)
         CloseHandle(t_hHudSync[1]);
     t_hHudSync[2] = null;
-    
+
     if(t_hHudSync[3] != null)
         CloseHandle(t_hHudSync[1]);
     t_hHudSync[3] = null;
@@ -298,7 +296,7 @@ void Games_OnEquipPost(DataPack pack)
 
     // get item defindex
     int index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
-    
+
     // ignore knife, grenade and special item
     if(500 <= index <= 515 || 42 < index < 50 || index == 0)
         return;
@@ -314,7 +312,7 @@ void Games_OnEquipPost(DataPack pack)
     if(mg_restrictawp.BoolValue && strcmp(classname, "weapon_awp") == 0)
     {
         Chat(client, "%T", "restrict awp", client);
-        
+
         if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == weapon)
         {
             int knife = GetPlayerWeaponSlot(client, 2);
@@ -352,7 +350,7 @@ void Games_OnEquipPost(DataPack pack)
 void Games_OnClientConnected(int client)
 {
     t_szSpecHudContent[client][0] = '\0';
-    
+
     for(int i = 0; i < view_as<int>(kOptions); ++i)
         g_kOptions[client][view_as<kOptions>(i)] = false;
 }
@@ -380,7 +378,7 @@ void Games_OnPlayerRunCmd(int client, int buttons)
 
     // limit pref speed
     Games_LimitPreSpeed(client, view_as<bool>(GetEntityFlags(client) & FL_ONGROUND), CurVelVec);
-    
+
     // Reserve Ammo
     Games_ReserveAmmo(client, buttons);
 
@@ -404,7 +402,7 @@ static void Games_ReserveAmmo(int client, int buttons)
         return;
 
     static int nextTime[MAXPLAYERS+1];
-    
+
     int currentTime = GetTime();
 
     if(currentTime >= nextTime[client])
@@ -413,7 +411,7 @@ static void Games_ReserveAmmo(int client, int buttons)
     nextTime[client] = currentTime + 30;
 
     int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-    
+
     if(weapon == -1 || !IsValidEdict(weapon))
         return;
 
