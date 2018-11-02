@@ -104,7 +104,7 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
         g_bLateLoad = false;
 
         for(int client = 1; client <= MaxClients; ++client)
-            if(IsClientInGame(client))
+            if(ClientValid(client))
             {
                 OnClientConnected(client);
                 OnClientPutInServer(client);

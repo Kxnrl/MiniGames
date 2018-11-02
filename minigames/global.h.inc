@@ -18,7 +18,7 @@
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "1.7." ... MYBUILD
+#define PI_VERSION  "1.6." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
@@ -150,7 +150,7 @@ stock void ChatAll(const char[] buffer, any ...)
 {
     char msg[256];
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && !IsFakeClient(client) && !g_kOptions[client][kO_HudChat])
+        if(ClientValid(client) && !g_kOptions[client][kO_HudChat])
         {
             SetGlobalTransTarget(client);
             VFormat(msg, 256, buffer, 2);
@@ -257,7 +257,7 @@ stock void TextAll(const char[] buffer, any ...)
 {
     char msg[256];
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && !IsFakeClient(client) && !g_kOptions[client][kO_HudText])
+        if(ClientValid(client) && !g_kOptions[client][kO_HudText])
         {
             SetGlobalTransTarget(client);
             VFormat(msg, 256, buffer, 2);
@@ -351,7 +351,7 @@ stock void GetAlives(int &tt, int &te, int &ct)
     te = 0;
 
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && IsPlayerAlive(client))
+        if(ClientValid(client) && IsPlayerAlive(client))
         {
             tt++;
             if(g_iTeam[client] == 3)
@@ -371,4 +371,9 @@ stock void ResetValue(int &val, int reset, int critical)
 {
     if(val == critical)
         val = reset;
+}
+
+stock bool ClientValid(int client)
+{
+    return (client > 0 && client <= MaxClients && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client));
 }

@@ -69,13 +69,13 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     // A2SFirewall
     MarkNativeAsOptional("A2SFirewall_GetClientTicket");
     MarkNativeAsOptional("A2SFirewall_IsClientChecked");
-    
+
     // MapMusic-API
     MarkNativeAsOptional("MapMusic_GetStatus");
     MarkNativeAsOptional("MapMusic_SetStatus");
     MarkNativeAsOptional("MapMusic_GetVolume");
     MarkNativeAsOptional("MapMusic_SetVolume");
-    
+
     // Updater
     MarkNativeAsOptional("Updater_AddPlugin");
 

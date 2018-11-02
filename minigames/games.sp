@@ -45,7 +45,7 @@ void Games_OnPluginStart()
 
 public Action Command_Main(int client, int args)
 {
-    if(!client || !IsClientInGame(client))
+    if(!ClientValid(client))
         return Plugin_Handled;
 
     char line[32];
@@ -102,7 +102,7 @@ public int MenuHandler_MenuMain(Menu menu, MenuAction action, int client, int sl
 
 public Action Command_Options(int client, int args)
 {
-    if(!client || !IsClientInGame(client))
+    if(!ClientValid(client))
         return Plugin_Handled;
 
     char line[32];
@@ -209,7 +209,7 @@ public Action Games_UpdateGameHUD(Handle timer)
 {
     // spec hud
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && IsClientObserver(client))
+        if(ClientValid(client) && IsClientObserver(client))
         {
             // client is in - menu?
             if(GetClientMenu(client, null) != MenuSource_None)
@@ -236,7 +236,7 @@ public Action Games_UpdateGameHUD(Handle timer)
             int target = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
             
             // target is valid?
-            if(iLastSpecTarget[client] == target || target < 1 || target > MaxClients || !IsClientInGame(target))
+            if(iLastSpecTarget[client] == target || !ClientValid(target))
                 continue;
 
             bLastDisplayHud[client] = true;
@@ -258,12 +258,12 @@ public Action Games_UpdateGameHUD(Handle timer)
         needClear = true;
         SetHudTextParams(-1.0, 0.975, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !g_kOptions[client][kO_HudVac])
+            if(!bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac timer", client, t_iWallHackCD);
 
         SetHudTextParams(-1.0, 0.000, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !g_kOptions[client][kO_HudVac])
+            if(bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac timer", client, t_iWallHackCD);
     }
     else if(t_iWallHackCD != -1)
@@ -271,19 +271,19 @@ public Action Games_UpdateGameHUD(Handle timer)
         needClear = true;
         SetHudTextParams(-1.0, 0.975, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(!bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !g_kOptions[client][kO_HudVac])
+            if(!bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
 
         SetHudTextParams(-1.0, 0.000, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(bVACHudPosition[client] && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client) && !g_kOptions[client][kO_HudVac])
+            if(bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
     }
     else if(needClear || t_iWallHackCD == -2)
     {
         needClear = false;
         for(int client = 1; client <= MaxClients; ++client)
-            if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+            if(ClientValid(client))
                 ClearSyncHud(client, t_hHudSync[1]);
     }
 
@@ -500,7 +500,7 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
     
-    if(!client || !IsClientInGame(client))
+    if(!ClientValid(client))
         return Plugin_Stop;
 
     SetEntProp(client, Prop_Send, "m_iHideHUD",   1<<12);                       // hide radar
@@ -552,7 +552,7 @@ void Games_OnRoundStarted()
     t_tRoundTimer = CreateTimer(1.0, Games_RoundTimer, _, TIMER_REPEAT);
     
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client))
+        if(ClientValid(client))
             if(QueryClientConVar(client, "cl_hud_playercount_pos", Games_HudPosition, 0) == QUERYCOOKIE_FAILED)
                 bVACHudPosition[client] = false;
 }
@@ -583,7 +583,7 @@ public Action Games_RoundTimer(Handle timer)
         }
 
         for(int client = 1; client <= MaxClients; ++client)
-            if(IsClientInGame(client) && IsPlayerAlive(client))
+            if(ClientValid(client) && IsPlayerAlive(client))
                 SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 9999999.0);
     }
 
@@ -639,7 +639,7 @@ void Games_OnPlayerBlind(DataPack pack)
     int client = GetClientOfUserId(pack.ReadCell());
     float time = pack.ReadFloat();
     
-    if(!victim || !IsClientInGame(victim) || !client || !IsClientInGame(client))
+    if(!ClientValid(victim) || !ClientValid(client))
         return;
 
     if(victim == client)

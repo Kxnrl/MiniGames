@@ -53,14 +53,14 @@ public Action Command_Stats(int client, int args)
 void Stats_OnPluginEnd()
 {
     for(int client = 1; client <= MaxClients; ++ client)
-        if(IsClientInGame(client) && !IsFakeClient(client))
+        if(ClientValid(client))
             Stats_OnClientDisconnect(client);
 }
 
 void Stats_OnWinPanel()
 {
     for(int client = 1; client <= MaxClients; ++ client)
-        if(IsClientInGame(client) && !IsFakeClient(client))
+        if(ClientValid(client))
             Stats_OnClientConnected(client);
 }
 
@@ -362,7 +362,7 @@ void Stats_PublicMessage(int client, bool disconnected = false)
 public Action Stats_PrivateMessage(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
-    if(!client || !IsClientInGame(client))
+    if(!ClientValid(client))
         return Plugin_Stop;
 
     Chat(client, "\x04*****************************************");
@@ -535,7 +535,7 @@ void Stats_OnRoundEnd()
         return;
 
     for(int client = 1; client <= MaxClients; ++client)
-        if(IsClientInGame(client) && IsPlayerAlive(client))
+        if(ClientValid(client) && IsPlayerAlive(client))
         {
             t_Session[client][iSurvivals]++;
             if(g_smxStore && mg_bonus_survival.IntValue > 0)

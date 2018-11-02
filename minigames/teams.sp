@@ -41,7 +41,7 @@ void Teams_OnPlayerConnected(int userid)
 public Action Timer_FullConnected(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
-    if(!client || !IsClientInGame(client) || g_iTeam[client] > TEAM_OB)
+    if(!ClientValid(client) || g_iTeam[client] > TEAM_OB)
         return Plugin_Stop;
 
     int newteam = Teams_GetAllowTeam();
@@ -84,7 +84,7 @@ public Action Teams_RandomTeam(Handle timer)
 
     // push all client to random pool
     for(int x = 1; x <= MaxClients; ++x)
-        if(IsClientInGame(x) && !IsFakeClient(x) && !IsClientSourceTV(x) && GetClientTeam(x) > TEAM_OB)
+        if(ClientValid(x) && GetClientTeam(x) > TEAM_OB)
         {
             t_iNextTeam[x] = TEAM_CT;
             array_players.Push(x);
@@ -135,7 +135,7 @@ public Action Timer_ChangeTeam(Handle timer)
     if(--t_iSwitchCD == 0)
     {
         for(int x = 1; x <= MaxClients; ++x)
-            if(IsClientInGame(x) && t_iNextTeam[x] > TEAM_US)
+            if(ClientValid(x) && t_iNextTeam[x] > TEAM_US)
             {
                 if(g_iTeam[x] == t_iNextTeam[x])
                 {
@@ -162,7 +162,7 @@ public Action Timer_ChangeTeam(Handle timer)
 
 public Action Command_Jointeam(int client, const char[] command, int argc)
 {
-    if(!client || !IsClientInGame(client) || argc < 1)
+    if(!ClientValid(client) || argc < 1)
         return Plugin_Handled;
 
     char arg[4];
