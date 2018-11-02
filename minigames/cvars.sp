@@ -131,8 +131,8 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     else
     {
         sv_staminamax.SetFloat(100.0, true, false);
-        sv_staminajumpcost.SetFloat(0.04, true, false);
-        sv_staminalandcost.SetFloat(0.02, true, false);
+        sv_staminajumpcost.SetFloat(0.03, true, false);
+        sv_staminalandcost.SetFloat(0.15, true, false);
         sv_staminarecoveryrate.SetFloat(100.0, true, false);
         sv_timebetweenducks.SetFloat(0.4, true, false);
     }

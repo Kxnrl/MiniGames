@@ -290,6 +290,10 @@ public void OnConfigsExecuted()
     if(g_tWarmup != null)
         KillTimer(g_tWarmup);
     g_tWarmup = CreateTimer(mp_warmuptime.FloatValue + 0.5, Timer_WarmupEnd);
+    
+    // check message for A2SFirewall
+    if(!g_extA2SFirewall)
+        LogError("A2SFirewall not install! -> For A2S attack protection, please install A2SFirewall.ext! please contact 'https://steamcommunity.com/profiles/76561198048432253' or Download from 'https://build.kxnrl.com/_Raw/A2SFirewall'.");
 }
 
 public void OnMapEnd()
@@ -319,11 +323,21 @@ public void OnClientConnected(int client)
 public void OnClientPutInServer(int client)
 {
     // checking cluent
-    if(g_extA2SFirewall && !A2SFirewall_IsClientChecked(client))
+    if(g_extA2SFirewall)
     {
-        LogMessage("A2SFirewall does not check \"%L\"");
-        KickClient(client, "Something wrong!\n Please re-connect to server!");
-        return;
+        if(!A2SFirewall_IsClientChecked(client))
+        {
+            LogMessage("A2SFirewall -> \"%L\" -> failed to check ticket.");
+            KickClient(client, "Something went wrong!\n Please reconnect to server!");
+            return;
+        }
+        else
+        {
+            char ticket[32];
+            A2SFirewall_GetClientTicket(client, ticket, 32);
+            strcopy(g_szTicket[client], 32, ticket);
+            Chat(client, )
+        }
     }
 
     // fire to module

@@ -77,6 +77,8 @@ bool g_kOptions[MAXPLAYERS+1][kOptions];
 native bool A2SFirewall_IsClientChecked(int client);
 native void A2SFirewall_GetClientTicket(int client, char[] ticket, int maxLen);
 
+char g_szA2STicket[MAXPLAYERS+1][32];
+
 // vars
 Database g_hMySQL  = null;
 Handle   g_tWarmup = null;
@@ -170,7 +172,7 @@ stock void ChatAll(const char[] buffer, any ...)
     SetGlobalTransTarget(LANG_SERVER);
 }
 
-stock void ProcessColorString(char[] message, int maxLen)
+stock int ProcessColorString(char[] message, int maxLen)
 {
     ReplaceString(message, maxLen, "{normal}",      "\x01", false);
     ReplaceString(message, maxLen, "{default}",     "\x01", false);
@@ -193,7 +195,7 @@ stock void ProcessColorString(char[] message, int maxLen)
     ReplaceString(message, maxLen, "{purple}",      "\x0E", false);
     ReplaceString(message, maxLen, "{darkorange}",  "\x0F", false);
 
-    Format(message, maxLen, "[\x04MG\x01]   %s", message);
+    return Format(message, maxLen, "[\x04MG\x01]   %s", message);
 }
 
 stock int GetWeaponClassname(int weapon, int index, char[] classname, int maxLen)
