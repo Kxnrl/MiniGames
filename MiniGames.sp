@@ -31,6 +31,7 @@
 #undef REQUIRE_PLUGIN
 #include <store>
 #include <mapmusic>
+#include <updater>
 #define REQUIRE_PLUGIN
 
 // header
@@ -74,6 +75,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     MarkNativeAsOptional("MapMusic_SetStatus");
     MarkNativeAsOptional("MapMusic_GetVolume");
     MarkNativeAsOptional("MapMusic_SetVolume");
+    
+    // Updater
+    MarkNativeAsOptional("Updater_AddPlugin");
 
     return APLRes_Success;
 }
@@ -180,12 +184,25 @@ public void OnPluginStart()
         SetFailState("NoBlock offset -> not found.");
 
     LoadTranslations("com.kxnrl.minigames.translations");
+    
+    // check library
+    if(g_bLateLoad)
+    {
+        g_extA2SFirewall = LibraryExists("A2SFirewall");
+        g_smxStore = LibraryExists("Store");
+        g_smxMapMuisc = LibraryExists("mapmusic");
+    }
 }
 
 public void OnPluginEnd()
 {
     // save all when unload plugin
     Stats_OnPluginEnd();
+}
+
+public void Updater_OnPluginUpdated()
+{
+    ReloadPlugin();
 }
 
 public void OnLibraryAdded(const char[] name)
@@ -361,6 +378,14 @@ public void OnConfigsExecuted()
     // check message for MapMusic
     if(!g_smxMapMuisc)
         LogError("MapMusic-API not install -> For map music controller, we recommend that you install this plugin. -> 'https://github.com/Kxnrl/MapMusic-API'");
+
+    static bool updater = false;
+    if(g_smxUpdater && !updater)
+    {
+        updater = true;
+        Updater_AddPlugin("https://build.kxnrl.com/MiniGames/release.txt");
+        ConVar_Easy_SetInt("sm_updater", 2);
+    }
 }
 
 public void OnMapEnd()
