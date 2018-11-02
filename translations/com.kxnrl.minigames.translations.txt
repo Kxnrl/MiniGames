@@ -437,6 +437,18 @@
         "chi"       "显示"
     }
     
+    "options mapmusic toggle"
+    {
+        "en"        "Map BGM toggle"
+        "chi"       "地图音乐开关"
+    }
+    
+    "options mapmusic volume"
+    {
+        "en"        "Map BGM volume"
+        "chi"       "地图音乐音量"
+    }
+    
     "options hudspec"
     {
         "en"        "HUD [Observer]"

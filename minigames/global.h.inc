@@ -55,6 +55,7 @@ char g_szBlockRadio[27][16] = {"kill", "explode", "coverme", "takepoint", "holdp
 
 // library 
 bool g_smxStore;
+bool g_smxMapMuisc;
 bool g_extA2SFirewall;
 
 // forwards
@@ -357,4 +358,16 @@ stock void GetAlives(int &tt, int &te, int &ct)
             else if(g_iTeam[client] == 2)
                 te++;
         }
+}
+
+stock void ScopeValue(int &val, int max, int min)
+{
+    if(val > max) val = max;
+    if(val < min) val = min;
+}
+
+stock void ResetValue(int &val, int reset, int critical)
+{
+    if(val == critical)
+        val = reset;
 }

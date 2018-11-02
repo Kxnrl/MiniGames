@@ -113,6 +113,15 @@ public Action Command_Options(int client, int args)
 
     FormatEx(line, 32, "%T", "options title", client);
     options.SetTitle("[MG]  %s\n ", line);
+    
+    if(g_smxMapMuisc)
+    {
+        FormatEx(line, 32, "%T:  %T", "options mapmusic toggle", client, !MapMusic_GetStatus(client) ? "menu item Off" : "menu item On", client);
+        options.AddItem("yukiim", line);
+
+        FormatEx(line, 32, "%T:  %d", "options mapmusic volume", client, MapMusic_GetVolume(client));
+        options.AddItem("yukiim", line);
+    }
 
     FormatEx(line, 32, "%T:  %T", "options hudspec", client, g_kOptions[client][kO_HudSpec] ? "menu item Off" : "menu item On", client);
     options.AddItem("s", line);
@@ -126,11 +135,11 @@ public Action Command_Options(int client, int args)
     FormatEx(line, 32, "%T:  %T", "options hudhurt", client, g_kOptions[client][kO_HudHurt] ? "menu item Off" : "menu item On", client);
     options.AddItem("u", line);
 
-    FormatEx(line, 32, "%T:  %T", "options hudchat", client, g_kOptions[client][kO_HudChat] ? "menu item Off" : "menu item On", client);
-    options.AddItem("s", line);
-
     FormatEx(line, 32, "%T:  %T", "options hudtext", client, g_kOptions[client][kO_HudText] ? "menu item Off" : "menu item On", client);
     options.AddItem("o", line);
+    
+    FormatEx(line, 32, "%T:  %T", "options hudchat", client, g_kOptions[client][kO_HudChat] ? "menu item Off" : "menu item On", client);
+    options.AddItem("s", line);
 
     options.ExitButton = false;
     options.ExitBackButton = true;
@@ -147,11 +156,34 @@ public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int
         Command_Main(client, slot);
     else if(action == MenuAction_Select)
     {
-        kOptions options = view_as<kOptions>(slot);
-        g_kOptions[client][options] = !g_kOptions[client][options];
-        SetClientCookie(client, t_kOCookies[options], g_kOptions[client][options] ? "1" : "0");
+        if(!g_smxMapMuisc)
+        {
+            Games_SetOptions(client, slot);
+            Command_Options(client, 0);
+            return;
+        }
+
+        switch (slot)
+        {
+            case 0 : MapMusic_SetStatus(client, !MapMusic_GetStatus(client));
+            case 1 : 
+            {
+                int volume = MapMusic_GetVolume(client) - 10;
+                ScopeValue(volume, 100, 0);
+                ResetValue(volume, 100, 0);
+                MapMusic_SetVolume(client, volume);
+            }
+            default: Games_SetOptions(client, slot+2);
+        }
         Command_Options(client, 0);
     }
+}
+
+static void Games_SetOptions(int client, int option)
+{
+    kOptions options = view_as<kOptions>(option);
+    g_kOptions[client][options] = !g_kOptions[client][options];
+    SetClientCookie(client, t_kOCookies[options], g_kOptions[client][options] ? "1" : "0");
 }
 
 void Games_OnMapStart()

@@ -30,6 +30,7 @@
 // plugin
 #undef REQUIRE_PLUGIN
 #include <store>
+#include <mapmusic>
 #define REQUIRE_PLUGIN
 
 // header
@@ -67,6 +68,12 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     // A2SFirewall
     MarkNativeAsOptional("A2SFirewall_GetClientTicket");
     MarkNativeAsOptional("A2SFirewall_IsClientChecked");
+    
+    // MapMusic-API
+    MarkNativeAsOptional("MapMusic_GetStatus");
+    MarkNativeAsOptional("MapMusic_SetStatus");
+    MarkNativeAsOptional("MapMusic_GetVolume");
+    MarkNativeAsOptional("MapMusic_SetVolume");
 
     return APLRes_Success;
 }
@@ -187,6 +194,8 @@ public void OnLibraryAdded(const char[] name)
         g_extA2SFirewall = true;
     else if(strcmp(name, "Store") == 0)
         g_smxStore = true;
+    else if(strcmp(name, "mapmusic") == 0)
+        g_smxMapMuisc = true;
 }
 
 public void OnLibraryRemoved(const char[] name)
@@ -195,6 +204,8 @@ public void OnLibraryRemoved(const char[] name)
         g_extA2SFirewall = false;
     else if(strcmp(name, "Store") == 0)
         g_smxStore = false;
+    else if(strcmp(name, "mapmusic") == 0)
+        g_smxMapMuisc = false;
 }
 
 static void ConnectToDatabase(int retry)
@@ -346,6 +357,10 @@ public void OnConfigsExecuted()
     // check message for A2SFirewall
     if(!g_extA2SFirewall)
         LogError("A2SFirewall not install! -> For A2S attack protection, please install A2SFirewall.ext! please contact 'https://steamcommunity.com/profiles/76561198048432253' or Download from 'https://build.kxnrl.com/_Raw/A2SFirewall'.");
+
+    // check message for MapMusic
+    if(!g_smxMapMuisc)
+        LogError("MapMusic-API not install -> For map music controller, we recommend that you install this plugin. -> 'https://github.com/Kxnrl/MapMusic-API'");
 }
 
 public void OnMapEnd()
