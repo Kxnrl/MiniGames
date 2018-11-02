@@ -244,7 +244,7 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
                               `online` int(11) unsigned NOT NULL DEFAULT '0',           \
                               PRIMARY KEY (`uid`),                                      \
                               UNIQUE KEY `uk_steamid` (`steamid`)                       \
-                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;                       \
+                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;                    \
                             ");
     g_hMySQL.Query(Database_CreateTable, m_szQuery, _, DBPrio_High);
 }
