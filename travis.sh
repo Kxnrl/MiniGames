@@ -3,11 +3,13 @@
 git fetch --unshallow
 COUNT=$(git rev-list --count HEAD)
 FILE=MiniGames-git$COUNT-$2.7z
+LATEST=MiniGames-$1-latest.7z
 
 echo " "
 echo "*** Trigger build ***"
 echo " "
 wget "https://github.com/Kxnrl/Store/raw/master/include/store.inc" -q -O include/store.inc
+wget "https://github.com/Kxnrl/MapMusic-API/raw/master/include/mapmusic.inc" -q -O include/mapmusic.inc
 wget "https://www.sourcemod.net/latest.php?version=$1&os=linux" -q -O sourcemod.tar.gz
 tar -xzf sourcemod.tar.gz
 
@@ -51,12 +53,14 @@ mv translations         build
 
 cd build
 7z a $FILE -t7z -mx9 LICENSE plugins scripting translations >nul
+7z a $LATEST -t7z -mx9 LICENSE plugins scripting translations >nul
 
-echo -e "Upload file RSYNC ..."
+echo "Upload file rsync ..."
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./$FILE $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/$1/
+RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./$LATEST $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/
 
 if [ "$1" = "1.9" ]; then
-echo "Upload RAW RSYNC ..."
+echo "Upload RAW rsync ..."
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/MiniGames.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/_Raw/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./translations/com.kxnrl.minigames.translations.txt $RSYNC_USER@$RSYNC_HOST::TravisCI/_Raw/translations/
 fi
