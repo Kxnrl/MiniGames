@@ -246,16 +246,69 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
                               UNIQUE KEY `uk_steamid` (`steamid`)                       \
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;                    \
                             ");
-    g_hMySQL.Query(Database_CreateTable, m_szQuery, _, DBPrio_High);
+    g_hMySQL.Query(Database_CreateTable, m_szQuery, 0, DBPrio_High);
 }
 
-public void Database_CreateTable(Database db, DBResultSet results, const char[] error, DataPack pack)
+public void Database_CreateTable(Database db, DBResultSet results, const char[] error, int step)
 {
     if(results == null || error[0])
-        SetFailState("Database_CreateTable -> %s", error);
+        SetFailState("Database_CreateTable -> %s -> %d", error, step);
     
-    // fire to module
-    Ranks_OnDBConnected();
+    step++;
+    
+    switch(step)
+    {
+        case 1:
+        {
+            char m_szQuery[2048];
+            FormatEx(m_szQuery, 2048, "CREATE TABLE `k_minigames_s` (                           \
+                                      `id` int(11) unsigned NOT NULL AUTO_INCREMENT,            \
+                                      `uid` int(11) unsigned NOT NULL,                          \
+                                      `ticket` varchar(32) DEFAULT NULL,                        \
+                                      `map` varchar(32) DEFAULT NULL,                           \
+                                      `kills` int(11) unsigned NOT NULL DEFAULT '0',            \
+                                      `deaths` int(11) unsigned NOT NULL DEFAULT '0',           \
+                                      `assists` int(11) unsigned NOT NULL DEFAULT '0',          \
+                                      `hits` int(11) unsigned NOT NULL DEFAULT '0',             \
+                                      `shots` int(11) unsigned NOT NULL DEFAULT '0',            \
+                                      `headshots` int(11) unsigned NOT NULL DEFAULT '0',        \
+                                      `knife` int(11) unsigned NOT NULL DEFAULT '0',            \
+                                      `taser` int(11) unsigned NOT NULL DEFAULT '0',            \
+                                      `grenade` int(11) unsigned NOT NULL DEFAULT '0',          \
+                                      `molotov` int(11) unsigned NOT NULL DEFAULT '0',          \
+                                      `damage` int(11) unsigned NOT NULL DEFAULT '0',           \
+                                      `survivals` int(11) unsigned NOT NULL DEFAULT '0',        \
+                                      `rounds` int(11) unsigned NOT NULL DEFAULT '0',           \
+                                      `score` int(11) unsigned NOT NULL DEFAULT '0',            \
+                                      `online` int(11) unsigned NOT NULL DEFAULT '0',           \
+                                      `date` int(11) unsigned NOT NULL DEFAULT '0',             \
+                                      PRIMARY KEY (`id`)                                        \
+                                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;                    \
+                                    ");
+            g_hMySQL.Query(Database_CreateTable, m_szQuery, step, DBPrio_High);
+        }
+        case 2:
+        {
+            char m_szQuery[2048];
+            FormatEx(m_szQuery, 2048, "CREATE TABLE `k_minigames_k` (                           \
+                                      `id` int(11) unsigned NOT NULL AUTO_INCREMENT,            \
+                                      `killer` int(11) unsigned NOT NULL DEFAULT '0',           \
+                                      `assister` int(11) unsigned NOT NULL DEFAULT '0',         \
+                                      `victim` int(11) unsigned NOT NULL DEFAULT '0',           \
+                                      `map` varchar(128) DEFAULT '0',                           \
+                                      `round` tinyint(3) unsigned NOT NULL DEFAULT '0',         \
+                                      `time` float(6,3) unsigned NOT NULL DEFAULT '0.000',      \
+                                      `weapon` varchar(32) DEFAULT NULL,                        \
+                                      `headshot` tinyint(2) unsigned NOT NULL DEFAULT '0',      \
+                                      `victim_model` varchar(192) DEFAULT NULL,                 \
+                                      `timestamp` int(11) unsigned NOT NULL DEFAULT '0',        \
+                                      PRIMARY KEY (`id`)                                        \
+                                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;                    \
+                                    ");
+            g_hMySQL.Query(Database_CreateTable, m_szQuery, step, DBPrio_High);
+        }
+        default: Ranks_OnDBConnected();
+    }
 }
 
 public Action Timer_ReconnectDB(Handle timer, int retry)
@@ -269,10 +322,9 @@ public Action Timer_ReconnectDB(Handle timer, int retry)
 public void OnMapStart()
 {
     // we only work on mg_ maps
-    char map[128];
-    GetCurrentMap(map, 128);
-    if(StrContains(map, "mg_", false) != 0)
-        SetFailState("This plugin only for mg_ (MiniGames/MultiGames) map!");
+    GetCurrentMap(g_szMap, 128);
+    if(StrContains(g_szMap, "mg_", false) != 0)
+        SetFailState("This plugin only for mg_ (MiniGames/MultiGames) map! -> %s", g_szMap);
 
     // fire to module
     Stats_OnMapStart();

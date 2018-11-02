@@ -90,6 +90,8 @@ int g_offsetNoBlock = -1;
 
 bool g_bLateLoad = false;
 
+char g_szMap[128];
+
 // convars
 ConVar mp_warmuptime            = null;
 ConVar sv_enablebunnyhopping    = null;

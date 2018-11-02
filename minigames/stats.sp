@@ -101,6 +101,70 @@ void Stats_OnClientPutInServer(int client)
         return;
 
     // load client data
+    Stats_LoadClient(client);
+}
+
+void Stats_OnClientDisconnect(int client)
+{
+    t_bEnabled = (GetClientCount(true) >= 6 && g_tWarmup == null);
+
+    if(!IsClientInGame(client))
+        return;
+
+    Stats_PublicMessage(client, true);
+
+    // saving data - session
+    FormatEx(m_szQuery, 1024,  "INSERT INTO `k_minigames_s` VALUES      \
+                                (                                       \
+                                    DEFAULT,                            \
+                                    %d,                                 \
+                                    '%s',                               \
+                                    '%s',                               \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d                                  \
+                                );                                      \
+                                ",
+                                g_iUId[client],
+                                g_szA2STicket[client],
+                                g_szMap,
+                                t_Session[client][iKills],
+                                t_Session[client][iDeaths],
+                                t_Session[client][iAssists],
+                                t_Session[client][iHits],
+                                t_Session[client][iShots],
+                                t_Session[client][iHeadshots],
+                                t_Session[client][iKnifeKills],
+                                t_Session[client][iTaserKills],
+                                t_Session[client][iGrenadeKills],
+                                t_Session[client][iMolotovKills],
+                                t_Session[client][iTotalDamage],
+                                t_Session[client][iSurvivals],
+                                t_Session[client][iPlayRounds],
+                                t_Session[client][iTotalScores],
+                                GetTime() - t_Session[client][iTotalOnline],
+                                GetTime()
+                                );
+}
+
+/*******************************************************/
+/******************** Database Handle ******************/
+/*******************************************************/
+static void Stats_LoadClient(int client)
+{
     char steamid[32];
     GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
 
@@ -109,23 +173,18 @@ void Stats_OnClientPutInServer(int client)
     g_hMySQL.Query(LoadUserCallback, m_szQuery, GetClientUserId(client));
 }
 
-void Stats_OnClientDisconnect(int client)
+static void Stats_SaveClient(int client)
 {
-    t_bEnabled = (GetClientCount(true) >= 6 && g_tWarmup == null);
-
     if(!t_bLoaded[client])
         return;
 
-    Stats_PublicMessage(client, true);
-
     t_bLoaded[client] = false;
 
-    char name[32], ename[64];
+    char name[32], ename[64], m_szQuery[1024];
     GetClientName(client, name, 32);
     g_hMySQL.Escape(name, ename, 64);
 
-    // saving data
-    char m_szQuery[1024];
+    // saving data - stats
     FormatEx(m_szQuery, 1024,  "UPDATE `k_minigames` SET           \
                                    `username` = '%s',                \
                                    `kills` = `kills` + '%d',         \
@@ -166,6 +225,41 @@ void Stats_OnClientDisconnect(int client)
     MySQL_VoidQuery(m_szQuery);
 }
 
+static void Stats_TraceClient(int killer, int assister, int victim, bool headshot, const char[] weapon);
+{
+    char model[192];
+    GetClientModel(client, model, 192);
+    
+    char m_szQuery[1024];
+    FormatEx(m_szQuery, 1024,  "INSERT INTO `k_minigames_k` VALUES      \
+                                (                                       \
+                                    DEFAULT,                            \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    %d,                                 \
+                                    '%s',                               \
+                                    %d,                                 \
+                                    '%.3f',                             \
+                                    '%s',                               \
+                                    %b,                                 \
+                                    '%s',                               \
+                                    %d                                  \
+                                )                                       \
+                                ",
+                                g_iUId[killer],
+                                g_iUId[assister],
+                                g_iUId[victim],
+                                g_szMap,
+                                Games_GetRoundNumber(),
+                                Games_GetRoundTime(),
+                                weapon,
+                                headshot,
+                                model,
+                                GetTime()
+                                );
+    MySQL_VoidQuery(m_szQuery);
+}
+
 public void LoadUserCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
@@ -181,7 +275,7 @@ public void LoadUserCallback(Database db, DBResultSet results, const char[] erro
     
     if(results.RowCount == 0)
     {
-        Stats_CreateNewClient(client);
+        Stats_CreateClient(client);
         return;
     }
 
@@ -213,7 +307,7 @@ public Action Stats_ReloadClientData(Handle timer, int userid)
     return Plugin_Stop;
 }
 
-void Stats_CreateNewClient(int client)
+static void Stats_CreateClient(int client)
 {
     char steamid[32];
     GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
@@ -228,7 +322,7 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
     int client = GetClientOfUserId(userid);
     if(!client)
         return;
-    
+
     if(results == null || error[0])
     {
         LogError("CreateClientCallback -> %L -> %s", client, error);
@@ -296,6 +390,8 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 {
     if(!t_bEnabled)
         return;
+    
+    Stats_TraceClient(attacker, assister, victim, headshot, weapon);
     
     t_Session[victim][iDeaths]++;
     

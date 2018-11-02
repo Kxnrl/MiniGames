@@ -21,7 +21,8 @@ static bool bLastDisplayHud[MAXPLAYERS+1];
 static bool bVACHudPosition[MAXPLAYERS+1];
 static Handle t_hHudSync[4] = null;
 static Handle t_tRoundTimer = null;
-
+static float t_fRoundStart = -1.0;
+static int t_iRoundNumber = 0;
 
 static Handle t_kOCookies[kOptions];
 
@@ -502,6 +503,17 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
 
 void Games_OnRoundStarted()
 {
+    // check warmup
+    if(GameRules_GetProp("m_bWarmupPeriod") != 1)
+        return;
+
+    // round count
+    t_iRoundNumber++;
+
+    // start time
+    t_fRoundStart = GetGameTime();
+    
+    // calculate cooldown
     t_iWallHackCD = RoundToCeil(mg_wallhack_delay.FloatValue);
 
     // init round timer
@@ -629,4 +641,14 @@ int Games_SetSpecHudContent(int client, const char[] content)
         return false;
 
     return strcopy(t_szSpecHudContent[client], 256, content);
+}
+
+float Games_GetRoundTime()
+{
+    return GetGameTime() - t_fRoundStart;
+}
+
+int Games_GetRoundNumber()
+{
+    return t_iRoundNumber;
 }
