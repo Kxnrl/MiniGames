@@ -289,7 +289,7 @@ public void Database_CreateTable(Database db, DBResultSet results, const char[] 
         case 1:
         {
             char m_szQuery[2048];
-            FormatEx(m_szQuery, 2048, "CREATE TABLE `k_minigames_s` (                           \
+            FormatEx(m_szQuery, 2048, "CREATE TABLE IF NOT EXISTS `k_minigames_s` (             \
                                       `id` int(11) unsigned NOT NULL AUTO_INCREMENT,            \
                                       `uid` int(11) unsigned NOT NULL,                          \
                                       `ticket` varchar(32) DEFAULT NULL,                        \
@@ -318,7 +318,7 @@ public void Database_CreateTable(Database db, DBResultSet results, const char[] 
         case 2:
         {
             char m_szQuery[2048];
-            FormatEx(m_szQuery, 2048, "CREATE TABLE `k_minigames_k` (                           \
+            FormatEx(m_szQuery, 2048, "CREATE TABLE IF NOT EXISTS `k_minigames_k` (             \
                                       `id` int(11) unsigned NOT NULL AUTO_INCREMENT,            \
                                       `killer` int(11) unsigned NOT NULL DEFAULT '0',           \
                                       `assister` int(11) unsigned NOT NULL DEFAULT '0',         \
