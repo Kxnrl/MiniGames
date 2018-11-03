@@ -383,7 +383,7 @@ public void OnConfigsExecuted()
     if(g_smxUpdater && !updater)
     {
         updater = true;
-        Updater_AddPlugin("https://build.kxnrl.com/MiniGames/release.txt");
+        Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
         ConVar_Easy_SetInt("sm_updater", 2);
     }
 }
