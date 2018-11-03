@@ -191,7 +191,11 @@ public void OnPluginStart()
         g_extA2SFirewall = LibraryExists("A2SFirewall");
         g_smxStore = LibraryExists("Store");
         g_smxMapMuisc = LibraryExists("mapmusic");
-        g_smxUpdater = LibraryExists("updater");
+        if(LibraryExists("updater"))
+        {
+            ConVar_Easy_SetInt("sm_updater", 2);
+            Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
+        }
     }
 }
 
@@ -215,7 +219,10 @@ public void OnLibraryAdded(const char[] name)
     else if(strcmp(name, "MapMusic") == 0)
         g_smxMapMuisc = true;
     else if(strcmp(name, "updater") == 0)
-        g_smxUpdater = true;
+    {
+        ConVar_Easy_SetInt("sm_updater", 2);
+        Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
+    }
 }
 
 public void OnLibraryRemoved(const char[] name)
@@ -226,8 +233,6 @@ public void OnLibraryRemoved(const char[] name)
         g_smxStore = false;
     else if(strcmp(name, "MapMusic") == 0)
         g_smxMapMuisc = false;
-    else if(strcmp(name, "updater") == 0)
-        g_smxUpdater = false;
 }
 
 static void ConnectToDatabase(int retry)
@@ -384,14 +389,6 @@ public void OnConfigsExecuted()
     // check message for MapMusic
     if(!g_smxMapMuisc)
         LogMessage("MapMusic-API not install -> For map music controller, we recommend that you install this plugin. -> 'https://github.com/Kxnrl/MapMusic-API'");
-
-    static bool updater = false;
-    if(g_smxUpdater && !updater)
-    {
-        updater = true;
-        Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
-        ConVar_Easy_SetInt("sm_updater", 2);
-    }
 }
 
 public void OnMapEnd()

@@ -55,7 +55,6 @@ char g_szBlockRadio[27][16] = {"kill", "explode", "coverme", "takepoint", "holdp
 
 // library 
 bool g_smxStore;
-bool g_smxUpdater;
 bool g_smxMapMuisc;
 bool g_extA2SFirewall;
 
