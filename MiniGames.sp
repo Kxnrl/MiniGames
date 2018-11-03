@@ -191,6 +191,7 @@ public void OnPluginStart()
         g_extA2SFirewall = LibraryExists("A2SFirewall");
         g_smxStore = LibraryExists("Store");
         g_smxMapMuisc = LibraryExists("mapmusic");
+        g_smxUpdater = LibraryExists("updater");
     }
 }
 
@@ -209,20 +210,24 @@ public void OnLibraryAdded(const char[] name)
 {
     if(strcmp(name, "A2SFirewall") == 0)
         g_extA2SFirewall = true;
-    else if(strcmp(name, "Store") == 0)
+    else if(strcmp(name, "store") == 0)
         g_smxStore = true;
-    else if(strcmp(name, "mapmusic") == 0)
+    else if(strcmp(name, "MapMusic") == 0)
         g_smxMapMuisc = true;
+    else if(strcmp(name, "updater") == 0)
+        g_smxUpdater = true;
 }
 
 public void OnLibraryRemoved(const char[] name)
 {
     if(strcmp(name, "A2SFirewall") == 0)
         g_extA2SFirewall = false;
-    else if(strcmp(name, "Store") == 0)
+    else if(strcmp(name, "store") == 0)
         g_smxStore = false;
-    else if(strcmp(name, "mapmusic") == 0)
+    else if(strcmp(name, "MapMusic") == 0)
         g_smxMapMuisc = false;
+    else if(strcmp(name, "updater") == 0)
+        g_smxUpdater = false;
 }
 
 static void ConnectToDatabase(int retry)
@@ -310,7 +315,8 @@ public void Database_CreateTable(Database db, DBResultSet results, const char[] 
                                       `score` int(11) unsigned NOT NULL DEFAULT '0',            \
                                       `online` int(11) unsigned NOT NULL DEFAULT '0',           \
                                       `date` int(11) unsigned NOT NULL DEFAULT '0',             \
-                                      PRIMARY KEY (`id`)                                        \
+                                      PRIMARY KEY (`id`),                                       \
+                                      UNIQUE KEY `uk_ticket` (`ticket`)                         \
                                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;                    \
                                     ");
             g_hMySQL.Query(Database_CreateTable, m_szQuery, step, DBPrio_High);
@@ -419,7 +425,7 @@ public void OnClientPutInServer(int client)
     {
         if(!A2SFirewall_IsClientChecked(client))
         {
-            LogMessage("A2SFirewall -> \"%L\" -> failed to check ticket.");
+            LogError("A2SFirewall -> \"%L\" -> failed to check ticket.");
             KickClient(client, "Something went wrong!\n Please reconnect to server!");
             return;
         }
