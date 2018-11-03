@@ -1,11 +1,11 @@
-# Store
+# MiniGames
   
 |Build Status|Download|
 |---|---
 |[![Build Status](https://img.shields.io/travis/Kxnrl/MiniGames/master.svg?style=flat-square)](https://travis-ci.org/Kxnrl/MiniGames?branch=master) |[![Download](https://static.kxnrl.com/images/web/buttons/download.png)](https://build.kxnrl.com/MiniGames/)  
   
   
-CSGO game mode -> MiniGames for mg_ map.
+CSGO game mode -> MiniGames for mg map.
   
   
 ### Features:
@@ -32,10 +32,10 @@ CSGO game mode -> MiniGames for mg_ map.
 ### How to install
 * [Download](https://build.kxnrl.com/MiniGames/) latest build.
 * Extract all files on disk.
-* Upload to server following folders: 
+* Upload files to server following folders: 
   * plugins 
   * translations
-* make sure your database.cfg **MySQL/MariaDB only** ( path: addons/sourcemod/configs/database.cfg )
+* make sure your database.cfg. **MySQL/MariaDB only** ( path: [GAME]/addons/sourcemod/configs/database.cfg )
 ``` keyvalues
 "default"
 {
@@ -58,3 +58,4 @@ CSGO game mode -> MiniGames for mg_ map.
 * [Steam Trade Offer](https://steamcommunity.com/tradeoffer/new/?partner=88166525&token=lszXBJeY)
 * **AliPay**: h673321480[AT]163.com
 * **Paypal**: 673321480[AT]qq.com
+  
