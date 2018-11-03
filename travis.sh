@@ -52,8 +52,8 @@ mv inputkill_hotfix.sp  build/scripting
 mv translations         build
 
 cd build
-7z a $FILE -t7z -mx9 LICENSE plugins scripting translations >nul
-7z a $LATEST -t7z -mx9 LICENSE plugins scripting translations >nul
+7z a $FILE -t7z -mx9 LICENSE.md README.md plugins scripting translations >nul
+7z a $LATEST -t7z -mx9 LICENSE.md README.md plugins scripting translations >nul
 
 echo "Upload file rsync ..."
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./$FILE $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/$1/
