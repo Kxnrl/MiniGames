@@ -45,7 +45,7 @@ if [ ! -f "build/plugins/inputkill_hotfix.smx" ]; then
 fi
 
 
-mv LICENSE.md build
+mv LICENSE.md README.md build
 mv include              build/scripting
 mv minigames            build/scripting
 mv MiniGames.sp         build/scripting
