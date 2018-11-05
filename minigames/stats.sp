@@ -135,6 +135,12 @@ static void Stats_SaveClient(int client)
 
     t_bLoaded[client] = false;
 
+    if(t_Session[client][iTotalOnline] < 123456789)
+    {
+        LogError("WTF? somthing went wrong. :(");
+        return;
+    }
+
     char name[32], ename[64], m_szQuery[1024];
     GetClientName(client, name, 32);
     g_hMySQL.Escape(name, ename, 64);
@@ -343,16 +349,47 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
 
 void Stats_PublicMessage(int client, bool disconnected = false)
 {
-    // public message
-    ChatAll("%t", "public message",
-            client, 
-            disconnected ? "disconnect" : "join",
-            Ranks_GetRank(client), 
-            Stats_GetKDA(client),
-            Stats_GetHSP(client),
-            t_StatsDB[client][iTotalScores],
-            t_StatsDB[client][iTotalOnline]/3600
-           );
+    PrintToChat(client, " \x04LibraryExists(\"GeoIP2\", %s) -> %s", LibraryExists("GeoIP2") ? "true" : "false", g_extGeoIP2 ? "true" : "false");
+    PrintToChat(client, " \x04LibraryExists(\"A2SFirewall\", %s) -> %s", LibraryExists("A2SFirewall") ? "true" : "false", g_extA2SFirewall ? "true" : "false");
+
+    if(g_extGeoIP2)
+    {
+        char ip[16];
+        GetClientIP(client, ip, 16, true);
+
+        char lang[8];
+        mg_geoiplanguage.GetString(lang, 8);
+
+        char geo[2][16];
+        GeoipCity   (ip, geo[1], 32, lang);
+        GeoipCountry(ip, geo[0], 32, lang);
+
+        // public message with geoip
+        ChatAll("%t", "public message with geoip",
+                client, 
+                disconnected ? "disconnect" : "join",
+                Ranks_GetRank(client), 
+                Stats_GetKDA(client),
+                Stats_GetHSP(client),
+                t_StatsDB[client][iTotalScores],
+                t_StatsDB[client][iTotalOnline]/3600,
+                geo[0],
+                geo[1]
+                );
+    }
+    else
+    {
+        // public message
+        ChatAll("%t", "public message",
+                client, 
+                disconnected ? "disconnect" : "join",
+                Ranks_GetRank(client), 
+                Stats_GetKDA(client),
+                Stats_GetHSP(client),
+                t_StatsDB[client][iTotalScores],
+                t_StatsDB[client][iTotalOnline]/3600
+                );
+    }
 
     // private message
     if(!disconnected)

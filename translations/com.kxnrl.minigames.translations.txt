@@ -91,6 +91,13 @@
         "chi"       "{green}{1}{normal}{2}了游戏, {blue}排名: {green}{3}  {blue}杀亡比: {green}{4}  {blue}爆头率: {green}{5}{normal}%%  {blue}得分: {green}{6}  {blue}在线: {green}{7}{normal}小时"
     }
 
+    "public message with geoip"
+    {
+        "#format"   "{1:N},{2:t},{3:d},{4:.2f},{5:.2f},{6:d},{7:d},{8:s},{9:s}"
+        "en"        "{green}{1} {normal}{2} the game, {blue}Rank:{green}{3}  {blue}KD: {green}{4}  {blue}HSRatio: {green}{5}{normal}%%  {blue}Scores: {green}{6}{normal}p  {blue}Onlines: {green}{7}{normal}hours  {blue}From: {green}{9}, {8}"
+        "chi"       "{green}{1}{normal}{2}了游戏, {blue}排名: {green}{3}  {blue}杀亡比: {green}{4}  {blue}爆头率: {green}{5}{normal}%%  {blue}得分: {green}{6}  {blue}在线: {green}{7}{normal}小时  {blue}来自: {green}{8} {9}"
+    }
+
     "join"
     {
         "en"    "Join"

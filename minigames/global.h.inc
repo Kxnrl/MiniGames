@@ -56,6 +56,7 @@ char g_szBlockRadio[27][16] = {"kill", "explode", "coverme", "takepoint", "holdp
 // library 
 bool g_smxStore;
 bool g_smxMapMuisc;
+bool g_extGeoIP2;
 bool g_extA2SFirewall;
 
 // forwards
@@ -89,11 +90,11 @@ int g_iUId[MAXPLAYERS+1];
 
 int g_offsetNoBlock = -1;
 
-bool g_bLateLoad = false;
-
 char g_szMap[128];
 
 // convars
+ConVar mg_geoiplanguage         = null;
+
 ConVar mp_warmuptime            = null;
 ConVar sv_enablebunnyhopping    = null;
 ConVar mp_damage_headshot_only  = null;

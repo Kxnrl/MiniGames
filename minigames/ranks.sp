@@ -97,19 +97,6 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
             t_RankMenu.AddItem(pidstr, buffer);
         }
     }
-
-    // if late load
-    if(g_bLateLoad)
-    {
-        g_bLateLoad = false;
-
-        for(int client = 1; client <= MaxClients; ++client)
-            if(ClientValid(client))
-            {
-                OnClientConnected(client);
-                OnClientPutInServer(client);
-            }
-    }
 }
 
 public int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int param2)

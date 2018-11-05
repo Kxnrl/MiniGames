@@ -18,11 +18,12 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-// extensions
+// requires
 #include <sdktools>
 #include <sdkhooks>
 #include <cstrike>
 #include <clientprefs>
+#include <autoexecconfig>
 
 // myself
 #include <minigames>
@@ -33,6 +34,11 @@
 #include <mapmusic>
 #include <updater>
 #define REQUIRE_PLUGIN
+
+// extensions
+#undef REQUIRE_EXTENSIONS
+#include <geoip>
+#define REQUIRE_EXTENSIONS
 
 // header
 #include "minigames/global.h"
@@ -46,8 +52,6 @@
 
 public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max)
 {
-    g_bLateLoad = late;
-
     RegPluginLibrary("MiniGames");
 
     // Natives
@@ -69,6 +73,10 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     // A2SFirewall
     MarkNativeAsOptional("A2SFirewall_GetClientTicket");
     MarkNativeAsOptional("A2SFirewall_IsClientChecked");
+
+    // GeoIP2
+    MarkNativeAsOptional("GeoipCountry");
+    MarkNativeAsOptional("GeoipCity");
 
     // MapMusic-API
     MarkNativeAsOptional("MapMusic_GetStatus");
@@ -186,16 +194,14 @@ public void OnPluginStart()
     LoadTranslations("com.kxnrl.minigames.translations");
     
     // check library
-    if(g_bLateLoad)
+    g_extGeoIP2 = LibraryExists("GeoIP2");
+    g_extA2SFirewall = LibraryExists("A2SFirewall");
+    g_smxStore = LibraryExists("Store");
+    g_smxMapMuisc = LibraryExists("mapmusic");
+    if(LibraryExists("updater"))
     {
-        g_extA2SFirewall = LibraryExists("A2SFirewall");
-        g_smxStore = LibraryExists("Store");
-        g_smxMapMuisc = LibraryExists("mapmusic");
-        if(LibraryExists("updater"))
-        {
-            ConVar_Easy_SetInt("sm_updater", 2);
-            Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
-        }
+        ConVar_Easy_SetInt("sm_updater", 2);
+        Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
     }
 }
 
@@ -214,6 +220,8 @@ public void OnLibraryAdded(const char[] name)
 {
     if(strcmp(name, "A2SFirewall") == 0)
         g_extA2SFirewall = true;
+    else if(strcmp(name, "GeoIP2") == 0)
+        g_extGeoIP2 = true;
     else if(strcmp(name, "store") == 0)
         g_smxStore = true;
     else if(strcmp(name, "MapMusic") == 0)
@@ -229,6 +237,11 @@ public void OnLibraryRemoved(const char[] name)
 {
     if(strcmp(name, "A2SFirewall") == 0)
         g_extA2SFirewall = false;
+    else if(strcmp(name, "GeoIP2") == 0)
+    {
+        g_extGeoIP2 = false;
+        LogError("GeoIP2 removed");
+    }
     else if(strcmp(name, "store") == 0)
         g_smxStore = false;
     else if(strcmp(name, "MapMusic") == 0)
@@ -240,8 +253,14 @@ static void ConnectToDatabase(int retry)
     if(g_hMySQL != null)
         return;
 
+    char config[16];
+    if(SQL_CheckConfig("minigames")) strcopy(config, 16, "minigames");
+    if(SQL_CheckConfig("kxnrl")) strcopy(config, 16, "kxnrl");
+    if(SQL_CheckConfig("csgo")) strcopy(config, 16, "csgo");
+    if(!config[0]) strcopy(config, 16, "default");
+
     // connect to database
-    Database.Connect(Database_OnConnected, "default", retry);
+    Database.Connect(Database_OnConnected, config, retry);
 }
 
 public void Database_OnConnected(Database db, const char[] error, int retry)
