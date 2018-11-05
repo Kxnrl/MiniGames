@@ -7,7 +7,7 @@
 #define PI_NAME     "MiniGames - Input 'Kill' hotfix"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "1.7." ... MYBUILD
+#define PI_VERSION  "1.8." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
