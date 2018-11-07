@@ -349,9 +349,6 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
 
 void Stats_PublicMessage(int client, bool disconnected = false)
 {
-    PrintToChat(client, " \x04LibraryExists(\"GeoIP2\", %s) -> %s", LibraryExists("GeoIP2") ? "true" : "false", g_extGeoIP2 ? "true" : "false");
-    PrintToChat(client, " \x04LibraryExists(\"A2SFirewall\", %s) -> %s", LibraryExists("A2SFirewall") ? "true" : "false", g_extA2SFirewall ? "true" : "false");
-
     if(g_extGeoIP2)
     {
         char ip[16];

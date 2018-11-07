@@ -37,7 +37,7 @@
 
 // extensions
 #undef REQUIRE_EXTENSIONS
-#include <geoip>
+#include <geoip2>  //https://github.com/Kxnrl/GeoIP2
 #define REQUIRE_EXTENSIONS
 
 // header
@@ -403,11 +403,36 @@ public void OnConfigsExecuted()
     
     // check message for A2SFirewall
     if(!g_extA2SFirewall)
-        LogMessage("A2SFirewall not install! -> For A2S attack protection, please install A2SFirewall.ext! please contact 'https://steamcommunity.com/profiles/76561198048432253' or Download from 'https://build.kxnrl.com/_Raw/A2SFirewall'.");
+    {
+        static bool print_a2s = false;
+        if(!print_a2s)
+        {
+            print_a2s = true;
+            LogMessage("A2SFirewall not install! -> For A2S attack protection, please install A2SFirewall.ext! please contact 'https://steamcommunity.com/profiles/76561198048432253' or Download from 'https://build.kxnrl.com/_Raw/A2SFirewall'.");
+        }
+    }
 
     // check message for MapMusic
     if(!g_smxMapMuisc)
-        LogMessage("MapMusic-API not install -> For map music controller, we recommend that you install this plugin. -> 'https://github.com/Kxnrl/MapMusic-API'");
+    {
+        static bool print_mma = false;
+        if(!print_mma)
+        {
+            print_mma = true;
+            LogMessage("MapMusic-API not install -> For map music controller, we recommend that you install this plugin. -> 'https://github.com/Kxnrl/MapMusic-API'");
+        }
+    }
+
+    // check message for GeoIP2
+    if(!g_extGeoIP2)
+    {
+        static bool print_geo = false;
+        if(!print_geo)
+        {
+            print_geo = true;
+            LogMessage("GeoIP2 not install -> For GeoIP connection message, we recommend that you install this extension. -> 'https://github.com/Kxnrl/GeoIP2'");
+        }
+    }
 }
 
 public void OnMapEnd()
@@ -490,6 +515,7 @@ public void OnClientDisconnect(int client)
 
     // unhook
     SDKUnhook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
+    SDKUnhook(client, SDKHook_SetTransmit, Hook_OnSetTransmit);
 }
 
 public void Hook_OnPostWeaponEquip(int client, int weapon)

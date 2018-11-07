@@ -28,6 +28,7 @@ include/events.inc
 include/files.inc
 include/float.inc
 include/functions.inc
+include/geoip.inc
 include/halflife.inc
 include/handles.inc
 include/helpers.inc
@@ -76,6 +77,7 @@ include/version_auto.inc
 #library from github.com/Kxnrl
 include/store.inc
 include/mapmusic.inc
+include/geoip2.inc
 
 # OSX
 # =========================

@@ -11,6 +11,7 @@ echo " "
 wget "https://github.com/Kxnrl/Store/raw/master/include/store.inc" -q -O include/store.inc
 wget "https://github.com/Kxnrl/MapMusic-API/raw/master/include/mapmusic.inc" -q -O include/mapmusic.inc
 wget "https://github.com/Impact123/AutoExecConfig/raw/development/autoexecconfig.inc" -q -O include/autoexecconfig.inc
+wget "https://github.com/Kxnrl/GeoIP2/raw/master/geoip2.inc" -q -O include/geoip2.inc
 wget "https://www.sourcemod.net/latest.php?version=$1&os=linux" -q -O sourcemod.tar.gz
 tar -xzf sourcemod.tar.gz
 
