@@ -436,6 +436,10 @@ public void OnClientConnected(int client)
 
 public void OnClientPutInServer(int client)
 {
+    // Block Bot/GOTV
+    if(!ClientValid(client))
+        return;
+
     // checking cluent
     if(g_extA2SFirewall)
     {
@@ -460,6 +464,9 @@ public void OnClientPutInServer(int client)
 
     // hook this to check weapon
     SDKHookEx(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
+
+    // hook this to set transmit
+    SDKHookEx(client, SDKHook_SetTransmit, Hook_OnSetTransmit);
 }
 
 public void OnClientCookiesCached(int client)
@@ -495,6 +502,20 @@ public void Hook_OnPostWeaponEquip(int client, int weapon)
     pack.WriteCell(client);
     pack.WriteCell(EntIndexToEntRef(weapon));
     RequestFrame(Games_OnEquipPost, pack);
+}
+
+public Action Hook_OnSetTransmit(int entity, int client)
+{
+    // Function not enabled.
+    if(!mg_transmitblock.BoolValue)
+        return Plugin_Continue;
+
+    // Follo client's option
+    if(!g_kOptions[client][kO_Transmit])
+        return Plugin_Continue;
+
+    // Set Transmit
+    return (g_iTeam[client] == g_iTeam[entity]) ? Plugin_Handled : Plugin_Continue;
 }
 
 public Action Timer_WarmupEnd(Handle timer)
@@ -580,7 +601,7 @@ public Action Event_PlayerTeams(Event event, const char[] name, bool dontBroadca
 {
     g_iTeam[GetClientOfUserId(event.GetInt("userid"))] = event.GetInt("team");
 
-    SetEventBroadcast(event, true);
+    event.BroadcastDisabled = true;
     return Plugin_Changed;
 }
 
@@ -598,7 +619,7 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 
 public Action Event_PlayerDisconnect(Event event, const char[] name, bool dontBroadcast)
 {
-    SetEventBroadcast(event, true);
+    event.BroadcastDisabled = true;
     return Plugin_Changed;
 }
 

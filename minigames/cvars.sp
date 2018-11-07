@@ -46,7 +46,6 @@ void Cvars_OnPluginStart()
     // Version convar
     AutoExecConfig_CreateConVar("minigames_version", PI_VERSION, "Current MiniGames version", FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
-    mg_geoiplanguage    = AutoExecConfig_CreateConVar("mg_geoiplanguage",  "en",       "Language of GeoIP2-City. List of language: en, de, fr, ja, ru, zh-CN."                      );
     mg_restrictawp      = AutoExecConfig_CreateConVar("mg_restrictawp",    "0",        "Restrict use AWP",                                                 _, true, 0.0,   true, 1.0);
     mg_slaygaygun       = AutoExecConfig_CreateConVar("mg_slaygaygun",     "1",        "Slay player who uses gaygun",                                      _, true, 0.0,   true, 1.0);
     mg_spawn_knife      = AutoExecConfig_CreateConVar("mg_spawn_knife",    "0",        "Give knife On player spawn",                                       _, true, 0.0,   true, 1.0);
@@ -56,6 +55,8 @@ void Cvars_OnPluginStart()
     mg_bhopspeed        = AutoExecConfig_CreateConVar("mg_bhopspeed",      "250.0",    "Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)",  _, true, 200.0, true, 3500.0);
     mg_randomteam       = AutoExecConfig_CreateConVar("mg_randomteam",     "1",        "Scramble Team after Round End",                                    _, true, 0.0,   true, 1.0);
     mg_wallhack_delay   = AutoExecConfig_CreateConVar("mg_wallhack_delay", "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 150.0);
+    mg_transmitblock    = AutoExecConfig_CreateConVar("mg_transmitblock",  "1",        "Allow client hide teammate.",                                      _, true, 0.0,   true, 1.0);
+    mg_geoiplanguage    = AutoExecConfig_CreateConVar("mg_geoiplanguage",  "en",       "Language of GeoIP2-City. \nList of language: \nBrazilian Portuguese (pt-BR), English (en), French (fr), German (de), Japanese (ja), Russian (ru), Simplified Chinese (zh-CN), and Spanish (es)");
 
     mg_bonus_kill_via_gun     = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun",       "3", "How many credits to earn when player kill enemy with gun",                _, true, 0.0, true, 1000.0);
     mg_bonus_kill_via_gun_hs  = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun_hs",    "4", "How many credits to earn when player kill enemy with gun and headshot",   _, true, 0.0, true, 1000.0);

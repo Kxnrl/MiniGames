@@ -123,6 +123,9 @@ public Action Command_Options(int client, int args)
         options.AddItem("yukiim", line);
     }
 
+    FormatEx(line, 32, "%T:  %T", "options transmit", client, g_kOptions[client][kO_Transmit] ? "menu item On" : "menu item Off", client);
+    options.AddItem("yukiim", line);
+
     FormatEx(line, 32, "%T:  %T", "options hudspec", client, g_kOptions[client][kO_HudSpec] ? "menu item Off" : "menu item On", client);
     options.AddItem("s", line);
 

@@ -71,7 +71,8 @@ enum kOptions
     kO_HudSpeed,
     kO_HudHurt,
     kO_HudChat,
-    kO_HudText
+    kO_HudText,
+    kO_Transmit
 }
 bool g_kOptions[MAXPLAYERS+1][kOptions];
 
@@ -94,6 +95,7 @@ char g_szMap[128];
 
 // convars
 ConVar mg_geoiplanguage         = null;
+ConVar mg_transmitblock         = null;
 
 ConVar mp_warmuptime            = null;
 ConVar sv_enablebunnyhopping    = null;
