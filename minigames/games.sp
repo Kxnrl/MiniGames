@@ -24,7 +24,7 @@ static Handle t_tRoundTimer = null;
 static float t_fRoundStart = -1.0;
 static int t_iRoundNumber = 0;
 
-static Handle t_kOCookies[kOptions];
+static Handle t_kOCookies[kO_MaxOptions];
 
 static char t_szSpecHudContent[MAXPLAYERS+1][256];
 

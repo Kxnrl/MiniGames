@@ -18,7 +18,7 @@
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "1.8." ... MYBUILD
+#define PI_VERSION  "1.9." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
@@ -31,23 +31,42 @@ public Plugin myinfo =
 };
 
 // enum
-enum Analytics
+enum struct stats_t
 {
-    iKills,
-    iDeaths,
-    iAssists,
-    iHits,
-    iShots,
-    iHeadshots,
-    iKnifeKills,
-    iTaserKills,
-    iGrenadeKills,
-    iMolotovKills,
-    iTotalDamage,
-    iSurvivals,
-    iPlayRounds,
-    iTotalScores,
-    iTotalOnline
+    int m_iKills;
+    int m_iDeaths;
+    int m_iAssists;
+    int m_iHits;
+    int m_iShots;
+    int m_iHeadshots;
+    int m_iKnifeKills;
+    int m_iTaserKills;
+    int m_iGrenadeKills;
+    int m_iMolotovKills;
+    int m_iTotalDamage;
+    int m_iSurvivals;
+    int m_iPlayRounds;
+    int m_iTotalScores;
+    int m_iTotalOnline;
+
+    void Reset()
+    {
+        this.m_iKills         = 0;
+        this.m_iDeaths        = 0;
+        this.m_iAssists       = 0;
+        this.m_iHits          = 0;
+        this.m_iShots         = 0;
+        this.m_iHeadshots     = 0;
+        this.m_iKnifeKills    = 0;
+        this.m_iTaserKills    = 0;
+        this.m_iGrenadeKills  = 0;
+        this.m_iMolotovKills  = 0;
+        this.m_iTotalDamage   = 0;
+        this.m_iSurvivals     = 0;
+        this.m_iPlayRounds    = 0;
+        this.m_iTotalScores   = 0;
+        this.m_iTotalOnline   = 0;
+    }
 }
 
 // staic var
@@ -66,15 +85,16 @@ Handle g_fwdOnVacEnabled;
 // options
 enum kOptions
 {
-    kO_HudSpec,
+    kO_HudSpec = 0,
     kO_HudVac,
     kO_HudSpeed,
     kO_HudHurt,
     kO_HudChat,
     kO_HudText,
-    kO_Transmit
+    kO_Transmit,
 }
-bool g_kOptions[MAXPLAYERS+1][kOptions];
+#define kO_MaxOptions 7
+bool g_kOptions[MAXPLAYERS+1][kO_MaxOptions];
 
 // temp
 native bool A2SFirewall_IsClientChecked(int client);

@@ -15,8 +15,8 @@
 /******************************************************************/
 
 
-static any t_Session[MAXPLAYERS+1][Analytics];
-static any t_StatsDB[MAXPLAYERS+1][Analytics];
+static stats_t t_Session[MAXPLAYERS+1];
+static stats_t t_StatsDB[MAXPLAYERS+1];
 
 static bool t_bLoaded[MAXPLAYERS+1];
 static bool t_bEnabled = false;
@@ -41,9 +41,22 @@ public Action Command_Stats(int client, int args)
     char username[32];
     GetClientName(client, username, 32);
 
-    DataPack pack = new DataPack();
-    for(int i = 0; i < view_as<int>(Analytics); ++i)
-        pack.WriteCell(t_Session[client][i] + t_StatsDB[client][i]);
+    stats_t pack;
+    pack.m_iKills        = t_Session[client].m_iKills        + t_StatsDB[client].m_iKills;
+    pack.m_iDeaths       = t_Session[client].m_iDeaths       + t_StatsDB[client].m_iDeaths;
+    pack.m_iAssists      = t_Session[client].m_iAssists      + t_StatsDB[client].m_iAssists;
+    pack.m_iHits         = t_Session[client].m_iHits         + t_StatsDB[client].m_iHits;
+    pack.m_iShots        = t_Session[client].m_iShots        + t_StatsDB[client].m_iShots;
+    pack.m_iHeadshots    = t_Session[client].m_iHeadshots    + t_StatsDB[client].m_iHeadshots;
+    pack.m_iKnifeKills   = t_Session[client].m_iKnifeKills   + t_StatsDB[client].m_iKnifeKills;
+    pack.m_iTaserKills   = t_Session[client].m_iTaserKills   + t_StatsDB[client].m_iTaserKills;
+    pack.m_iGrenadeKills = t_Session[client].m_iGrenadeKills + t_StatsDB[client].m_iGrenadeKills;
+    pack.m_iMolotovKills = t_Session[client].m_iMolotovKills + t_StatsDB[client].m_iMolotovKills;
+    pack.m_iTotalDamage  = t_Session[client].m_iTotalDamage  + t_StatsDB[client].m_iTotalDamage;
+    pack.m_iSurvivals    = t_Session[client].m_iSurvivals    + t_StatsDB[client].m_iSurvivals;
+    pack.m_iPlayRounds   = t_Session[client].m_iPlayRounds   + t_StatsDB[client].m_iPlayRounds;
+    pack.m_iTotalScores  = t_Session[client].m_iTotalScores  + t_StatsDB[client].m_iTotalScores;
+    pack.m_iTotalOnline  = t_Session[client].m_iTotalOnline  + t_StatsDB[client].m_iTotalOnline;
 
     DisplayRankDetails(client, username, pack);
 
@@ -80,15 +93,12 @@ void Stats_OnClientConnected(int client)
 {
     // init client
 
-    for(int i = 0; i < view_as<int>(Analytics); ++i)
-    {
-        t_Session[client][i] = 0;
-        t_StatsDB[client][i] = 0;
-    }
+    t_Session[client].Reset();
+    t_StatsDB[client].Reset();
 
     t_bLoaded[client] = false;
 
-    t_Session[client][iTotalOnline] = GetTime();
+    t_Session[client].m_iTotalOnline = GetTime();
 }
 
 void Stats_OnClientPutInServer(int client)
@@ -135,7 +145,7 @@ static void Stats_SaveClient(int client)
 
     t_bLoaded[client] = false;
 
-    if(t_Session[client][iTotalOnline] < 123456789)
+    if(t_Session[client].m_iTotalOnline < 123456789)
     {
         LogError("WTF? somthing went wrong. :(");
         return;
@@ -166,21 +176,21 @@ static void Stats_SaveClient(int client)
                                 WHERE `uid` = '%d';                  \
                                 ",
                                 ename,
-                                t_Session[client][iKills],
-                                t_Session[client][iDeaths],
-                                t_Session[client][iAssists],
-                                t_Session[client][iHits],
-                                t_Session[client][iShots],
-                                t_Session[client][iHeadshots],
-                                t_Session[client][iKnifeKills],
-                                t_Session[client][iTaserKills],
-                                t_Session[client][iGrenadeKills],
-                                t_Session[client][iMolotovKills],
-                                t_Session[client][iTotalDamage],
-                                t_Session[client][iSurvivals],
-                                t_Session[client][iPlayRounds],
-                                t_Session[client][iTotalScores],
-                                GetTime() - t_Session[client][iTotalOnline],
+                                t_Session[client].m_iKills,
+                                t_Session[client].m_iDeaths,
+                                t_Session[client].m_iAssists,
+                                t_Session[client].m_iHits,
+                                t_Session[client].m_iShots,
+                                t_Session[client].m_iHeadshots,
+                                t_Session[client].m_iKnifeKills,
+                                t_Session[client].m_iTaserKills,
+                                t_Session[client].m_iGrenadeKills,
+                                t_Session[client].m_iMolotovKills,
+                                t_Session[client].m_iTotalDamage,
+                                t_Session[client].m_iSurvivals,
+                                t_Session[client].m_iPlayRounds,
+                                t_Session[client].m_iTotalScores,
+                                GetTime() - t_Session[client].m_iTotalOnline,
                                 g_iUId[client]);
     MySQL_VoidQuery(m_szQuery);
 
@@ -212,21 +222,21 @@ static void Stats_SaveClient(int client)
                                 g_iUId[client],
                                 g_szTicket[client],
                                 g_szMap,
-                                t_Session[client][iKills],
-                                t_Session[client][iDeaths],
-                                t_Session[client][iAssists],
-                                t_Session[client][iHits],
-                                t_Session[client][iShots],
-                                t_Session[client][iHeadshots],
-                                t_Session[client][iKnifeKills],
-                                t_Session[client][iTaserKills],
-                                t_Session[client][iGrenadeKills],
-                                t_Session[client][iMolotovKills],
-                                t_Session[client][iTotalDamage],
-                                t_Session[client][iSurvivals],
-                                t_Session[client][iPlayRounds],
-                                t_Session[client][iTotalScores],
-                                GetTime() - t_Session[client][iTotalOnline],
+                                t_Session[client].m_iKills,
+                                t_Session[client].m_iDeaths,
+                                t_Session[client].m_iAssists,
+                                t_Session[client].m_iHits,
+                                t_Session[client].m_iShots,
+                                t_Session[client].m_iHeadshots,
+                                t_Session[client].m_iKnifeKills,
+                                t_Session[client].m_iTaserKills,
+                                t_Session[client].m_iGrenadeKills,
+                                t_Session[client].m_iMolotovKills,
+                                t_Session[client].m_iTotalDamage,
+                                t_Session[client].m_iSurvivals,
+                                t_Session[client].m_iPlayRounds,
+                                t_Session[client].m_iTotalScores,
+                                GetTime() - t_Session[client].m_iTotalOnline,
                                 GetTime());
     MySQL_VoidQuery(m_szQuery);
 }
@@ -293,8 +303,21 @@ public void LoadUserCallback(Database db, DBResultSet results, const char[] erro
 
     g_iUId[client] = results.FetchInt(0);
 
-    for(int i = 0; i < view_as<int>(Analytics); ++i)
-        t_StatsDB[client][i] = results.FetchInt(i+3);
+    t_StatsDB[client].m_iKills         = results.FetchInt( 3);
+    t_StatsDB[client].m_iDeaths        = results.FetchInt( 4);
+    t_StatsDB[client].m_iAssists       = results.FetchInt( 5);
+    t_StatsDB[client].m_iHits          = results.FetchInt( 6);
+    t_StatsDB[client].m_iShots         = results.FetchInt( 7);
+    t_StatsDB[client].m_iHeadshots     = results.FetchInt( 8);
+    t_StatsDB[client].m_iKnifeKills    = results.FetchInt( 9);
+    t_StatsDB[client].m_iTaserKills    = results.FetchInt(10);
+    t_StatsDB[client].m_iGrenadeKills  = results.FetchInt(11);
+    t_StatsDB[client].m_iMolotovKills  = results.FetchInt(12);
+    t_StatsDB[client].m_iTotalDamage   = results.FetchInt(13);
+    t_StatsDB[client].m_iSurvivals     = results.FetchInt(14);
+    t_StatsDB[client].m_iPlayRounds    = results.FetchInt(15);
+    t_StatsDB[client].m_iTotalScores   = results.FetchInt(16);
+    t_StatsDB[client].m_iTotalOnline   = results.FetchInt(17);
 
     t_bLoaded[client] = true;
 
@@ -368,8 +391,8 @@ void Stats_PublicMessage(int client, bool disconnected = false)
                 Ranks_GetRank(client), 
                 Stats_GetKDA(client),
                 Stats_GetHSP(client),
-                t_StatsDB[client][iTotalScores],
-                t_StatsDB[client][iTotalOnline]/3600,
+                t_StatsDB[client].m_iTotalScores,
+                t_StatsDB[client].m_iTotalOnline/3600,
                 geo[0],
                 geo[1]
                 );
@@ -383,8 +406,8 @@ void Stats_PublicMessage(int client, bool disconnected = false)
                 Ranks_GetRank(client), 
                 Stats_GetKDA(client),
                 Stats_GetHSP(client),
-                t_StatsDB[client][iTotalScores],
-                t_StatsDB[client][iTotalOnline]/3600
+                t_StatsDB[client].m_iTotalScores,
+                t_StatsDB[client].m_iTotalOnline/3600
                 );
     }
 
@@ -416,7 +439,7 @@ void Stats_OnClientSpawn(int client)
     if(!t_bEnabled)
         return;
 
-    t_Session[client][iPlayRounds]++;
+    t_Session[client].m_iPlayRounds++;
 }
 
 void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, const char[] weapon)
@@ -426,12 +449,12 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 
     Stats_TraceClient(attacker, assister, victim, headshot, weapon);
 
-    t_Session[victim][iDeaths]++;
+    t_Session[victim].m_iDeaths++;
 
     if(assister != 0)
     {
-        t_Session[assister][iAssists]++;
-        t_Session[assister][iTotalScores]++;
+        t_Session[assister].m_iAssists++;
+        t_Session[assister].m_iTotalScores++;
         
         if(g_smxStore && mg_bonus_assist.IntValue > 0)
         {
@@ -443,8 +466,8 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
     if(attacker == victim || attacker == 0)
         return;
 
-    t_Session[attacker][iKills]++;
-    t_Session[attacker][iTotalScores]+=3;
+    t_Session[attacker].m_iKills++;
+    t_Session[attacker].m_iTotalScores+=3;
 
     if(mp_damage_headshot_only.BoolValue)
     {
@@ -455,7 +478,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
                 Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_knife.IntValue, "[MiniGames] - Knife kill");
                 Chat(attacker, "%T", "store bonus knife", attacker, victim, mg_bonus_kill_via_knife.IntValue);
             }
-            t_Session[attacker][iKnifeKills]++;
+            t_Session[attacker].m_iKnifeKills++;
         }
         else
         {
@@ -464,7 +487,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
                 Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun.IntValue, "[MiniGames] - normal kill");
                 Chat(attacker, "%T", "store bonus kill", attacker, victim, mg_bonus_kill_via_gun.IntValue);
             }
-            t_Session[attacker][iHeadshots]++;
+            t_Session[attacker].m_iHeadshots++;
         }
         return;
     }
@@ -476,8 +499,8 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun_hs.IntValue, "[MiniGames] - Headshot kill");
             Chat(attacker, "%T", "store bonus headshot", attacker, victim, mg_bonus_kill_via_gun_hs.IntValue);
         }
-        t_Session[attacker][iHeadshots]++;
-        t_Session[attacker][iTotalScores]+=2;
+        t_Session[attacker].m_iHeadshots++;
+        t_Session[attacker].m_iTotalScores+=2;
         return;
     }
 
@@ -488,7 +511,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_knife.IntValue, "[MiniGames] - Knife kill");
             Chat(attacker, "%T", "store bonus knife", attacker, victim, mg_bonus_kill_via_knife.IntValue);
         }
-        t_Session[attacker][iKnifeKills]++;
+        t_Session[attacker].m_iKnifeKills++;
         return;
     }
 
@@ -509,7 +532,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_taser.IntValue, "[MiniGames] - Taser kill");
             Chat(attacker, "%T", "store bonus taser", attacker, victim, mg_bonus_kill_via_taser.IntValue);
         }
-        t_Session[attacker][iTaserKills]++;
+        t_Session[attacker].m_iTaserKills++;
         return;
     }
 
@@ -520,7 +543,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_inferno.IntValue, "[MiniGames] - Inferno kill");
             Chat(attacker, "%T", "store bonus inferno", attacker, victim, mg_bonus_kill_via_inferno.IntValue);
         }
-        t_Session[attacker][iMolotovKills]++;
+        t_Session[attacker].m_iMolotovKills++;
         return;
     }
 
@@ -531,7 +554,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_grenade.IntValue, "[MiniGames] - Grenade kill");
             Chat(attacker, "%T", "store bonus grenade", attacker, victim, mg_bonus_kill_via_grenade.IntValue);
         }
-        t_Session[attacker][iGrenadeKills]++;
+        t_Session[attacker].m_iGrenadeKills++;
         return;
     }
 
@@ -547,12 +570,12 @@ void Stats_PlayerHurts(int victim, int attacker, int damage, const char[] weapon
     if(!t_bEnabled || victim == attacker || attacker == 0)
         return;
 
-    t_Session[attacker][iTotalDamage] += damage;
+    t_Session[attacker].m_iTotalDamage += damage;
 
     if(IsWeaponKnife(weapon) || IsWeaponInferno(weapon))
         return;
 
-    t_Session[attacker][iHits]++;
+    t_Session[attacker].m_iHits++;
 }
 
 void Stats_OnWeaponFire(int attacker, const char[] weapon)
@@ -560,7 +583,7 @@ void Stats_OnWeaponFire(int attacker, const char[] weapon)
     if(IsWeaponKnife(weapon) || IsWeaponInferno(weapon) || IsWeaponDodgeBall(weapon))
         return;
 
-    t_Session[attacker][iShots]++;
+    t_Session[attacker].m_iShots++;
 }
 
 void Stats_OnRoundEnd()
@@ -571,7 +594,7 @@ void Stats_OnRoundEnd()
     for(int client = 1; client <= MaxClients; ++client)
         if(ClientValid(client) && IsPlayerAlive(client))
         {
-            t_Session[client][iSurvivals]++;
+            t_Session[client].m_iSurvivals++;
             if(g_smxStore && mg_bonus_survival.IntValue > 0)
             {
                 Store_SetClientCredits(client, Store_GetClientCredits(client)+mg_bonus_survival.IntValue, "[MiniGames] - Survival");
@@ -613,22 +636,22 @@ public void MySQL_VoidQueryCallback(Database db, DBResultSet results, const char
 /*******************************************************/
 int Stats_GetTotalScore(int client)
 {
-    return t_Session[client][iTotalScores] + t_StatsDB[client][iTotalScores];
+    return t_Session[client].m_iTotalScores + t_StatsDB[client].m_iTotalScores;
 }
 
 int Stats_GetKills(int client)
 {
-    return t_Session[client][iKills] + t_StatsDB[client][iKills];
+    return t_Session[client].m_iKills + t_StatsDB[client].m_iKills;
 }
 
 int Stats_GetAssists(int client)
 {
-    return t_Session[client][iAssists] + t_StatsDB[client][iAssists];
+    return t_Session[client].m_iAssists + t_StatsDB[client].m_iAssists;
 }
 
 int Stats_GetDeaths(int client)
 {
-    return t_Session[client][iDeaths] + t_StatsDB[client][iDeaths];
+    return t_Session[client].m_iDeaths + t_StatsDB[client].m_iDeaths;
 }
 
 float Stats_GetKDA(int client)
@@ -638,17 +661,17 @@ float Stats_GetKDA(int client)
 
 int Stats_GetHeadShots(int client)
 {
-    return t_Session[client][iHeadshots] + t_StatsDB[client][iHeadshots];
+    return t_Session[client].m_iHeadshots + t_StatsDB[client].m_iHeadshots;
 }
 
 int Stats_GetKnifeKills(int client)
 {
-    return t_Session[client][iKnifeKills] + t_StatsDB[client][iKnifeKills];
+    return t_Session[client].m_iKnifeKills + t_StatsDB[client].m_iKnifeKills;
 }
 
 int Stats_GetTaserKills(int client)
 {
-    return t_Session[client][iTaserKills] + t_StatsDB[client][iTaserKills];
+    return t_Session[client].m_iTaserKills + t_StatsDB[client].m_iTaserKills;
 }
 
 float Stats_GetHSP(int client)
