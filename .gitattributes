@@ -1,0 +1,10 @@
+* text=auto
+* eol=lf
+
+*.sh  eol=lf
+*.md  eol=lf
+*.yml eol=lf
+*.txt eol=lf
+*.inc eol=lf
+*.sp  eol=lf
+
