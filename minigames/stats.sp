@@ -381,8 +381,8 @@ void Stats_PublicMessage(int client, bool disconnected = false)
         mg_geoiplanguage.GetString(lang, 8);
 
         char geo[2][16];
-        GeoipCity   (ip, geo[1], 32, lang);
-        GeoipCountry(ip, geo[0], 32, lang);
+        GeoIP2_City   (ip, geo[1], 32, lang);
+        GeoIP2_Country(ip, geo[0], 32, lang);
 
         // public message with geoip
         ChatAll("%t", "public message with geoip",

@@ -75,8 +75,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     MarkNativeAsOptional("A2SFirewall_IsClientChecked");
 
     // GeoIP2
-    MarkNativeAsOptional("GeoipCountry");
-    MarkNativeAsOptional("GeoipCity");
+    MarkNativeAsOptional("GeoIP2_Country");
+    MarkNativeAsOptional("GeoIP2_City");
 
     // MapMusic-API
     MarkNativeAsOptional("MapMusic_GetStatus");
@@ -192,12 +192,16 @@ public void OnPluginStart()
         SetFailState("NoBlock offset -> not found.");
 
     LoadTranslations("com.kxnrl.minigames.translations");
-    
+}
+
+public void OnAllPluginsLoaded()
+{
     // check library
     g_extGeoIP2 = LibraryExists("GeoIP2");
     g_extA2SFirewall = LibraryExists("A2SFirewall");
     g_smxStore = LibraryExists("Store");
     g_smxMapMuisc = LibraryExists("mapmusic");
+
     if(LibraryExists("updater"))
     {
         ConVar_Easy_SetInt("sm_updater", 2);

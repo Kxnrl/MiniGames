@@ -75,7 +75,7 @@ include/version.inc
 include/version_auto.inc
 
 #library from github.com/Kxnrl
-include/store.inc
+#include/store.inc
 include/mapmusic.inc
 include/geoip2.inc
 
