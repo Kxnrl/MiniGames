@@ -203,16 +203,16 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("sv_full_alltalk",                   1, true, false);
     ConVar_Easy_SetInt("sv_talk_enemy_living",              1, true, false);
     ConVar_Easy_SetInt("sv_talk_enemy_dead",                1, true, false);
-    ConVar_Easy_SetInt("sv_clamp_unsafe_velocities",        0, true, false);
+    ConVar_Easy_SetInt("sv_clamp_unsafe_velocities",        1, true, false);
     ConVar_Easy_SetInt("sv_friction",                       5, true, false);
     ConVar_Easy_SetInt("sv_ignoregrenaderadio",             1, true, false);
     ConVar_Easy_SetInt("sv_infinite_ammo",                  0, true, false);
     ConVar_Easy_SetInt("weapon_reticle_knife_show",         1, true, false);
 
     sv_staminamax.SetFloat(         100.0, true, false);
-    sv_staminajumpcost.SetFloat(     0.16, true, false);
-    sv_staminalandcost.SetFloat(     0.10, true, false);
-    sv_staminarecoveryrate.SetFloat( 50.0, true, false);
+    sv_staminajumpcost.SetFloat(     0.10, true, false);
+    sv_staminalandcost.SetFloat(     0.05, true, false);
+    sv_staminarecoveryrate.SetFloat( 66.0, true, false);
 
     sv_autobunnyhopping.SetInt(0, true, false);
 
