@@ -25,21 +25,17 @@ int g_HookId[MAXPLAYERS+1] = {-1, ...};
 
 public void OnPluginStart()
 {
-    Handle GameConf = LoadGameConfigFile("sdktools.games\\engine.csgo");
+    GameData conf = new GameData("sdktools.games\\engine.csgo");
+    if (conf == null)
+        SetFailState("Failed to load gamedata.");
 
-    if(GameConf == null)
-    {
-        SetFailState("Why you not has gamedata?");
-        return;
-    }
+    int offset = conf.GetOffset("AcceptInput"); delete conf;
+    if (offset == -1)
+        SetFailState("Failed to get offset of \"AcceptInput\".");
 
-    int offset = GameConfGetOffset(GameConf, "AcceptInput");
     AcceptInput = DHookCreate(offset, HookType_Entity, ReturnType_Bool, ThisPointer_CBaseEntity, Event_AcceptInput);
-    if(AcceptInput == null)
-    {
+    if (AcceptInput == null)
         SetFailState("Failed to DHook \"AcceptInput\".");
-        return;
-    }
 
     delete GameConf;
 

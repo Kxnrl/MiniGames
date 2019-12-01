@@ -30,12 +30,19 @@ mkdir build/scripting
 cp -rf include/*            addons/sourcemod/scripting/include
 cp -rf minigames            addons/sourcemod/scripting
 cp -rf MiniGames.sp         addons/sourcemod/scripting
+cp -rf bspcvar.sp           addons/sourcemod/scripting
 cp -rf inputkill_hotfix.sp  addons/sourcemod/scripting
 
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/MiniGames.sp -o"build/plugins/MiniGames.smx"
+addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/bspcvar.sp -o"build/plugins/bspcvar.smx"
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/inputkill_hotfix.sp -o"build/plugins/inputkill_hotfix.smx"
 
 if [ ! -f "build/plugins/MiniGames.smx" ]; then
+    echo "Compile failed!"
+    exit 1;
+fi
+
+if [ ! -f "build/plugins/bspcvar.smx" ]; then
     echo "Compile failed!"
     exit 1;
 fi
@@ -50,6 +57,7 @@ mv LICENSE.md README.md build
 mv include              build/scripting
 mv minigames            build/scripting
 mv MiniGames.sp         build/scripting
+mv bspcvar.sp           build/scripting
 mv inputkill_hotfix.sp  build/scripting
 mv translations         build
 
@@ -61,9 +69,10 @@ echo "Upload file rsync ..."
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./$FILE $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/$1/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./$LATEST $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/
 
-if [ "$1" = "1.9" ]; then
+if [ "$1" = "1.10" ]; then
 echo "Upload RAW rsync ..."
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/MiniGames.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
+RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/bspcvar.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/bspcvar/updater/plugins/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/inputkill_hotfix.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./translations/com.kxnrl.minigames.translations.txt $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/translations/
 fi
