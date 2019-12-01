@@ -37,7 +37,7 @@ public void OnPluginStart()
     if (AcceptInput == null)
         SetFailState("Failed to DHook \"AcceptInput\".");
 
-    delete GameConf;
+    delete conf;
 
     DHookAddParam(AcceptInput, HookParamType_CharPtr);
     DHookAddParam(AcceptInput, HookParamType_CBaseEntity);
