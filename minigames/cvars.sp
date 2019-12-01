@@ -148,8 +148,8 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     else
     {
         sv_staminamax.SetFloat(100.0, true, false);
-        sv_staminajumpcost.SetFloat(0.03, true, false);
-        sv_staminalandcost.SetFloat(0.15, true, false);
+        sv_staminajumpcost.SetFloat(0.10, true, false);
+        sv_staminalandcost.SetFloat(0.05, true, false);
         sv_staminarecoveryrate.SetFloat(100.0, true, false);
         sv_timebetweenducks.SetFloat(0.4, true, false);
     }
@@ -219,6 +219,9 @@ static void Cvars_SetCvarDefault()
     sv_staminajumpcost.SetFloat(     0.10, true, false);
     sv_staminalandcost.SetFloat(     0.05, true, false);
     sv_staminarecoveryrate.SetFloat( 66.0, true, false);
+
+    phys_pushscale.SetInt              (1, true, true);
+    cs_enable_player_physics_box.SetInt(1, true, true);
 
     sv_autobunnyhopping.SetInt(0, true, false);
 
