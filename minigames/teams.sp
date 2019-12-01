@@ -41,7 +41,7 @@ void Teams_OnPlayerConnected(int userid)
 public Action Timer_FullConnected(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
-    if(!ClientValid(client) || g_iTeam[client] > TEAM_OB)
+    if (!ClientValid(client) || g_iTeam[client] > TEAM_OB)
         return Plugin_Stop;
 
     int newteam = Teams_GetAllowTeam();
@@ -65,16 +65,16 @@ void Teams_OnRoundEnd()
     t_iSwitchCD = -1;
 
     // timer to delay random team
-    if(mg_randomteam.BoolValue)
+    if (mg_randomteam.BoolValue)
         CreateTimer(1.5, Teams_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Teams_RandomTeam(Handle timer)
 {
-    if(g_tWarmup != null)
+    if (g_tWarmup != null)
         return Plugin_Stop;
 
-    if(GetTeamClientCount(TEAM_TE) <= 1 && GetTeamClientCount(TEAM_CT) <= 1)
+    if (GetTeamClientCount(TEAM_TE) <= 1 && GetTeamClientCount(TEAM_CT) <= 1)
     {
         ChatAll("%t", "cancel random team");
         return Plugin_Stop;
@@ -84,7 +84,7 @@ public Action Teams_RandomTeam(Handle timer)
 
     // push all client to random pool
     for(int x = 1; x <= MaxClients; ++x)
-        if(ClientValid(x) && GetClientTeam(x) > TEAM_OB)
+        if (ClientValid(x) && GetClientTeam(x) > TEAM_OB)
         {
             t_iNextTeam[x] = TEAM_CT;
             array_players.Push(x);
@@ -97,7 +97,7 @@ public Action Teams_RandomTeam(Handle timer)
     Call_PushCell(counts);
     Call_PushCell(array_players.Length - counts);
     Call_Finish(block);
-    if(block)
+    if (block)
     {
         delete array_players;
         
@@ -128,16 +128,16 @@ public Action Teams_RandomTeam(Handle timer)
 
 public Action Timer_ChangeTeam(Handle timer)
 {
-    if(t_iSwitchCD < 0)
+    if (t_iSwitchCD < 0)
         return Plugin_Stop;
 
     // countdown
-    if(--t_iSwitchCD == 0)
+    if (--t_iSwitchCD == 0)
     {
         for(int x = 1; x <= MaxClients; ++x)
-            if(ClientValid(x) && t_iNextTeam[x] > TEAM_US)
+            if (ClientValid(x) && t_iNextTeam[x] > TEAM_US)
             {
-                if(g_iTeam[x] == t_iNextTeam[x])
+                if (g_iTeam[x] == t_iNextTeam[x])
                 {
                     t_iNextTeam[x] = TEAM_US;
                     Text(x, "%T", "self random not change text", x);
@@ -162,7 +162,7 @@ public Action Timer_ChangeTeam(Handle timer)
 
 public Action Command_Jointeam(int client, const char[] command, int argc)
 {
-    if(!ClientValid(client) || argc < 1)
+    if (!ClientValid(client) || argc < 1)
         return Plugin_Handled;
 
     char arg[4];
@@ -171,18 +171,18 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
     int oldteam = GetClientTeam(client);
 
     // if client join game at the moment.
-    if(oldteam <= TEAM_OB)
+    if (oldteam <= TEAM_OB)
     {
         ChangeClientTeam(client, Teams_GetAllowTeam());
         return Plugin_Handled;
     }
 
     // team?
-    if(newteam == oldteam)
+    if (newteam == oldteam)
         return Plugin_Handled;
 
     // in random team processing
-    if(t_iNextTeam[client] != TEAM_US)
+    if (t_iNextTeam[client] != TEAM_US)
     {
         ChangeClientTeam(client, t_iNextTeam[client]);
         t_iNextTeam[client] = TEAM_US;
@@ -191,7 +191,7 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
     }
 
     // force change
-    if(IsPlayerAlive(client) || newteam == 1)
+    if (IsPlayerAlive(client) || newteam == 1)
     {
         ChangeClientTeam(client, newteam);
         return Plugin_Handled;
@@ -207,11 +207,11 @@ static int Teams_GetAllowTeam()
     int tes = GetTeamClientCount(TEAM_TE);
 
     // random t or ct
-    if(cts == tes)
+    if (cts == tes)
         return RandomInt(TEAM_TE, TEAM_CT);
 
     // force t side
-    if(cts > tes)
+    if (cts > tes)
         return TEAM_TE;
 
     // ct side

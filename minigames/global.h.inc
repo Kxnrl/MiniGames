@@ -144,7 +144,7 @@ ConVar mg_bonus_assist           = null;
 // stock functions
 stock void Chat(int client, const char[] buffer, any ...)
 {
-    if(g_kOptions[client][kO_HudChat])
+    if (g_kOptions[client][kO_HudChat])
         return;
 
     char msg[256];
@@ -152,7 +152,7 @@ stock void Chat(int client, const char[] buffer, any ...)
     ProcessColorString(msg, 256);
 
     Protobuf SayText2 = view_as<Protobuf>(StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
-    if(SayText2 == null)
+    if (SayText2 == null)
     {
         LogError("StartMessageAll -> SayText2 is null");
         return;
@@ -172,14 +172,14 @@ stock void ChatAll(const char[] buffer, any ...)
 {
     char msg[256];
     for(int client = 1; client <= MaxClients; ++client)
-        if(ClientValid(client) && !g_kOptions[client][kO_HudChat])
+        if (ClientValid(client) && !g_kOptions[client][kO_HudChat])
         {
             SetGlobalTransTarget(client);
             VFormat(msg, 256, buffer, 2);
             ProcessColorString(msg, 256);
 
             Protobuf SayText2 = view_as<Protobuf>(StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
-            if(SayText2 == null)
+            if (SayText2 == null)
             {
                 LogError("StartMessageOne -> SayText2 is null");
                 continue;
@@ -252,14 +252,14 @@ stock int GetWeaponClassname(int weapon, int index, char[] classname, int maxLen
 
 stock void Text(int client, const char[] buffer, any ...)
 {
-    if(g_kOptions[client][kO_HudText])
+    if (g_kOptions[client][kO_HudText])
         return;
 
     char msg[256];
     VFormat(msg, 256, buffer, 3);
 
     Protobuf TextMsg = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
-    if(TextMsg == null)
+    if (TextMsg == null)
     {
         LogError("StartMessageOne -> TextMsg is null");
         return;
@@ -279,13 +279,13 @@ stock void TextAll(const char[] buffer, any ...)
 {
     char msg[256];
     for(int client = 1; client <= MaxClients; ++client)
-        if(ClientValid(client) && !g_kOptions[client][kO_HudText])
+        if (ClientValid(client) && !g_kOptions[client][kO_HudText])
         {
             SetGlobalTransTarget(client);
             VFormat(msg, 256, buffer, 2);
 
             Protobuf TextMsg = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
-            if(TextMsg == null)
+            if (TextMsg == null)
             {
                 LogError("StartMessageOne -> TextMsg is null");
                 continue;
@@ -308,7 +308,7 @@ stock int RandomInt(int min, int max)
 {
     int random = GetURandomInt();
 
-    if(random == 0)
+    if (random == 0)
         random++;
 
     return RoundToCeil(float(random) / (float(2147483647) / float(max - min + 1))) + min - 1;
@@ -317,7 +317,7 @@ stock int RandomInt(int min, int max)
 stock void ConVar_Easy_SetInt(const char[] name, int val, bool replicate = true, bool notify = false)
 {
     ConVar cvar = FindConVar(name);
-    if(cvar != null)
+    if (cvar != null)
     {
         cvar.SetInt(val, replicate, notify);
     }
@@ -326,7 +326,7 @@ stock void ConVar_Easy_SetInt(const char[] name, int val, bool replicate = true,
 stock void ConVar_Easy_SetFlo(const char[] name, float val, bool replicate = true, bool notify = false)
 {
     ConVar cvar = FindConVar(name);
-    if(cvar != null)
+    if (cvar != null)
     {
         cvar.SetFloat(val, replicate, notify);
     }
@@ -335,7 +335,7 @@ stock void ConVar_Easy_SetFlo(const char[] name, float val, bool replicate = tru
 stock void ConVar_Easy_SetStr(const char[] name, const char[] val, bool replicate = true, bool notify = false)
 {
     ConVar cvar = FindConVar(name);
-    if(cvar != null)
+    if (cvar != null)
     {
         cvar.SetString(val, replicate, notify);
     }
@@ -373,25 +373,25 @@ stock void GetAlives(int &tt, int &te, int &ct)
     te = 0;
 
     for(int client = 1; client <= MaxClients; ++client)
-        if(ClientValid(client) && IsPlayerAlive(client))
+        if (ClientValid(client) && IsPlayerAlive(client))
         {
             tt++;
-            if(g_iTeam[client] == 3)
+            if (g_iTeam[client] == 3)
                 ct++;
-            else if(g_iTeam[client] == 2)
+            else if (g_iTeam[client] == 2)
                 te++;
         }
 }
 
 stock void ScopeValue(int &val, int max, int min)
 {
-    if(val > max) val = max;
-    if(val < min) val = min;
+    if (val > max) val = max;
+    if (val < min) val = min;
 }
 
 stock void ResetValue(int &val, int reset, int critical)
 {
-    if(val == critical)
+    if (val == critical)
         val = reset;
 }
 

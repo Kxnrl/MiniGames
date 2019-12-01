@@ -29,10 +29,10 @@ void Stats_OnPluginStart()
 
 public Action Command_Stats(int client, int args)
 {
-    if(!client)
+    if (!client)
         return Plugin_Handled;
 
-    if(!t_bLoaded[client])
+    if (!t_bLoaded[client])
     {
         Chat(client, "%T", "stats loading", client);
         return Plugin_Handled;
@@ -66,14 +66,14 @@ public Action Command_Stats(int client, int args)
 void Stats_OnPluginEnd()
 {
     for(int client = 1; client <= MaxClients; ++ client)
-        if(ClientValid(client))
+        if (ClientValid(client))
             Stats_OnClientDisconnect(client);
 }
 
 void Stats_OnWinPanel()
 {
     for(int client = 1; client <= MaxClients; ++ client)
-        if(ClientValid(client))
+        if (ClientValid(client))
             Stats_OnClientConnected(client);
 }
 
@@ -107,7 +107,7 @@ void Stats_OnClientPutInServer(int client)
     t_bEnabled = (GetClientCount(true) >= 6 && g_tWarmup == null);
 
     // ignore bot and gotv
-    if(IsFakeClient(client) || IsClientSourceTV(client))
+    if (IsFakeClient(client) || IsClientSourceTV(client))
         return;
 
     // load client data
@@ -118,7 +118,7 @@ void Stats_OnClientDisconnect(int client)
 {
     t_bEnabled = (GetClientCount(true) >= 6 && g_tWarmup == null);
 
-    if(!IsClientInGame(client))
+    if (!IsClientInGame(client))
         return;
 
     Stats_PublicMessage(client, true);
@@ -140,12 +140,12 @@ static void Stats_LoadClient(int client)
 
 static void Stats_SaveClient(int client)
 {
-    if(!t_bLoaded[client])
+    if (!t_bLoaded[client])
         return;
 
     t_bLoaded[client] = false;
 
-    if(t_Session[client].m_iTotalOnline < 123456789)
+    if (t_Session[client].m_iTotalOnline < 123456789)
     {
         LogError("WTF? somthing went wrong. :(");
         return;
@@ -278,23 +278,23 @@ static void Stats_TraceClient(int killer, int assister, int victim, bool headsho
 public void LoadUserCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
-    if(!client)
+    if (!client)
         return;
 
-    if(results == null || error[0])
+    if (results == null || error[0])
     {
         LogError("LoadUserCallback -> %L -> %s", client, error);
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
 
-    if(results.RowCount == 0)
+    if (results.RowCount == 0)
     {
         Stats_CreateClient(client);
         return;
     }
 
-    if(!results.FetchRow())
+    if (!results.FetchRow())
     {
         LogError("LoadUserCallback -> %L -> Can not fetch row.", client);
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
@@ -327,7 +327,7 @@ public void LoadUserCallback(Database db, DBResultSet results, const char[] erro
 public Action Stats_ReloadClientData(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
-    if(!client)
+    if (!client)
         return Plugin_Stop;
 
     Stats_OnClientPutInServer(client);
@@ -348,17 +348,17 @@ static void Stats_CreateClient(int client)
 public void CreateClientCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
-    if(!client)
+    if (!client)
         return;
 
-    if(results == null || error[0])
+    if (results == null || error[0])
     {
         LogError("CreateClientCallback -> %L -> %s", client, error);
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
         return;
     }
 
-    if(results.AffectedRows == 0)
+    if (results.AffectedRows == 0)
     {
         LogError("CreateClientCallback -> %L -> no affected rows...", client);
         CreateTimer(1.0, Stats_ReloadClientData, userid, TIMER_FLAG_NO_MAPCHANGE);
@@ -372,7 +372,7 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
 
 void Stats_PublicMessage(int client, bool disconnected = false)
 {
-    if(g_extGeoIP2)
+    if (g_extGeoIP2)
     {
         char ip[16];
         GetClientIP(client, ip, 16, true);
@@ -412,14 +412,14 @@ void Stats_PublicMessage(int client, bool disconnected = false)
     }
 
     // private message
-    if(!disconnected)
+    if (!disconnected)
     CreateTimer(6.88, Stats_PrivateMessage, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Stats_PrivateMessage(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
-    if(!ClientValid(client))
+    if (!ClientValid(client))
         return Plugin_Stop;
 
     Chat(client, "\x04*****************************************");
@@ -436,7 +436,7 @@ public Action Stats_PrivateMessage(Handle timer, int userid)
 /*******************************************************/
 void Stats_OnClientSpawn(int client)
 {
-    if(!t_bEnabled)
+    if (!t_bEnabled)
         return;
 
     t_Session[client].m_iPlayRounds++;
@@ -444,36 +444,36 @@ void Stats_OnClientSpawn(int client)
 
 void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, const char[] weapon)
 {
-    if(!t_bEnabled)
+    if (!t_bEnabled)
         return;
 
     Stats_TraceClient(attacker, assister, victim, headshot, weapon);
 
     t_Session[victim].m_iDeaths++;
 
-    if(assister != 0)
+    if (assister != 0)
     {
         t_Session[assister].m_iAssists++;
         t_Session[assister].m_iTotalScores++;
         
-        if(g_smxStore && mg_bonus_assist.IntValue > 0)
+        if (g_smxStore && mg_bonus_assist.IntValue > 0)
         {
             Store_SetClientCredits(assister, Store_GetClientCredits(assister)+mg_bonus_assist.IntValue, "[MiniGames] - Assist kill");
             Chat(assister, "%T", "store bonus assist", assister, victim, mg_bonus_assist.IntValue);
         }
     }
 
-    if(attacker == victim || attacker == 0)
+    if (attacker == victim || attacker == 0)
         return;
 
     t_Session[attacker].m_iKills++;
     t_Session[attacker].m_iTotalScores+=3;
 
-    if(mp_damage_headshot_only.BoolValue)
+    if (mp_damage_headshot_only.BoolValue)
     {
-        if(IsWeaponKnife(weapon))
+        if (IsWeaponKnife(weapon))
         {
-            if(g_smxStore && mg_bonus_kill_via_knife.IntValue > 0)
+            if (g_smxStore && mg_bonus_kill_via_knife.IntValue > 0)
             {
                 Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_knife.IntValue, "[MiniGames] - Knife kill");
                 Chat(attacker, "%T", "store bonus knife", attacker, victim, mg_bonus_kill_via_knife.IntValue);
@@ -482,7 +482,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         }
         else
         {
-            if(g_smxStore && mg_bonus_kill_via_gun.IntValue > 0)
+            if (g_smxStore && mg_bonus_kill_via_gun.IntValue > 0)
             {
                 Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun.IntValue, "[MiniGames] - normal kill");
                 Chat(attacker, "%T", "store bonus kill", attacker, victim, mg_bonus_kill_via_gun.IntValue);
@@ -492,9 +492,9 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         return;
     }
 
-    if(headshot)
+    if (headshot)
     {
-        if(g_smxStore && mg_bonus_kill_via_gun_hs.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_gun_hs.IntValue > 0)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun_hs.IntValue, "[MiniGames] - Headshot kill");
             Chat(attacker, "%T", "store bonus headshot", attacker, victim, mg_bonus_kill_via_gun_hs.IntValue);
@@ -504,9 +504,9 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         return;
     }
 
-    if(IsWeaponKnife(weapon))
+    if (IsWeaponKnife(weapon))
     {
-        if(g_smxStore && mg_bonus_kill_via_knife.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_knife.IntValue > 0)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_knife.IntValue, "[MiniGames] - Knife kill");
             Chat(attacker, "%T", "store bonus knife", attacker, victim, mg_bonus_kill_via_knife.IntValue);
@@ -515,9 +515,9 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         return;
     }
 
-    if(IsWeaponDodgeBall(weapon))
+    if (IsWeaponDodgeBall(weapon))
     {
-        if(g_smxStore && mg_bonus_kill_via_dodge.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_dodge.IntValue > 0)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_dodge.IntValue, "[MiniGames] - Dodgeball kill");
             Chat(attacker, "%T", "store bonus dodgeball", attacker, victim, mg_bonus_kill_via_dodge.IntValue);
@@ -525,9 +525,9 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         return;
     }
 
-    if(IsWeaponTaser(weapon))
+    if (IsWeaponTaser(weapon))
     {
-        if(g_smxStore && mg_bonus_kill_via_taser.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_taser.IntValue > 0)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_taser.IntValue, "[MiniGames] - Taser kill");
             Chat(attacker, "%T", "store bonus taser", attacker, victim, mg_bonus_kill_via_taser.IntValue);
@@ -536,9 +536,9 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         return;
     }
 
-    if(IsWeaponInferno(weapon))
+    if (IsWeaponInferno(weapon))
     {
-        if(g_smxStore && mg_bonus_kill_via_inferno.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_inferno.IntValue > 0)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_inferno.IntValue, "[MiniGames] - Inferno kill");
             Chat(attacker, "%T", "store bonus inferno", attacker, victim, mg_bonus_kill_via_inferno.IntValue);
@@ -547,9 +547,9 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         return;
     }
 
-    if(IsWeaponGrenade(weapon))
+    if (IsWeaponGrenade(weapon))
     {
-        if(g_smxStore && mg_bonus_kill_via_grenade.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_grenade.IntValue > 0)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_grenade.IntValue, "[MiniGames] - Grenade kill");
             Chat(attacker, "%T", "store bonus grenade", attacker, victim, mg_bonus_kill_via_grenade.IntValue);
@@ -558,7 +558,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         return;
     }
 
-    if(g_smxStore && mg_bonus_kill_via_gun.IntValue > 0)
+    if (g_smxStore && mg_bonus_kill_via_gun.IntValue > 0)
     {
         Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun.IntValue, "[MiniGames] - normal kill");
         Chat(attacker, "%T", "store bonus kill", attacker, victim, mg_bonus_kill_via_gun.IntValue);
@@ -567,12 +567,12 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 
 void Stats_PlayerHurts(int victim, int attacker, int damage, const char[] weapon)
 {
-    if(!t_bEnabled || victim == attacker || attacker == 0)
+    if (!t_bEnabled || victim == attacker || attacker == 0)
         return;
 
     t_Session[attacker].m_iTotalDamage += damage;
 
-    if(IsWeaponKnife(weapon) || IsWeaponInferno(weapon))
+    if (IsWeaponKnife(weapon) || IsWeaponInferno(weapon))
         return;
 
     t_Session[attacker].m_iHits++;
@@ -580,7 +580,7 @@ void Stats_PlayerHurts(int victim, int attacker, int damage, const char[] weapon
 
 void Stats_OnWeaponFire(int attacker, const char[] weapon)
 {
-    if(IsWeaponKnife(weapon) || IsWeaponInferno(weapon) || IsWeaponDodgeBall(weapon))
+    if (IsWeaponKnife(weapon) || IsWeaponInferno(weapon) || IsWeaponDodgeBall(weapon))
         return;
 
     t_Session[attacker].m_iShots++;
@@ -588,14 +588,14 @@ void Stats_OnWeaponFire(int attacker, const char[] weapon)
 
 void Stats_OnRoundEnd()
 {
-    if(!t_bEnabled)
+    if (!t_bEnabled)
         return;
 
     for(int client = 1; client <= MaxClients; ++client)
-        if(ClientValid(client) && IsPlayerAlive(client))
+        if (ClientValid(client) && IsPlayerAlive(client))
         {
             t_Session[client].m_iSurvivals++;
-            if(g_smxStore && mg_bonus_survival.IntValue > 0)
+            if (g_smxStore && mg_bonus_survival.IntValue > 0)
             {
                 Store_SetClientCredits(client, Store_GetClientCredits(client)+mg_bonus_survival.IntValue, "[MiniGames] - Survival");
                 Chat(client, "%T", "store bonus survival", client, mg_bonus_survival.IntValue);
@@ -615,7 +615,7 @@ static void MySQL_VoidQuery(const char[] m_szQuery)
 
 public void MySQL_VoidQueryCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
-    if(results == null || error[0])
+    if (results == null || error[0])
     {
         int maxLen = pack.ReadCell();
         char[] m_szQuery = new char[maxLen];

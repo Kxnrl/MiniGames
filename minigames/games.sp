@@ -45,7 +45,7 @@ void Games_OnPluginStart()
 
 public Action Command_Main(int client, int args)
 {
-    if(!ClientValid(client))
+    if (!ClientValid(client))
         return Plugin_Handled;
 
     char line[32];
@@ -84,9 +84,9 @@ public Action Command_Main(int client, int args)
 
 public int MenuHandler_MenuMain(Menu menu, MenuAction action, int client, int slot)
 {
-    if(action == MenuAction_End)
+    if (action == MenuAction_End)
         delete menu;
-    else if(action == MenuAction_Select)
+    else if (action == MenuAction_Select)
     {
         switch(slot)
         {
@@ -102,7 +102,7 @@ public int MenuHandler_MenuMain(Menu menu, MenuAction action, int client, int sl
 
 public Action Command_Options(int client, int args)
 {
-    if(!ClientValid(client))
+    if (!ClientValid(client))
         return Plugin_Handled;
 
     char line[32];
@@ -114,7 +114,7 @@ public Action Command_Options(int client, int args)
     FormatEx(line, 32, "%T", "options title", client);
     options.SetTitle("[MG]  %s\n ", line);
     
-    if(g_smxMapMuisc)
+    if (g_smxMapMuisc)
     {
         FormatEx(line, 32, "%T:  %T", "options mapmusic toggle", client, !MapMusic_GetStatus(client) ? "menu item Off" : "menu item On", client);
         options.AddItem("yukiim", line);
@@ -153,13 +153,13 @@ public Action Command_Options(int client, int args)
 
 public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int slot)
 {
-    if(action == MenuAction_End)
+    if (action == MenuAction_End)
         delete menu;
-    else if(action == MenuAction_Cancel && slot == MenuCancel_ExitBack)
+    else if (action == MenuAction_Cancel && slot == MenuCancel_ExitBack)
         Command_Main(client, slot);
-    else if(action == MenuAction_Select)
+    else if (action == MenuAction_Select)
     {
-        if(!g_smxMapMuisc)
+        if (!g_smxMapMuisc)
         {
             Games_SetOptions(client, slot);
             Command_Options(client, 0);
@@ -192,16 +192,16 @@ static void Games_SetOptions(int client, int option)
 void Games_OnMapStart()
 {
     // init hud synchronizer ...
-    if(t_hHudSync[0] == null)
+    if (t_hHudSync[0] == null)
         t_hHudSync[0] = CreateHudSynchronizer();
 
-    if(t_hHudSync[1] == null)
+    if (t_hHudSync[1] == null)
         t_hHudSync[1] = CreateHudSynchronizer();
 
-    if(t_hHudSync[2] == null)
+    if (t_hHudSync[2] == null)
         t_hHudSync[2] = CreateHudSynchronizer();
 
-    if(t_hHudSync[3] == null)
+    if (t_hHudSync[3] == null)
         t_hHudSync[3] = CreateHudSynchronizer();
 
     // timer to update hud
@@ -212,26 +212,26 @@ public Action Games_UpdateGameHUD(Handle timer)
 {
     // spec hud
     for(int client = 1; client <= MaxClients; ++client)
-        if(ClientValid(client) && IsClientObserver(client))
+        if (ClientValid(client) && IsClientObserver(client))
         {
             // client is in - menu?
-            if(GetClientMenu(client, null) != MenuSource_None)
+            if (GetClientMenu(client, null) != MenuSource_None)
             {
                 iLastSpecTarget[client] = 0;
-                if(bLastDisplayHud[client])
+                if (bLastDisplayHud[client])
                     ClearSyncHud(client, t_hHudSync[0]);
                 continue;
             }
 
             // disabled by client options
-            if(g_kOptions[client][kO_HudSpec])
+            if (g_kOptions[client][kO_HudSpec])
                 continue;
 
             // free look
-            if(!(4 <= GetEntProp(client, Prop_Send, "m_iObserverMode") <= 5))
+            if (!(4 <= GetEntProp(client, Prop_Send, "m_iObserverMode") <= 5))
             {
                 iLastSpecTarget[client] = 0;
-                if(bLastDisplayHud[client])
+                if (bLastDisplayHud[client])
                     ClearSyncHud(client, t_hHudSync[0]);
                 continue;
             }
@@ -239,7 +239,7 @@ public Action Games_UpdateGameHUD(Handle timer)
             int target = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
             
             // target is valid?
-            if(iLastSpecTarget[client] == target || !ClientValid(target))
+            if (iLastSpecTarget[client] == target || !ClientValid(target))
                 continue;
 
             bLastDisplayHud[client] = true;
@@ -256,37 +256,37 @@ public Action Games_UpdateGameHUD(Handle timer)
 
     // countdown wallhack
     static bool needClear;
-    if(t_iWallHackCD > 0)
+    if (t_iWallHackCD > 0)
     {
         needClear = true;
         SetHudTextParams(-1.0, 0.975, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(!bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
+            if (!bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac timer", client, t_iWallHackCD);
 
         SetHudTextParams(-1.0, 0.000, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
+            if (bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac timer", client, t_iWallHackCD);
     }
-    else if(t_iWallHackCD != -1)
+    else if (t_iWallHackCD != -1)
     {
         needClear = true;
         SetHudTextParams(-1.0, 0.975, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(!bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
+            if (!bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
 
         SetHudTextParams(-1.0, 0.000, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
-            if(bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
+            if (bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
                 ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
     }
-    else if(needClear || t_iWallHackCD == -2)
+    else if (needClear || t_iWallHackCD == -2)
     {
         needClear = false;
         for(int client = 1; client <= MaxClients; ++client)
-            if(ClientValid(client))
+            if (ClientValid(client))
                 ClearSyncHud(client, t_hHudSync[1]);
     }
 
@@ -297,23 +297,23 @@ void Games_OnMapEnd()
 {
     //free all
 
-    if(t_hHudSync[0] != null)
+    if (t_hHudSync[0] != null)
         CloseHandle(t_hHudSync[0]);
     t_hHudSync[0] = null;
 
-    if(t_hHudSync[1] != null)
+    if (t_hHudSync[1] != null)
         CloseHandle(t_hHudSync[1]);
     t_hHudSync[1] = null;
 
-    if(t_hHudSync[2] != null)
+    if (t_hHudSync[2] != null)
         CloseHandle(t_hHudSync[1]);
     t_hHudSync[2] = null;
 
-    if(t_hHudSync[3] != null)
+    if (t_hHudSync[3] != null)
         CloseHandle(t_hHudSync[1]);
     t_hHudSync[3] = null;
 
-    if(t_tRoundTimer != null)
+    if (t_tRoundTimer != null)
         KillTimer(t_tRoundTimer);
     t_tRoundTimer = null;
 }
@@ -326,32 +326,32 @@ void Games_OnEquipPost(DataPack pack)
     int weapon = EntRefToEntIndex(pack.ReadCell());
     delete pack;
 
-    if(!IsValidEdict(weapon))
+    if (!IsValidEdict(weapon))
         return;
 
     // get item defindex
     int index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
 
     // ignore knife, grenade and special item
-    if(500 <= index <= 515 || 42 < index < 50 || index == 0)
+    if (500 <= index <= 515 || 42 < index < 50 || index == 0)
         return;
 
     char classname[32];
     GetWeaponClassname(weapon, index, classname, 32);
 
     // ignore taser
-    if(StrContains(classname, "taser", false) != -1)
+    if (StrContains(classname, "taser", false) != -1)
         return;
 
     // restrict AWP
-    if(mg_restrictawp.BoolValue && strcmp(classname, "weapon_awp") == 0)
+    if (mg_restrictawp.BoolValue && strcmp(classname, "weapon_awp") == 0)
     {
         Chat(client, "%T", "restrict awp", client);
 
-        if(GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == weapon)
+        if (GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == weapon)
         {
             int knife = GetPlayerWeaponSlot(client, 2);
-            if(knife != -1)
+            if (knife != -1)
                 SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", knife);
         }
 
@@ -362,7 +362,7 @@ void Games_OnEquipPost(DataPack pack)
     }
 
     // force slay player who uses gaygun
-    if(mg_slaygaygun.BoolValue && (strcmp(classname, "weapon_scar20") == 0 || strcmp(classname, "weapon_g3sg1") == 0))
+    if (mg_slaygaygun.BoolValue && (strcmp(classname, "weapon_scar20") == 0 || strcmp(classname, "weapon_g3sg1") == 0))
     {
         ChatAll("%t", "slay gaygun", client, classname[7]);
 
@@ -376,7 +376,7 @@ void Games_OnEquipPost(DataPack pack)
     // fix ammo */1
     int amtype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
 
-    if(amtype == -1)
+    if (amtype == -1)
         return;
 
     SetEntProp(client, Prop_Send, "m_iAmmo", 416, _, amtype);
@@ -402,7 +402,7 @@ void Games_OnClientCookiesCached(int client)
 
 void Games_OnPlayerRunCmd(int client, int buttons)
 {
-    if(!IsPlayerAlive(client))
+    if (!IsPlayerAlive(client))
         return;
 
     float CurVelVec[3];
@@ -424,7 +424,7 @@ void Games_OnPlayerRunCmd(int client, int buttons)
 static void Games_DuckSpam(int client)
 {
     // fixes crouch spamming
-    if(GetEntPropFloat(client, Prop_Data, "m_flDuckSpeed") < 7.0)
+    if (GetEntPropFloat(client, Prop_Data, "m_flDuckSpeed") < 7.0)
     {
         SetEntPropFloat(client, Prop_Send, "m_flDuckSpeed", 7.0, 0);
     }
@@ -433,40 +433,40 @@ static void Games_DuckSpam(int client)
 static void Games_ReserveAmmo(int client, int buttons)
 {
     // not in reloading
-    if(!(buttons & IN_RELOAD))
+    if (!(buttons & IN_RELOAD))
         return;
 
     static int nextTime[MAXPLAYERS+1];
 
     int currentTime = GetTime();
 
-    if(currentTime >= nextTime[client])
+    if (currentTime >= nextTime[client])
         return;
 
-    nextTime[client] = currentTime + 30;
+    nextTime[client] = currentTime + 5;
 
     int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
 
-    if(weapon == -1 || !IsValidEdict(weapon))
+    if (weapon == -1 || !IsValidEdict(weapon))
         return;
 
     // get item defindex
     int index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
 
     // ignore knife, grenade and special item
-    if(500 <= index <= 515 || 42 < index < 50 || index == 0)
+    if (500 <= index <= 515 || 42 < index < 50 || index == 0)
         return;
 
     char classname[32];
     GetWeaponClassname(weapon, index, classname, 32);
 
     // ignore taser
-    if(StrContains(classname, "taser", false) != -1)
+    if (StrContains(classname, "taser", false) != -1)
         return;
 
     int amtype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
 
-    if(amtype == -1)
+    if (amtype == -1)
         return;
 
     SetEntProp(client, Prop_Send, "m_iAmmo", 416, _, amtype);
@@ -475,19 +475,19 @@ static void Games_ReserveAmmo(int client, int buttons)
 // code from KZTimer by 1NutWunDeR -> https://github.com/1NutWunDeR/KZTimerOffical
 static void Games_LimitPreSpeed(int client, bool bOnGround, float curVelvec[3])
 {
-    if(!sv_enablebunnyhopping.BoolValue)
+    if (!sv_enablebunnyhopping.BoolValue)
         return;
 
     static bool IsOnGround[MAXPLAYERS+1];
 
-    if(bOnGround)
+    if (bOnGround)
     {
-        if(!IsOnGround[client])
+        if (!IsOnGround[client])
         {
             float speedlimit = mg_bhopspeed.FloatValue;
 
             IsOnGround[client] = true;    
-            if(GetVectorLength(curVelvec) > speedlimit)
+            if (GetVectorLength(curVelvec) > speedlimit)
             {
                 NormalizeVector(curVelvec, curVelvec);
                 ScaleVector(curVelvec, speedlimit);
@@ -503,7 +503,7 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
     
-    if(!ClientValid(client))
+    if (!ClientValid(client))
         return Plugin_Stop;
 
     SetEntProp(client, Prop_Send, "m_iHideHUD",   1<<12);                       // hide radar
@@ -519,15 +519,15 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
     ClearSyncHud(client, t_hHudSync[0]);
 
     // spawn weapon
-    if(mg_spawn_knife.BoolValue  && GetPlayerWeaponSlot(client, 2) == -1)
+    if (mg_spawn_knife.BoolValue  && GetPlayerWeaponSlot(client, 2) == -1)
         GivePlayerItem(client, "weapon_knife");
 
-    if(mg_spawn_pistol.BoolValue && GetPlayerWeaponSlot(client, 1) == -1)
+    if (mg_spawn_pistol.BoolValue && GetPlayerWeaponSlot(client, 1) == -1)
     {
-        if(g_iTeam[client] == 2)
+        if (g_iTeam[client] == 2)
             GivePlayerItem(client, "weapon_glock");
 
-        if(g_iTeam[client] == 3)
+        if (g_iTeam[client] == 3)
             GivePlayerItem(client, "weapon_hkp2000");
     }
 
@@ -537,7 +537,7 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
 void Games_OnRoundStarted()
 {
     // check warmup
-    if(GameRules_GetProp("m_bWarmupPeriod") != 1)
+    if (GameRules_GetProp("m_bWarmupPeriod") == 1)
         return;
 
     // round count
@@ -550,13 +550,13 @@ void Games_OnRoundStarted()
     t_iWallHackCD = RoundToCeil(mg_wallhack_delay.FloatValue);
 
     // init round timer
-    if(t_tRoundTimer != null)
+    if (t_tRoundTimer != null)
         KillTimer(t_tRoundTimer);
     t_tRoundTimer = CreateTimer(1.0, Games_RoundTimer, _, TIMER_REPEAT);
     
     for(int client = 1; client <= MaxClients; ++client)
-        if(ClientValid(client))
-            if(QueryClientConVar(client, "cl_hud_playercount_pos", Games_HudPosition, 0) == QUERYCOOKIE_FAILED)
+        if (ClientValid(client))
+            if (QueryClientConVar(client, "cl_hud_playercount_pos", Games_HudPosition, 0) == QUERYCOOKIE_FAILED)
                 bVACHudPosition[client] = false;
 }
 
@@ -569,7 +569,7 @@ public void Games_HudPosition(QueryCookie cookie, int client, ConVarQueryResult 
 public Action Games_RoundTimer(Handle timer)
 {
     // wallhack timer
-    if(t_iWallHackCD > 0 && --t_iWallHackCD == 0)
+    if (t_iWallHackCD > 0 && --t_iWallHackCD == 0)
     {
         int tt, ct, te;
         GetAlives(tt, te, ct);
@@ -579,14 +579,14 @@ public Action Games_RoundTimer(Handle timer)
         Call_PushCell(te);
         Call_PushCell(ct);
         Call_Finish(block);
-        if(block)
+        if (block)
         {
             t_iWallHackCD = -2;
             return Plugin_Continue;
         }
 
         for(int client = 1; client <= MaxClients; ++client)
-            if(ClientValid(client) && IsPlayerAlive(client))
+            if (ClientValid(client) && IsPlayerAlive(client))
                 SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 9999999.0);
     }
 
@@ -595,7 +595,7 @@ public Action Games_RoundTimer(Handle timer)
 
 void Games_OnRoundEnd()
 {
-    if(t_tRoundTimer != null)
+    if (t_tRoundTimer != null)
         KillTimer(t_tRoundTimer);
     t_tRoundTimer = null;
 
@@ -605,7 +605,7 @@ void Games_OnRoundEnd()
 static void Games_ShowCurrentSpeed(int client, float speed)
 {
     // disabled by client options
-    if(g_kOptions[client][kO_HudSpeed])
+    if (g_kOptions[client][kO_HudSpeed])
         return;
 
     SetHudTextParams(-1.0, 0.785, 0.1, 0, 191, 255, 200, 0, 0.0, 0.0, 0.0);
@@ -614,19 +614,19 @@ static void Games_ShowCurrentSpeed(int client, float speed)
 
 void Games_PlayerHurts(int client, int hitgroup)
 {
-    if(!client || g_kOptions[client][kO_HudHurt])
+    if (!client || g_kOptions[client][kO_HudHurt])
         return;
 
     static float lastDisplay[MAXPLAYERS+1];
 
-    if(hitgroup == 1)
+    if (hitgroup == 1)
     {
         lastDisplay[client] = GetGameTime() + 0.66;
         SetHudTextParams(-1.0, -1.0, 0.66, 255, 0, 0, 128, 0, 0.3, 0.1, 0.3);
     }
     else
     {
-        if(GetGameTime() < lastDisplay[client])
+        if (GetGameTime() < lastDisplay[client])
             return;
 
         SetHudTextParams(-1.0, -1.0, 0.25, 250, 128, 114, 128, 0, 0.125, 0.1, 0.125);
@@ -642,10 +642,10 @@ void Games_OnPlayerBlind(DataPack pack)
     int client = GetClientOfUserId(pack.ReadCell());
     float time = pack.ReadFloat();
     
-    if(!ClientValid(victim) || !ClientValid(client))
+    if (!ClientValid(victim) || !ClientValid(client))
         return;
 
-    if(victim == client)
+    if (victim == client)
     {
         ChatAll("%t", "flashing self", victim);
         SlapPlayer(client, 1, true);
@@ -656,7 +656,7 @@ void Games_OnPlayerBlind(DataPack pack)
     Chat(client, "%T", "flashing notice attacker", client, victim, time);
 
     // Anti Team flash, fucking idiot teammate. just fucking retarded.
-    if(g_iTeam[victim] == g_iTeam[client])
+    if (g_iTeam[victim] == g_iTeam[client])
     {
         SetEntPropFloat(client, Prop_Send, "m_flFlashMaxAlpha", 0.5);
         int damage = RoundToCeil(time * 10);
@@ -670,7 +670,7 @@ void Games_OnPlayerBlind(DataPack pack)
 /*******************************************************/
 int Games_SetSpecHudContent(int client, const char[] content)
 {
-    if(strlen(content) >= 255)
+    if (strlen(content) >= 255)
         return false;
 
     return strcopy(t_szSpecHudContent[client], 256, content);

@@ -148,7 +148,7 @@ public int NativeCall_GetLevel(Handle plugin, int numParams)
 
 public void OnPluginStart()
 {
-    if(GetEngineVersion() != Engine_CSGO)
+    if (GetEngineVersion() != Engine_CSGO)
         SetFailState("This plugin only for CSGO!");
 
     // Forwards
@@ -188,7 +188,7 @@ public void OnPluginStart()
 
     // for noblock
     g_offsetNoBlock = FindSendPropInfo("CBaseEntity", "m_CollisionGroup");
-    if(g_offsetNoBlock == -1)
+    if (g_offsetNoBlock == -1)
         SetFailState("NoBlock offset -> not found.");
 
     LoadTranslations("com.kxnrl.minigames.translations");
@@ -202,7 +202,7 @@ public void OnAllPluginsLoaded()
     g_smxStore = LibraryExists("Store");
     g_smxMapMuisc = LibraryExists("mapmusic");
 
-    if(LibraryExists("updater"))
+    if (LibraryExists("updater"))
     {
         ConVar_Easy_SetInt("sm_updater", 2);
         Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
@@ -222,15 +222,15 @@ public void Updater_OnPluginUpdated()
 
 public void OnLibraryAdded(const char[] name)
 {
-    if(strcmp(name, "A2SFirewall") == 0)
+    if (strcmp(name, "A2SFirewall") == 0)
         g_extA2SFirewall = true;
-    else if(strcmp(name, "GeoIP2") == 0)
+    else if (strcmp(name, "GeoIP2") == 0)
         g_extGeoIP2 = true;
-    else if(strcmp(name, "store") == 0)
+    else if (strcmp(name, "store") == 0)
         g_smxStore = true;
-    else if(strcmp(name, "MapMusic") == 0)
+    else if (strcmp(name, "MapMusic") == 0)
         g_smxMapMuisc = true;
-    else if(strcmp(name, "updater") == 0)
+    else if (strcmp(name, "updater") == 0)
     {
         ConVar_Easy_SetInt("sm_updater", 2);
         Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
@@ -239,29 +239,29 @@ public void OnLibraryAdded(const char[] name)
 
 public void OnLibraryRemoved(const char[] name)
 {
-    if(strcmp(name, "A2SFirewall") == 0)
+    if (strcmp(name, "A2SFirewall") == 0)
         g_extA2SFirewall = false;
-    else if(strcmp(name, "GeoIP2") == 0)
+    else if (strcmp(name, "GeoIP2") == 0)
     {
         g_extGeoIP2 = false;
         LogError("GeoIP2 removed");
     }
-    else if(strcmp(name, "store") == 0)
+    else if (strcmp(name, "store") == 0)
         g_smxStore = false;
-    else if(strcmp(name, "MapMusic") == 0)
+    else if (strcmp(name, "MapMusic") == 0)
         g_smxMapMuisc = false;
 }
 
 static void ConnectToDatabase(int retry)
 {
-    if(g_hMySQL != null)
+    if (g_hMySQL != null)
         return;
 
     char config[16];
-    if(SQL_CheckConfig("minigames")) strcopy(config, 16, "minigames");
-    if(SQL_CheckConfig("kxnrl")) strcopy(config, 16, "kxnrl");
-    if(SQL_CheckConfig("csgo")) strcopy(config, 16, "csgo");
-    if(!config[0]) strcopy(config, 16, "default");
+    if (SQL_CheckConfig("minigames")) strcopy(config, 16, "minigames");
+    if (SQL_CheckConfig("kxnrl")) strcopy(config, 16, "kxnrl");
+    if (SQL_CheckConfig("csgo")) strcopy(config, 16, "csgo");
+    if (!config[0]) strcopy(config, 16, "default");
 
     // connect to database
     Database.Connect(Database_OnConnected, config, retry);
@@ -270,10 +270,10 @@ static void ConnectToDatabase(int retry)
 public void Database_OnConnected(Database db, const char[] error, int retry)
 {
     // Exception
-    if(db == null)
+    if (db == null)
     {
         LogError("Database_OnConnected -> Connect failed -> %s", error);
-        if(++retry <= 10)
+        if (++retry <= 10)
             CreateTimer(3.0, Timer_ReconnectDB, retry);
         else
             SetFailState("connect to database failed! -> %s", error);
@@ -312,7 +312,7 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
 
 public void Database_CreateTable(Database db, DBResultSet results, const char[] error, int step)
 {
-    if(results == null || error[0])
+    if (results == null || error[0])
         SetFailState("Database_CreateTable -> %s -> %d", error, step);
 
     step++;
@@ -385,7 +385,7 @@ public void OnMapStart()
 {
     // we only work on mg_ maps
     GetCurrentMap(g_szMap, 128);
-    if(StrContains(g_szMap, "mg_", false) != 0)
+    if (StrContains(g_szMap, "mg_", false) != 0)
         SetFailState("This plugin only for mg_ (MiniGames/MultiGames) map! -> %s", g_szMap);
 
     // fire to module
@@ -401,15 +401,15 @@ public void OnConfigsExecuted()
     Cvars_OnConfigsExecuted();
 
     // set up warmup timer
-    if(g_tWarmup != null)
+    if (g_tWarmup != null)
         KillTimer(g_tWarmup);
     g_tWarmup = CreateTimer(mp_warmuptime.FloatValue + 0.5, Timer_WarmupEnd);
     
     // check message for A2SFirewall
-    if(!g_extA2SFirewall)
+    if (!g_extA2SFirewall)
     {
         static bool print_a2s = false;
-        if(!print_a2s)
+        if (!print_a2s)
         {
             print_a2s = true;
             LogMessage("A2SFirewall not install! -> For A2S attack protection, please install A2SFirewall.ext! please contact 'https://steamcommunity.com/profiles/76561198048432253' or Download from 'https://build.kxnrl.com/_Raw/A2SFirewall'.");
@@ -417,10 +417,10 @@ public void OnConfigsExecuted()
     }
 
     // check message for MapMusic
-    if(!g_smxMapMuisc)
+    if (!g_smxMapMuisc)
     {
         static bool print_mma = false;
-        if(!print_mma)
+        if (!print_mma)
         {
             print_mma = true;
             LogMessage("MapMusic-API not install -> For map music controller, we recommend that you install this plugin. -> 'https://github.com/Kxnrl/MapMusic-API'");
@@ -428,10 +428,10 @@ public void OnConfigsExecuted()
     }
 
     // check message for GeoIP2
-    if(!g_extGeoIP2)
+    if (!g_extGeoIP2)
     {
         static bool print_geo = false;
-        if(!print_geo)
+        if (!print_geo)
         {
             print_geo = true;
             LogMessage("GeoIP2 not install -> For GeoIP connection message, we recommend that you install this extension. -> 'https://github.com/Kxnrl/GeoIP2'");
@@ -446,7 +446,7 @@ public void OnMapEnd()
     Ranks_OnMapEnd();
 
     // clear timer
-    if(g_tWarmup != null)
+    if (g_tWarmup != null)
         KillTimer(g_tWarmup);
     g_tWarmup = null;
 }
@@ -466,13 +466,13 @@ public void OnClientConnected(int client)
 public void OnClientPutInServer(int client)
 {
     // Block Bot/GOTV
-    if(!ClientValid(client))
+    if (!ClientValid(client))
         return;
 
     // checking cluent
-    if(g_extA2SFirewall)
+    if (g_extA2SFirewall)
     {
-        if(!A2SFirewall_IsClientChecked(client))
+        if (!A2SFirewall_IsClientChecked(client))
         {
             LogError("A2SFirewall -> \"%L\" -> failed to check ticket.");
             KickClient(client, "Something went wrong!\n Please reconnect to server!");
@@ -506,11 +506,11 @@ public void OnClientCookiesCached(int client)
 public void OnClientDisconnect(int client)
 {
     // if client is not fully in-game
-    if(!IsClientInGame(client))
+    if (!IsClientInGame(client))
         return;
 
     // if client is not passed.
-    if(g_extA2SFirewall && !A2SFirewall_IsClientChecked(client))
+    if (g_extA2SFirewall && !A2SFirewall_IsClientChecked(client))
         return;
 
     // fire to module
@@ -524,7 +524,7 @@ public void OnClientDisconnect(int client)
 
 public void Hook_OnPostWeaponEquip(int client, int weapon)
 {
-    if(!IsValidEdict(weapon))
+    if (!IsValidEdict(weapon))
         return;
 
     // we need check weapon when client fully equipped. 1 frame delay.
@@ -537,11 +537,11 @@ public void Hook_OnPostWeaponEquip(int client, int weapon)
 public Action Hook_OnSetTransmit(int entity, int client)
 {
     // Function not enabled.
-    if(!mg_transmitblock.BoolValue)
+    if (!mg_transmitblock.BoolValue)
         return Plugin_Continue;
 
     // Follo client's option
-    if(!g_kOptions[client][kO_Transmit])
+    if (!g_kOptions[client][kO_Transmit])
         return Plugin_Continue;
 
     // Set Transmit
@@ -560,7 +560,7 @@ public Action Timer_WarmupEnd(Handle timer)
 
 public Action Timer_CheckWarmupEnd(Handle timer)
 {
-    if(GameRules_GetProp("m_bWarmupPeriod") != 1)
+    if (GameRules_GetProp("m_bWarmupPeriod") != 1)
         return Plugin_Stop;
 
     // force end warmup
@@ -581,6 +581,8 @@ public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3
     // fire to module
     Games_OnPlayerRunCmd(client, buttons);
     Ranks_OnPlayerRunCmd(client, buttons);
+
+    return Plugin_Continue;
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
@@ -598,7 +600,7 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
 
 public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
-    if(g_tWarmup != null)
+    if (g_tWarmup != null)
         return;
 
     int client = GetClientOfUserId(event.GetInt("userid"));
@@ -613,7 +615,7 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
 
 public void Event_PlayerHurts(Event event, const char[] name, bool dontBroadcast)
 {
-    if(g_tWarmup != null)
+    if (g_tWarmup != null)
         return;
 
     int client = GetClientOfUserId(event.GetInt("userid"));
@@ -696,7 +698,7 @@ public void Event_WinPanel(Event event, const char[] name, bool dontBroadcast)
 public void Event_AnnouncePhaseEnd(Event event, const char[] name, bool dontBroadcast)
 {
     // scoreboard ranking
-    if(StartMessageAll("ServerRankRevealAll") != null)
+    if (StartMessageAll("ServerRankRevealAll") != null)
         EndMessage();
 }
 

@@ -52,19 +52,19 @@ static void Ranks_BuildRankCache()
 
 public void RankCacheCallback(Database db, DBResultSet results, const char[] error, any data)
 {
-    if(results == null || error[0])
+    if (results == null || error[0])
     {
         LogError("RankCacheCallback -> SQL Error: %s", error);
         return;
     }
 
     // has row?
-    if(results.RowCount > 0)
+    if (results.RowCount > 0)
     {
         t_aRankCache.Clear();
         t_aRankCache.PushString("This is First Line in Array"); // array index start from 0.
 
-        if(t_RankMenu != null)
+        if (t_RankMenu != null)
             delete t_RankMenu;
 
         // rank menu.
@@ -84,7 +84,7 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
             Ranks_FilterName(name, 64);
             t_aRankCache.Push(pid);
 
-            if(index > 100)
+            if (index > 100)
                 continue;
 
             iKill = results.FetchInt(2);
@@ -102,7 +102,7 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
 public int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int param2)
 {
     // loading details
-    if(action == MenuAction_Select)
+    if (action == MenuAction_Select)
     {
         char info[32];
         menu.GetItem(param2, info, 32);
@@ -110,17 +110,17 @@ public int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int 
         FormatEx(m_szQuery, 128, "SELECT * FROM `k_minigames` WHERE uid = '%d';", StringToInt(info));
         g_hMySQL.Query(RankDetailsCallback, m_szQuery, GetClientUserId(param1));
     }
-    else if(action == MenuAction_Cancel && param2 == MenuCancel_ExitBack)
+    else if (action == MenuAction_Cancel && param2 == MenuCancel_ExitBack)
         Command_Main(param1, param2);
 }
 
 public void RankDetailsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
-    if(!client)
+    if (!client)
         return;
 
-    if(results == null || error[0])
+    if (results == null || error[0])
     {
         LogError("RankDetailsCallback -> %L -> %s", client, error);
         Chat(client, "%T \x07Code:0x6B", "failed to load rank detail", client);
@@ -128,7 +128,7 @@ public void RankDetailsCallback(Database db, DBResultSet results, const char[] e
         return;
     }
 
-    if(results.RowCount == 0 || !results.FetchRow())
+    if (results.RowCount == 0 || !results.FetchRow())
     {
         Chat(client, "%T \x07Code:0x6A", "failed to load rank detail", client);
         Command_Rank(client, 0);
@@ -193,9 +193,9 @@ void DisplayRankDetails(int client, const char[] username, stats_t data)
 
 public int MenuHandler_RankDetails(Menu menu, MenuAction action, int param1, int param2)
 {
-    if(action == MenuAction_End)
+    if (action == MenuAction_End)
         delete menu;
-    else if(action == MenuAction_Select && param2 == 0)
+    else if (action == MenuAction_Select && param2 == 0)
     {
         t_RankMenu.SetTitle("%T\n ", "top 100 title", param1);
         t_RankMenu.Display(param1, 60);
@@ -204,12 +204,12 @@ public int MenuHandler_RankDetails(Menu menu, MenuAction action, int param1, int
 
 public Action Command_Rank(int client, int args)
 {
-    if(!client)
+    if (!client)
         return Plugin_Handled;
 
     Chat(client, "%T", "chat type stats", client);
 
-    if(t_RankMenu == null)
+    if (t_RankMenu == null)
     {
         Chat(client, "%T", "ranking unavailable", client);
         return Plugin_Handled;
@@ -251,18 +251,18 @@ void Ranks_OnPlayerRunCmd(int client, int buttons)
 
     static bool bLast[MAXPLAYERS+1];
 
-    if(!(buttons & IN_SCORE))
+    if (!(buttons & IN_SCORE))
     {
         bLast[client] = false;
         return;
     }
 
-    if(bLast[client])
+    if (bLast[client])
         return;
 
     bLast[client] = true;
 
-    if(StartMessageOne("ServerRankRevealAll", client) != null)
+    if (StartMessageOne("ServerRankRevealAll", client) != null)
         EndMessage();
 }
 
@@ -272,48 +272,48 @@ void Ranks_OnClientLoaded(int client)
     g_iTeam[client] = GetClientTeam(client);
 
     int rank = t_aRankCache.FindValue(g_iUId[client]);
-    if(rank == -1)
+    if (rank == -1)
         t_iRank[client] = t_aRankCache.Length + 1;
     else
         t_iRank[client] = rank;
 
     int score = Stats_GetTotalScore(client);
 
-    if(score >= 204800)
+    if (score >= 204800)
         t_iCompLevel[client] = 18;
-    else if(score >= 153600)
+    else if (score >= 153600)
         t_iCompLevel[client] = 17;
-    else if(score >= 120000)
+    else if (score >= 120000)
         t_iCompLevel[client] = 16;
-    else if(score >= 86400)
+    else if (score >= 86400)
         t_iCompLevel[client] = 15;
-    else if(score >= 64800)
+    else if (score >= 64800)
         t_iCompLevel[client] = 14;
-    else if(score >= 51200)
+    else if (score >= 51200)
         t_iCompLevel[client] = 13;
-    else if(score >= 38400)
+    else if (score >= 38400)
         t_iCompLevel[client] = 12;
-    else if(score >= 25600)
+    else if (score >= 25600)
         t_iCompLevel[client] = 11;
-    else if(score >= 12800)
+    else if (score >= 12800)
         t_iCompLevel[client] = 10;
-    else if(score >= 6400)
+    else if (score >= 6400)
         t_iCompLevel[client] = 9;
-    else if(score >= 3200)
+    else if (score >= 3200)
         t_iCompLevel[client] = 8;
-    else if(score >= 1600)
+    else if (score >= 1600)
         t_iCompLevel[client] = 7;
-    else if(score >= 800)
+    else if (score >= 800)
         t_iCompLevel[client] = 6;
-    else if(score >= 400)
+    else if (score >= 400)
         t_iCompLevel[client] = 5;
-    else if(score >= 200)
+    else if (score >= 200)
         t_iCompLevel[client] = 4;
-    else if(score >= 100)
+    else if (score >= 100)
         t_iCompLevel[client] = 3;
-    else if(score >= 50)
+    else if (score >= 50)
         t_iCompLevel[client] = 2;
-    else if(score >= 25)
+    else if (score >= 25)
         t_iCompLevel[client] = 1;
 
     Stats_PublicMessage(client);
@@ -334,9 +334,9 @@ void HookScoreboard(bool hook)
     static int  cs_player_manager = -1;
     static bool bHook = false;
     cs_player_manager = FindEntityByClassname(MaxClients+1, "cs_player_manager");
-    if(hook)
+    if (hook)
     {
-        if(cs_player_manager == -1)
+        if (cs_player_manager == -1)
         {
             LogError("HookScoreboard -> %b -> cs_player_manager is not valid.");
             return;
@@ -344,18 +344,18 @@ void HookScoreboard(bool hook)
 
         bHook = SDKHookEx(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
 
-        if(!bHook)
+        if (!bHook)
             LogError("HookScoreboard -> Hook cs_player_manager failed!");
     }
     else
     {
-        if(cs_player_manager == -1)
+        if (cs_player_manager == -1)
         {
             LogError("HookScoreboard -> %b -> cs_player_manager is not valid.");
             return;
         }
 
-        if(bHook)
+        if (bHook)
         {
             SDKUnhook(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
             cs_player_manager = -1;
@@ -366,7 +366,7 @@ void HookScoreboard(bool hook)
 public void Hook_OnThinkPost(int entity)
 {
     static int Offset = -1;
-    if(Offset == -1)
+    if (Offset == -1)
         Offset = FindSendPropInfo("CCSPlayerResource", "m_iCompetitiveRanking");
 
     SetEntDataArray(entity, Offset, t_iCompLevel, MAXPLAYERS+1, _, true);
@@ -382,6 +382,6 @@ static void Ranks_FilterName(char[] buffer, int maxLen)
     ReplaceString(buffer, maxLen, "   ", " ");
     ReplaceString(buffer, maxLen, "  ", " ");
 
-    if(strlen(buffer) > 32)
+    if (strlen(buffer) > 32)
         buffer[32] = '\0';
 }

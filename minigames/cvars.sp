@@ -98,7 +98,7 @@ void Cvars_OnPluginStart()
     mp_join_grace_time.AddChangeHook(Cvars_OnLateSpawnChanged);
     mp_freezetime.AddChangeHook(Cvars_OnLateSpawnChanged);
 
-    if(!DirExists("cfg/sourcemod/map-configs"))
+    if (!DirExists("cfg/sourcemod/map-configs"))
     {
         CreateDirectory("cfg/sourcemod/map-configs", 511);
         LogMessage("Created cfg/sourcemod/map-configs");
@@ -119,6 +119,9 @@ void Cvars_OnPluginStart()
     RegServerCmd("mg_setcvar", Command_SetCvar);
 
     HookEvent("server_cvar", MuteConVarChanged, EventHookMode_Pre);
+
+    // GENERATE CONFIG
+    CreateAllMapConfigs();
 }
 
 public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -131,7 +134,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     mp_t_default_secondary.SetString("", true, false);
     sv_tags.SetString("MG,MiniGames,Shop,Store,Skin,WeaponSkin", true, true);
 
-    if(sv_autobunnyhopping.IntValue == 1)
+    if (sv_autobunnyhopping.IntValue == 1)
     {
         sv_staminamax.SetInt(0, true, false);
         sv_staminajumpcost.SetInt(0, true, false);
@@ -151,10 +154,10 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
 
 public void Cvars_OnLateSpawnChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-    if(convar == mp_freezetime)
+    if (convar == mp_freezetime)
     {
         float newVal = StringToFloat(newValue);
-        if(newVal < 3.0)
+        if (newVal < 3.0)
         {
             newVal = 3.0;
             ConVar_Easy_SetFlo("mp_freezetime", newVal, true, false);
@@ -162,10 +165,10 @@ public void Cvars_OnLateSpawnChanged(ConVar convar, const char[] oldValue, const
 
         ConVar_Easy_SetFlo("mp_join_grace_time", newVal, true, false);
     }
-    else if(convar == mp_join_grace_time)
+    else if (convar == mp_join_grace_time)
     {
         float newVal = StringToFloat(newValue);
-        if(newVal != mp_freezetime.FloatValue)
+        if (newVal != mp_freezetime.FloatValue)
         {
             ConVar_Easy_SetFlo("mp_join_grace_time", mp_freezetime.FloatValue, true, false);
         }
@@ -203,7 +206,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("sv_full_alltalk",                   1, true, false);
     ConVar_Easy_SetInt("sv_talk_enemy_living",              1, true, false);
     ConVar_Easy_SetInt("sv_talk_enemy_dead",                1, true, false);
-    ConVar_Easy_SetInt("sv_clamp_unsafe_velocities",        1, true, false);
+    ConVar_Easy_SetInt("sv_clamp_unsafe_velocities",        0, true, false);
     ConVar_Easy_SetInt("sv_friction",                       5, true, false);
     ConVar_Easy_SetInt("sv_ignoregrenaderadio",             1, true, false);
     ConVar_Easy_SetInt("sv_infinite_ammo",                  0, true, false);
@@ -255,20 +258,54 @@ void Cvars_OnConfigsExecuted()
     Cvars_LoadMapConfigs();
 }
 
+static void CreateAllMapConfigs()
+{
+    DirectoryListing dir = OpenDirectory("maps");
+    if (dir == null)
+    {
+        LogError("CreateAllMapConfigs -> Failed to open maps.");
+        return;
+    }
+
+    FileType type = FileType_Unknown;
+    char map[128], path[256];
+    while(dir.GetNext(map, 128, type))
+    {
+        if (type != FileType_File || StrContains(map, ".bsp", false) == -1)
+            continue;
+
+        int c = FindCharInString(map, '.', true);
+        map[c] = '\0';
+
+        if (!IsMapValid(map))
+        {
+            LogError("CreateAllMapConfigs -> %s is invalid map.", map);
+            continue;
+        }
+
+        FormatEx(path, 128, "cfg/sourcemod/map-configs/%s.cfg", map);
+
+        if (!FileExists(map))
+        {
+            GenerateMapConfigs(map, path);
+            LogMessage("[%s] does not exists, Auto-generated.", path);
+        }
+    }
+    delete dir;
+}
+
 static void Cvars_LoadMapConfigs()
 {
     // load map config
-    char mapconfig[256];
-    GetCurrentMap(mapconfig, 256);
-    LogMessage("Searching %s.cfg", mapconfig);
-    Format(mapconfig, 256, "sourcemod/map-configs/%s.cfg", mapconfig);
+    char map[128], mapconfig[256], path[256];
+    GetCurrentMap(map, 256);
+    LogMessage("Searching %s.cfg", map);
+    FormatEx(mapconfig, 256, "sourcemod/map-configs/%s.cfg", map);
+    FormatEx(path, 256, "cfg/%s", mapconfig);
 
-    char path[256];
-    Format(path, 256, "cfg/%s", mapconfig);
-
-    if(!FileExists(path))
+    if (!FileExists(path))
     {
-        GenerateMapConfigs(path);
+        GenerateMapConfigs(map, path);
         LogMessage("[%s] does not exists, Auto-generated.", mapconfig);
         return;
     }
@@ -277,20 +314,17 @@ static void Cvars_LoadMapConfigs()
     LogMessage("Executed %s", mapconfig);
 }
 
-static void GenerateMapConfigs(const char[] path)
+static void GenerateMapConfigs(const char[] map, const char[] path)
 {
     File file = OpenFile(path, "w+");
 
-    if(file == null)
+    if (file == null)
     {
         LogError("Failed to create [%s]", path);
         return;
     }
 
-    file.WriteLine("// This file was auto-generated by %s (v%s)", PI_NAME, PI_VERSION);
-
-    char map[128];
-    GetCurrentMap(map, 128);
+    file.WriteLine("// This file was auto-generated by %s (v%s) (https://github.com/Kxnrl/MiniGames)", PI_NAME, PI_VERSION);
     file.WriteLine("// ConVars for map \"%s\"", map);
 
     file.WriteLine("");
@@ -397,12 +431,12 @@ static void GenerateMapConfigs(const char[] path)
     file.WriteLine("// VAC WALLHACK timer (Seconds)");
     file.WriteLine("mg_wallhack_delay \"120\"");
 
-    delete file;
+    file.Close();
 }
 
 public Action Command_SetBhopAllow(int args)
 {
-    if(args != 1)
+    if (args != 1)
     {
         LogError("Error trigger command mg_setbhop_allow!");
         return Plugin_Handled;
@@ -410,7 +444,7 @@ public Action Command_SetBhopAllow(int args)
 
     char buffer[16];
     GetCmdArg(1, buffer, 16);
-    if(StringToInt(buffer) == 0 || 
+    if (StringToInt(buffer) == 0 || 
        strcmp(buffer, "false", false) == 0 || 
        strcmp(buffer, "no", false) == 0 ||
        strcmp(buffer, "off", false) == 0)
@@ -419,7 +453,7 @@ public Action Command_SetBhopAllow(int args)
        sv_enablebunnyhopping.SetInt(0, true, true);
        ChatAll("%t", "map config toggle", "bunnyhopping", "color disabled");
     }
-    else if(StringToInt(buffer) == 1 || 
+    else if (StringToInt(buffer) == 1 || 
             strcmp(buffer, "true", false) == 0 || 
             strcmp(buffer, "yes", false) == 0 ||
             strcmp(buffer, "on", false) == 0)
@@ -438,7 +472,7 @@ public Action Command_SetBhopAllow(int args)
 
 public Action Command_SetBhopAuto(int args)
 {
-    if(args != 1)
+    if (args != 1)
     {
         LogError("Error trigger command mg_setbhop_auto!");
         return Plugin_Handled;
@@ -446,7 +480,7 @@ public Action Command_SetBhopAuto(int args)
 
     char buffer[16];
     GetCmdArg(1, buffer, 16);
-    if(StringToInt(buffer) == 0 || 
+    if (StringToInt(buffer) == 0 || 
        strcmp(buffer, "false", false) == 0 || 
        strcmp(buffer, "no", false) == 0 ||
        strcmp(buffer, "off", false) == 0)
@@ -455,7 +489,7 @@ public Action Command_SetBhopAuto(int args)
        sv_autobunnyhopping.SetInt(0, true, true);
        ChatAll("%t", "map config toggle", "autobhop", "color disabled");
     }
-    else if(StringToInt(buffer) == 1 || 
+    else if (StringToInt(buffer) == 1 || 
             strcmp(buffer, "true", false) == 0 || 
             strcmp(buffer, "yes", false) == 0 ||
             strcmp(buffer, "on", false) == 0)
@@ -474,7 +508,7 @@ public Action Command_SetBhopAuto(int args)
 
 public Action Command_SetBhopSpeed(int args)
 {
-    if(args != 1)
+    if (args != 1)
     {
         LogError("Error trigger command mg_setbhop_speed!");
         return Plugin_Handled;
@@ -484,7 +518,7 @@ public Action Command_SetBhopSpeed(int args)
     GetCmdArg(1, buffer, 16);
 
     float speed = StringToFloat(buffer);
-    if(speed > 3500.0 || speed < 200.0)
+    if (speed > 3500.0 || speed < 200.0)
     {
         LogError("Error trigger command mg_setbhop_speed! Wrong speed!");
         return Plugin_Handled;
@@ -500,19 +534,19 @@ public Action Command_SetBhopSpeed(int args)
 
 void Cvars_OnRoundStart()
 {
-    if(t_LastABhop)
+    if (t_LastABhop)
     {
         sv_autobunnyhopping.SetBool(!sv_autobunnyhopping.BoolValue, true, true);
         t_LastABhop = false;
     }
 
-    if(t_LastEBhop)
+    if (t_LastEBhop)
     {
         sv_enablebunnyhopping.SetBool(!sv_enablebunnyhopping.BoolValue, true, true);
         t_LastEBhop = false;
     }
 
-    if(t_LastSpeed > 0.0)
+    if (t_LastSpeed > 0.0)
     {
         mg_bhopspeed.FloatValue = t_LastSpeed;
         t_LastSpeed = -1.0;
@@ -525,7 +559,7 @@ void Cvars_OnRoundStart()
 
 public Action Command_SetCvar(int args)
 {
-    if(args != 2)
+    if (args != 2)
     {
         LogError("Error trigger command mg_setcvar! Wrong args!");
         return Plugin_Handled;
@@ -550,18 +584,19 @@ static void Cvars_CheckWhitelist()
 {
     ArrayList list = new ArrayList(ByteCountToCells(512));
 
-    if(!FileExists("bspconvar_whitelist.txt"))
+    if (!FileExists("bspconvar_whitelist.txt"))
     {
         LogError("Why not has bspconvar_whitelist?");
         Cvars_CreateWhitelist(list);
+        delete list;
         return;
     }
 
     File file = OpenFile("bspconvar_whitelist.txt","r+");
-    if(file == null)
+    if (file == null)
     {
-        delete list;
         LogError("Failed to check bspconvar_whitelist.txt");
+        delete list;
         return;
     }
 
@@ -571,23 +606,23 @@ static void Cvars_CheckWhitelist()
     while(file.ReadLine(files, 512))
     {
         TrimString(files);
-        if(StrContains(files, "\"convars\"") == 0 || StrContains(files, "//") == 0 || strlen(files) < 5)
+        if (StrContains(files, "\"convars\"") == 0 || StrContains(files, "//") == 0 || strlen(files) < 5)
             continue;
 
         mychar = FindCharInString(files, '1', false);
-        if(mychar != -1)
+        if (mychar != -1)
             files[mychar] = '\0';
 
         TrimString(files);
 
         list.PushString(files);
-        if(StrContains(files, "mg_setcvar") != -1)
+        if (StrContains(files, "mg_setcvar") != -1)
             found = true;
     }
 
-    delete file;
+    file.Close();
 
-    if(found)
+    if (found)
     {
         delete list;
         return;
@@ -603,9 +638,8 @@ static void Cvars_CreateWhitelist(ArrayList list)
     LogMessage("bspconvar_whitelist.txt does not exists, Auto-generated.");
 
     File file = OpenFile("bspconvar_whitelist.txt","w");
-    if(file == null)
+    if (file == null)
     {
-        delete list;
         LogError("Failed to generate bspconvar_whitelist.txt");
         return;
     }
@@ -628,5 +662,5 @@ static void Cvars_CreateWhitelist(ArrayList list)
 
     file.WriteLine("}");
 
-    delete file;
+    file.Close();
 }
