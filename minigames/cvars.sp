@@ -87,6 +87,9 @@ void Cvars_OnPluginStart()
     mp_freezetime           = FindConVar("mp_freezetime");
     mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
 
+    phys_pushscale               = FindConVar("phys_pushscale");
+    cs_enable_player_physics_box = FindConVar("cs_enable_player_physics_box");
+
     mp_ct_default_melee.AddChangeHook(Cvars_OnSettingChanged);
     mp_ct_default_primary.AddChangeHook(Cvars_OnSettingChanged);
     mp_ct_default_secondary.AddChangeHook(Cvars_OnSettingChanged);

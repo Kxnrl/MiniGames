@@ -114,32 +114,36 @@ int g_offsetNoBlock = -1;
 char g_szMap[128];
 
 // convars
-ConVar mg_geoiplanguage         = null;
-ConVar mg_transmitblock         = null;
+ConVar mg_geoiplanguage             = null;
+ConVar mg_transmitblock             = null;
 
-ConVar mp_warmuptime            = null;
-ConVar sv_enablebunnyhopping    = null;
-ConVar mp_damage_headshot_only  = null;
+ConVar mp_warmuptime                = null;
+ConVar sv_enablebunnyhopping        = null;
+ConVar mp_damage_headshot_only      = null;
 
-ConVar mg_bhopspeed             = null;
-ConVar mg_restrictawp           = null;
-ConVar mg_slaygaygun            = null;
-ConVar mg_spawn_knife           = null;
-ConVar mg_spawn_pistol          = null;
-ConVar mg_spawn_kevlar          = null;
-ConVar mg_spawn_helmet          = null;
-ConVar mg_randomteam            = null;
-ConVar mg_wallhack_delay        = null;
+ConVar mg_bhopspeed                 = null;
+ConVar mg_restrictawp               = null;
+ConVar mg_slaygaygun                = null;
+ConVar mg_spawn_knife               = null;
+ConVar mg_spawn_pistol              = null;
+ConVar mg_spawn_kevlar              = null;
+ConVar mg_spawn_helmet              = null;
+ConVar mg_randomteam                = null;
+ConVar mg_wallhack_delay            = null;
 
-ConVar mg_bonus_kill_via_gun     = null;
-ConVar mg_bonus_kill_via_gun_hs  = null;
-ConVar mg_bonus_kill_via_knife   = null;
-ConVar mg_bonus_kill_via_taser   = null;
-ConVar mg_bonus_kill_via_inferno = null;
-ConVar mg_bonus_kill_via_grenade = null;
-ConVar mg_bonus_kill_via_dodge   = null;
-ConVar mg_bonus_survival         = null;
-ConVar mg_bonus_assist           = null;
+ConVar mg_bonus_kill_via_gun        = null;
+ConVar mg_bonus_kill_via_gun_hs     = null;
+ConVar mg_bonus_kill_via_knife      = null;
+ConVar mg_bonus_kill_via_taser      = null;
+ConVar mg_bonus_kill_via_inferno    = null;
+ConVar mg_bonus_kill_via_grenade    = null;
+ConVar mg_bonus_kill_via_dodge      = null;
+ConVar mg_bonus_survival            = null;
+ConVar mg_bonus_assist              = null;
+
+ConVar phys_pushscale               = null;
+ConVar cs_enable_player_physics_box = null;
+
 
 // stock functions
 stock void Chat(int client, const char[] buffer, any ...)
