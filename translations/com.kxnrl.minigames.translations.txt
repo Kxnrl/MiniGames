@@ -169,21 +169,21 @@
     "broadcast random team text"
     {
         "#format"   "{1:d}"
-        "en"        "<font color='#0066CC' size='20'>The traitor will appear in</font><font color='#B15700' size='25'>   {1}s   </font>"
-        "chi"       "<font color='#0066CC' size='20'>25仔将于</font><font color='#B15700' size='25'>   {1}s   </font><font color='#0066CC' size='20'>后出现!</font>"
+        "en"        "The traitor will appear in {1}s"
+        "chi"       "25仔将于   {1}s   后出现!"
     }
 
     "self random team text"
     {
         "#format"   "{1:s},{2:T}"
-        "en"        "Randomly team switched\n You are assigned to <font color='#{1}' size='20'>{2}"
-        "chi"       "当前地图已经开启随机组队\n 你已被随机到 <font color='#{1}' size='20'>{2}"
+        "en"        "Randomly team switched\nYou are assigned to {2}"
+        "chi"       "当前地图已经开启随机组队\n你已被随机到 {2}"
     }
     
     "self random not change text"
     {
-        "en"        "<font color='#0066CC' size='28'>Randomly team switched"
-        "chi"       "当前地图已经开启随机组队\n <font color='#0066CC' size='25'>25仔已经出现"
+        "en"        "Randomly team switched"
+        "chi"       "25仔已经出现"
     }
 
     "team ct"
