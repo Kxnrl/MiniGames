@@ -291,7 +291,7 @@ static void CreateAllMapConfigs()
 
         FormatEx(path, 128, "cfg/sourcemod/map-configs/%s.cfg", map);
 
-        if (!FileExists(map))
+        if (!FileExists(path))
         {
             GenerateMapConfigs(map, path);
             LogMessage("[%s] does not exists, Auto-generated.", path);
