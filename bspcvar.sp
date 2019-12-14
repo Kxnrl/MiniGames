@@ -2,6 +2,7 @@
 #pragma newdecls required
 
 #include <sourcemod>
+#include <sdktools>
 #include <dhooks>
 #include <sdkhooks>
 #include <minigames>
@@ -34,7 +35,7 @@ public void OnPluginStart()
     if (offset == -1)
         SetFailState("Failed to get offset of \"AcceptInput\".");
 
-    g_AcceptInput = DHookCreate(offset, HookType_Entity, ReturnType_Bool, ThisPointer_CBaseEntity, Event_AcceptInput);
+    g_AcceptInput = DHookCreate(offset, HookType_Entity, ReturnType_Bool, ThisPointer_CBaseEntity);
     if (g_AcceptInput == null)
         SetFailState("Failed to DHook \"AcceptInput\".");
 
@@ -51,7 +52,7 @@ public void OnPluginStart()
 public void OnEntityCreated(int entity, const char[] classname)
 {
     if (strcmp(classname, "point_servercommand", false) == 0)
-        DHookEntity(g_AcceptInput, false, entity);
+        DHookEntity(g_AcceptInput, false, entity, _, Event_AcceptInput);
 }
 
 public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
