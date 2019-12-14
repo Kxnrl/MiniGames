@@ -414,25 +414,25 @@ static void GenerateMapConfigs(const char[] map, const char[] path)
     file.WriteLine("");
 
     //Taser recharge time
-    file.WriteLine("//电击枪充电时间(秒)");
+    file.WriteLine("// 电击枪充电时间(秒)");
     file.WriteLine("// Determines recharge time for taser (Seconds)");
     file.WriteLine("mp_taser_recharge_time \"15\"");
     file.WriteLine("");
 
     //Restrict AWP
-    file.WriteLine("//禁止使用AWP(1为启用)");
+    file.WriteLine("// 禁止使用AWP(1为启用)");
     file.WriteLine("// Restrict use AWP");
     file.WriteLine("mg_restrictawp \"0\"");
     file.WriteLine("");
 
     //Slay player who uses gaygun
-    file.WriteLine("//处死使用连狙玩家(默认1,1为启用)");
+    file.WriteLine("// 处死使用连狙玩家(默认1,1为启用)");
     file.WriteLine("// Slay player who uses gaygun");
     file.WriteLine("mg_slaygaygun \"1\"");
     file.WriteLine("");
 
     //VAC timer
-    file.WriteLine("//开局多久后透视全体玩家(秒,默认120[范围60~180])");
+    file.WriteLine("// 开局多久后透视全体玩家(秒,默认120[范围60~180])");
     file.WriteLine("// VAC WALLHACK timer (Seconds)");
     file.WriteLine("mg_wallhack_delay \"120\"");
 
