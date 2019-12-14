@@ -2,7 +2,6 @@
 #pragma newdecls required
 
 #include <sourcemod>
-#include <smutils>
 #include <dhooks>
 #include <sdkhooks>
 #include <minigames>
@@ -27,11 +26,6 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
-    SMUtils_InitUserMessage();
-    SMUtils_SetChatPrefix("[\x04地图\x01]");
-    SMUtils_SetChatSpaces("   ");
-    SMUtils_SetChatConSnd(false);
-
     GameData conf = new GameData("sdktools.games\\engine.csgo");
     if (conf == null)
         SetFailState("Failed to load gamedata.");
