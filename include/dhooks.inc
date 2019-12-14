@@ -72,6 +72,14 @@ enum HookType
 	HookType_Raw
 };
 
+enum CallingConvention
+{
+	CallConv_CDECL,
+	CallConv_THISCALL,
+	CallConv_STDCALL,
+	CallConv_FASTCALL,
+};
+
 enum MRESReturn
 {
 	MRES_ChangedHandled = -2,	// Use changed values and return MRES_Handled
@@ -84,8 +92,50 @@ enum MRESReturn
 
 enum DHookPassFlag
 {
-	DHookPass_ByVal = (1<<0),
-	DHookPass_ByRef = (1<<1)
+	DHookPass_ByVal = 		(1<<0),		/**< Passing by value */
+	DHookPass_ByRef = 		(1<<1),		/**< Passing by reference */
+	DHookPass_ODTOR =		(1<<2),		/**< Object has a destructor */
+	DHookPass_OCTOR =		(1<<3),		/**< Object has a constructor */
+	DHookPass_OASSIGNOP	=	(1<<4),		/**< Object has an assignment operator */
+};
+
+enum DHookRegister
+{
+	// Don't change the register and use the default for the calling convention.
+	DHookRegister_Default,
+	
+	// 8-bit general purpose registers
+	DHookRegister_AL,
+	DHookRegister_CL,
+	DHookRegister_DL,
+	DHookRegister_BL,
+	DHookRegister_AH,
+	DHookRegister_CH,
+	DHookRegister_DH,
+	DHookRegister_BH,
+	
+	// 32-bit general purpose registers
+	DHookRegister_EAX,
+	DHookRegister_ECX,
+	DHookRegister_EDX,
+	DHookRegister_EBX,
+	DHookRegister_ESP,
+	DHookRegister_EBP,
+	DHookRegister_ESI,
+	DHookRegister_EDI,
+	
+	// 128-bit XMM registers
+	DHookRegister_XMM0,
+	DHookRegister_XMM1,
+	DHookRegister_XMM2,
+	DHookRegister_XMM3,
+	DHookRegister_XMM4,
+	DHookRegister_XMM5,
+	DHookRegister_XMM6,
+	DHookRegister_XMM7,
+	
+	// 80-bit FPU registers
+	DHookRegister_ST0
 };
 
 typeset ListenCB
@@ -167,59 +217,125 @@ native bool DHookRemoveEntityListener(ListenType type, ListenCB callback);
  * @param hooktype		Type of hook
  * @param returntype	Type type of return
  * @param thistype		Type of this pointer or ignore (ignore can be used if not needed)
- * @param callback		Callback function
+ * @param callback		Optional callback function, if not set here must be set when hooking.
  * 
- * @return Returns setup handle for the hook or INVALID_HANDLE.
+ * @return Returns setup handle for the hook.
+ * @error Failed to create hook setup handle or invalid callback function.
 */
-native Handle DHookCreate(int offset, HookType hooktype, ReturnType returntype, ThisPointerType thistype, DHookCallback callback);
+native Handle DHookCreate(int offset, HookType hooktype, ReturnType returntype, ThisPointerType thistype, DHookCallback callback=INVALID_FUNCTION);
+
+/**
+ * Creates a detour
+ *
+ * @param funcaddr		The address of the function to detour.
+ *						Can be Address_Null if you want to load the address from gamedata using DHookSetFromConf.
+ * @param callConv		Calling convention of the function.
+ * @param returnType	Type of the return value.
+ * @param thisType		Type of this pointer or ignore (ignore can be used if not needed)
+ *
+ * @return				Setup handle for the detour.
+ * @error				Failed to create detour setup handle.
+ */	
+native Handle DHookCreateDetour(Address funcaddr, CallingConvention callConv, ReturnType returntype, ThisPointerType thisType);
+
+/**
+ * Setup a detour or hook for a function as described in a "Functions" section in gamedata.
+ *
+ * @param gameconf		GameConfig handle
+ * @param name			Name of the function in the gamedata to load.
+ *
+ * @return				Setup handle for the detour or INVALID_HANDLE if offset/signature/address wasn't found.
+ * @error				Failed to create detour setup handle, invalid gamedata handle, invalid callback function or failed to find function in gamedata.
+ */
+native Handle DHookCreateFromConf(Handle gameconf, const char[] name);
+
+/**
+ * Load details for a vhook or detour from a gamedata file.
+ *
+ * @param setup			Hook setup handle to set the offset or address on.
+ * @param gameconf		GameConfig handle
+ * @param source		Whether to look in Offsets or Signatures.
+ * @param name			Name of the property to find.
+ *
+ * @return				True on success, false if nothing was found.
+ * @error				Invalid setup or gamedata handle.
+ */
+native bool DHookSetFromConf(Handle setup, Handle gameconf, SDKFuncConfSource source, const char[] name);
+
+/**
+ * Enable the detour of the function described in the hook setup handle.
+ *
+ * @param setup			Hook setup handle
+ * @param post			True to make the hook a post hook. (If you need to change the retunr value or need the return value use a post hook! If you need to change params and return use a pre and post hook!)
+ * @param callback		Callback function
+ *
+ * @return				True if detour was enabled, false otherwise.
+ * @error				Hook handle is not setup for a detour.
+ */
+native bool DHookEnableDetour(Handle setup, bool post, DHookCallback callback);
+
+/**
+ * Disable the detour of the function described in the hook setup handle.
+ *
+ * @param setup			Hook setup handle
+ * @param post			True to disable a post hook.
+ * @param callback		Callback function
+ *
+ * @return				True if detour was disabled, false otherwise.
+ * @error				Hook handle is not setup for a detour or function is not detoured.
+ */
+native bool DHookDisableDetour(Handle setup, bool post, DHookCallback callback);
 
 /* Adds param to a hook setup
  *
- * @param setup			Setup handle to add the param to.
- * @param type			Param type
- * @param size			Used for Objects (not Object ptr) to define the size of the object.
- * @param flag			Used to change the pass type.
+ * @param setup				Setup handle to add the param to.
+ * @param type				Param type
+ * @param size				Used for Objects (not Object ptr) to define the size of the object.
+ * @param flag				Used to change the pass type.
+ * @param custom_register	The register this argument is passed in instead of the stack.
  * 
  * @error	Invalid setup handle or too many params added (request upping the max in thread)
  * @noreturn
 */
-native void DHookAddParam(Handle setup, HookParamType type, int size=-1, DHookPassFlag flag=DHookPass_ByVal);
-//native DHookAddParam(Handle:setup, HookParamType:type);
+native void DHookAddParam(Handle setup, HookParamType type, int size=-1, DHookPassFlag flag=DHookPass_ByVal, DHookRegister custom_register=DHookRegister_Default);
 
 /* Hook entity
  * 
  * @param setup			Setup handle to use to add the hook.
- * @param post			True to make the hook a post hook. (If you need to change the retunr value or need the return value use a post hook! If you need to change params and return use a pre and post hook!)
+ * @param post			True to make the hook a post hook. (If you need to change the return value or need the return value use a post hook! If you need to change params and return use a pre and post hook!)
  * @param entity		Entity index to hook on.
  * @param removalcb		Callback for when the hook is removed (Entity hooks are auto-removed on entity destroyed and will call this callback)
+ * @param callback		Optional callback function, if not set here must be set when creating the hook.
  * 
- * @error Invalid setup handle, invalid entity or invalid hook type.
+ * @error Invalid setup handle, invalid entity, invalid hook type or invalid callback.
  * @return -1 on fail a hookid on success
 */
-native int DHookEntity(Handle setup, bool post, int entity, DHookRemovalCB removalcb=INVALID_FUNCTION);
+native int DHookEntity(Handle setup, bool post, int entity, DHookRemovalCB removalcb=INVALID_FUNCTION, DHookCallback callback=INVALID_FUNCTION);
 
 /* Hook gamerules
  * 
  * @param setup			Setup handle to use to add the hook.
- * @param post			True to make the hook a post hook. (If you need to change the retunr value or need the return value use a post hook! If you need to change params and return use a pre and post hook!)
+ * @param post			True to make the hook a post hook. (If you need to change the return value or need the return value use a post hook! If you need to change params and return use a pre and post hook!)
  * @param removalcb		Callback for when the hook is removed (Game rules hooks are auto-removed on map end and will call this callback)
+ * @param callback		Optional callback function, if not set here must be set when creating the hook.
  * 
- * @error Invalid setup handle, failing to get gamerules pointer or invalid hook type.
+ * @error Invalid setup handle, failing to get gamerules pointer, invalid hook type or invalid callback.
  * @return -1 on fail a hookid on success
 */
-native int DHookGamerules(Handle setup, bool post, DHookRemovalCB removalcb=INVALID_FUNCTION);
+native int DHookGamerules(Handle setup, bool post, DHookRemovalCB removalcb=INVALID_FUNCTION, DHookCallback callback=INVALID_FUNCTION);
 
 /* Hook a raw pointer
  * 
  * @param setup			Setup handle to use to add the hook.
- * @param post			True to make the hook a post hook. (If you need to change the retunr value or need the return value use a post hook! If you need to change params and return use a pre and post hook!)
+ * @param post			True to make the hook a post hook. (If you need to change the return value or need the return value use a post hook! If you need to change params and return use a pre and post hook!)
  * @param addr			This pointer address.
  * @param removalcb		Callback for when the hook is removed (Entity hooks are auto-removed on entity destroyed and will call this callback)
+ * @param callback		Optional callback function, if not set here must be set when creating the hook.
  * 
- * @error Invalid setup handle, invalid address or invalid hook type.
+ * @error Invalid setup handle, invalid address, invalid hook type or invalid callback.
  * @return -1 on fail a hookid on success
 */
-native int DHookRaw(Handle setup, bool post, Address addr, DHookRemovalCB removalcb=INVALID_FUNCTION);
+native int DHookRaw(Handle setup, bool post, Address addr, DHookRemovalCB removalcb=INVALID_FUNCTION, DHookCallback callback=INVALID_FUNCTION);
 
 /* Remove hook by hook id
  * 
@@ -450,11 +566,16 @@ public Extension __ext_dhooks =
 };
 
 #if !defined REQUIRE_EXTENSIONS
-public __ext_dhooks_SetNTVOptional()
+public void __ext_dhooks_SetNTVOptional()
 {
 	MarkNativeAsOptional("DHookAddEntityListener");
 	MarkNativeAsOptional("DHookRemoveEntityListener");
 	MarkNativeAsOptional("DHookCreate");
+	MarkNativeAsOptional("DHookCreateDetour");
+	MarkNativeAsOptional("DHookCreateFromConf");
+	MarkNativeAsOptional("DHookSetFromConf");
+	MarkNativeAsOptional("DHookEnableDetour");
+	MarkNativeAsOptional("DHookDisableDetour");
 	MarkNativeAsOptional("DHookAddParam");
 	MarkNativeAsOptional("DHookEntity");
 	MarkNativeAsOptional("DHookGamerules");
