@@ -200,7 +200,7 @@ public void OnAllPluginsLoaded()
     g_extGeoIP2 = LibraryExists("GeoIP2");
     g_extA2SFirewall = LibraryExists("A2SFirewall");
     g_smxStore = LibraryExists("Store");
-    g_smxMapMuisc = LibraryExists("mapmusic");
+    g_smxMapMuisc = LibraryExists("MapMusic");
 
     if (LibraryExists("updater"))
     {
