@@ -1,6 +1,8 @@
 #pragma semicolon 1
 #pragma newdecls required
 
+#include <sourcemod>
+#include <sdktools>
 #include <minigames>
 #include <dhooks>
 
@@ -33,7 +35,7 @@ public void OnPluginStart()
     if (offset == -1)
         SetFailState("Failed to get offset of \"AcceptInput\".");
 
-    AcceptInput = DHookCreate(offset, HookType_Entity, ReturnType_Bool, ThisPointer_CBaseEntity, Event_AcceptInput);
+    AcceptInput = DHookCreate(offset, HookType_Entity, ReturnType_Bool, ThisPointer_CBaseEntity);
     if (AcceptInput == null)
         SetFailState("Failed to DHook \"AcceptInput\".");
 
@@ -51,7 +53,7 @@ public void OnClientPutInServer(int client)
     if(IsFakeClient(client))
         return;
 
-    g_HookId[client] = DHookEntity(AcceptInput, false, client);
+    g_HookId[client] = DHookEntity(AcceptInput, false, client, _, Event_AcceptInput);
 }
 
 public void OnClientDisconnect(int client)
