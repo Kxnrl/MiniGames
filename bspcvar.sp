@@ -1,9 +1,11 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-#include <minigames>
+#include <sourcemod>
+#include <smutils>
 #include <dhooks>
 #include <sdkhooks>
+#include <minigames>
 
 #define PI_NAME     "MiniGames - BSP Cvars"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
@@ -14,8 +16,22 @@
 Handle g_AcceptInput;
 ArrayList g_CvarList;
 
+public Plugin myinfo = 
+{
+    name        = PI_NAME,
+    author      = PI_AUTHOR,
+    description = PI_DESC,
+    version     = PI_VERSION,
+    url         = PI_URL
+};
+
 public void OnPluginStart()
 {
+    SMUtils_InitUserMessage();
+    SMUtils_SetChatPrefix("[\x04地图\x01]");
+    SMUtils_SetChatSpaces("   ");
+    SMUtils_SetChatConSnd(false);
+
     GameData conf = new GameData("sdktools.games\\engine.csgo");
     if (conf == null)
         SetFailState("Failed to load gamedata.");
@@ -36,11 +52,6 @@ public void OnPluginStart()
 
     g_CvarList = new ArrayList(ByteCountToCells(128));
     InitCvars();
-}
-
-public void OnConVarLocked(ConVar cvar, const char[] nv, const char[] ov)
-{
-    cvar.IntValue = 1;
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
@@ -163,6 +174,6 @@ void InitCvars()
 
     g_CvarList.PushString("sv_hegrenade_damage_multiplier");
     g_CvarList.PushString("sv_hegrenade_radius_multiplier");
-
+    
     g_CvarList.PushString("sv_knife_attack_extend_from_player_aabb");
 }
