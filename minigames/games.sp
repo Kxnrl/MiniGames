@@ -333,7 +333,7 @@ void Games_OnEquipPost(DataPack pack)
     int index = GetEntProp(weapon, Prop_Send, "m_iItemDefinitionIndex");
 
     // ignore knife, grenade and special item
-    if (500 <= index <= 515 || 42 < index < 50 || index == 0)
+    if (500 <= index <= 520 || 42 < index < 50 || index == 0)
         return;
 
     char classname[32];
@@ -372,14 +372,6 @@ void Games_OnEquipPost(DataPack pack)
 
         return;
     }
-
-    // fix ammo */1
-    int amtype = GetEntProp(weapon, Prop_Send, "m_iPrimaryAmmoType");
-
-    if (amtype == -1)
-        return;
-
-    SetEntProp(client, Prop_Send, "m_iAmmo", 416, _, amtype);
 }
 
 void Games_OnClientConnected(int client)

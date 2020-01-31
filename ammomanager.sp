@@ -36,6 +36,9 @@ Handle DHook_GetReserveAmmoMax;
 
 public void OnPluginStart()
 {
+    DHook_GetReserveAmmoMax = DHookCreate(OFFSET_GetReserveAmmoMax, HookType_Entity, ReturnType_Int, ThisPointer_CBaseEntity);
+    DHookAddParam(DHook_GetReserveAmmoMax, HookParamType_Int);
+
     StartPrepSDKCall(SDKCall_Entity);
     if (!PrepSDKCall_SetSignature(SDKLibrary_Server, SIGNATURE_SetReserveAmmoCount, SIGOFFSET_SetReserveAmmoCount))
         SetFailState("PrepSDKCall_SetSignature(SDKLibrary_Server, SIGNATURE, len) failed!");
@@ -52,9 +55,24 @@ public void OnPluginStart()
     PrepSDKCall_SetReturnInfo(SDKType_PlainOldData, SDKPass_ByValue);
     if ((SDKCall_GetMaxClip1 = EndPrepSDKCall()) == null)
         SetFailState("Failed to prepare SDKCall SDKCall_GetMaxClip1.");
+}
 
-    DHook_GetReserveAmmoMax = DHookCreate(OFFSET_GetReserveAmmoMax, HookType_Entity, ReturnType_Int, ThisPointer_CBaseEntity);
-    DHookAddParam(DHook_GetReserveAmmoMax, HookParamType_Int);
+public void OnConfigsExecuted()
+{
+    FindConVar("ammo_338mag_max").SetInt(0);
+    FindConVar("ammo_357sig_max").SetInt(0);
+    FindConVar("ammo_357sig_min_max").SetInt(0);
+    FindConVar("ammo_357sig_p250_max").SetInt(0);
+    FindConVar("ammo_357sig_small_max").SetInt(0);
+    FindConVar("ammo_45acp_max").SetInt(0);
+    FindConVar("ammo_50AE_max").SetInt(0);
+    FindConVar("ammo_556mm_box_max").SetInt(0);
+    FindConVar("ammo_556mm_max").SetInt(0);
+    FindConVar("ammo_556mm_small_max").SetInt(0);
+    FindConVar("ammo_57mm_max").SetInt(0);
+    FindConVar("ammo_762mm_max").SetInt(0);
+    FindConVar("ammo_9mm_max").SetInt(0);
+    FindConVar("ammo_buckshot_max").SetInt(0);
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
@@ -74,12 +92,20 @@ public void OnEntityCreated(int entity, const char[] classname)
 public void Event_WeaponCreated(int entity)
 {
     SDKUnhook(entity, SDKHook_SpawnPost, Event_WeaponCreated);
+
+    if (!IsValidEdict(entity))
+        return;
+
     SDKCall(SDKCall_SetReserveAmmoCount, entity, 1, MAX_RESERVE_AMMO_MAX, true, -1);
 }
 
 public MRESReturn Event_GetReserveAmmoMax(int pThis, Handle hReturn, Handle hParams)
 {
+    if (!IsValidEdict(pThis))
+        return MRES_Ignored;
+
     DHookSetReturn(hReturn, MAX_RESERVE_AMMO_MAX);
+
     return MRES_Supercede;
 }
 
