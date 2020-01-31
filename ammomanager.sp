@@ -55,27 +55,6 @@ public void OnPluginStart()
 
     DHook_GetReserveAmmoMax = DHookCreate(OFFSET_GetReserveAmmoMax, HookType_Entity, ReturnType_Int, ThisPointer_CBaseEntity);
     DHookAddParam(DHook_GetReserveAmmoMax, HookParamType_Int);
-
-    int entity = INVALID_ENT_REFERENCE; char classname[32];
-    while ((entity = FindEntityByClassname(entity, "weapon_*")) != INVALID_ENT_REFERENCE)
-    {
-        GetWeaponClassname(entity, -1, classname, 32);
-        OnEntityCreated(entity, classname);
-    }
-
-    for (int client = 1; client <= MaxClients; client++)
-    {
-        if (IsClientInGame(client))
-            OnClientPutInServer(client);
-    }
-}
-
-public void OnClientPutInServer(int client)
-{
-    if (IsFakeClient(client))
-        return;
-
-    SDKHook(client, SDKHook_SpawnPost, Event_PlayerSpawnPost);
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
@@ -96,21 +75,6 @@ public void Event_WeaponCreated(int entity)
 {
     SDKUnhook(entity, SDKHook_SpawnPost, Event_WeaponCreated);
     SDKCall(SDKCall_SetReserveAmmoCount, entity, 1, MAX_RESERVE_AMMO_MAX, true, -1);
-}
-
-public void Event_PlayerSpawnPost(int client)
-{
-    if (!IsPlayerAlive(client))
-        return;
-
-    for (int i = 0; i < 64; i++)
-    {
-        int weapon = GetEntPropEnt(client, Prop_Send, "m_hMyWeapons", i);
-        if (weapon == -1)
-            break;
-
-        Event_WeaponCreated(weapon);
-    }
 }
 
 public MRESReturn Event_GetReserveAmmoMax(int pThis, Handle hReturn, Handle hParams)
