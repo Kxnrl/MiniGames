@@ -234,19 +234,23 @@ static void Cvars_SetCvarDefault()
 static void Cvars_EnforceOptions()
 {
     // network
-    ConVar_Easy_SetInt("sv_maxrate",        128000, true, false); 
+    ConVar_Easy_SetInt("sv_maxrate",             0, true, false); 
     ConVar_Easy_SetInt("sv_minrate",        128000, true, false); 
     ConVar_Easy_SetInt("sv_minupdaterate",     128, true, false);
     ConVar_Easy_SetInt("sv_mincmdrate",        128, true, false);
 
     // optimized
-    ConVar_Easy_SetInt("net_splitrate",             2, true, false); 
+    ConVar_Easy_SetInt("net_splitrate",             2, true, false);
+    ConVar_Easy_SetInt("sv_parallel_packentities",  1, true, false);
     ConVar_Easy_SetInt("sv_parallel_sendsnapshot",  1, true, false); 
     ConVar_Easy_SetInt("sv_enable_delta_packing",   1, true, false); 
     ConVar_Easy_SetFlo("sv_maxunlag", 0.1, true, false);
 
     // phys
     ConVar_Easy_SetInt("phys_enable_experimental_optimizations", 1, true, false);
+
+    // 
+    ConVar_Easy_SetInt("sv_server_verify_blood_on_player", 0, true, false);
 
     // sv var
     ConVar_Easy_SetInt("sv_alternateticks",         1, true, false);
