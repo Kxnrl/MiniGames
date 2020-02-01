@@ -113,7 +113,7 @@
     "private message line 1"
     {
         "en"    "Welcome to MiniGames Server, Enjoy..."
-        "chi"   "欢迎来到MagicGirl娱乐世界,祝您游戏愉快..."
+        "chi"   "欢迎来到风云社娱乐世界,祝您游戏愉快..."
     }
 
     "private message line 2"
