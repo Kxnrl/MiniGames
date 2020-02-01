@@ -453,6 +453,9 @@ public void OnMapEnd()
 
 public void OnClientConnected(int client)
 {
+    // refresh players
+    g_GamePlayers = GetClientCount(true);
+
     // reset client vars
     g_iUId [client] = 0;
     g_iTeam[client] = 0;
@@ -465,6 +468,9 @@ public void OnClientConnected(int client)
 
 public void OnClientPutInServer(int client)
 {
+    // refresh players
+    g_GamePlayers = GetClientCount(true);
+
     // Block Bot/GOTV
     if (!ClientValid(client))
         return;
@@ -505,8 +511,11 @@ public void OnClientCookiesCached(int client)
 
 public void OnClientDisconnect(int client)
 {
+    // refresh players
+    g_GamePlayers = GetClientCount(true);
+
     // if client is not fully in-game
-    if (!IsClientInGame(client))
+    if (!ClientValid(client))
         return;
 
     // if client is not passed.

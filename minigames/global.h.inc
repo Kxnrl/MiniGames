@@ -110,6 +110,7 @@ int g_iTeam[MAXPLAYERS+1];
 int g_iUId[MAXPLAYERS+1];
 
 int g_offsetNoBlock = -1;
+int g_GamePlayers = 0;
 
 char g_szMap[128];
 
@@ -140,6 +141,7 @@ ConVar mg_bonus_kill_via_grenade    = null;
 ConVar mg_bonus_kill_via_dodge      = null;
 ConVar mg_bonus_survival            = null;
 ConVar mg_bonus_assist              = null;
+ConVar mg_bonus_requires_players    = null;
 
 ConVar phys_pushscale               = null;
 ConVar cs_enable_player_physics_box = null;

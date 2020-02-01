@@ -456,7 +456,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         t_Session[assister].m_iAssists++;
         t_Session[assister].m_iTotalScores++;
         
-        if (g_smxStore && mg_bonus_assist.IntValue > 0)
+        if (g_smxStore && mg_bonus_assist.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
         {
             Store_SetClientCredits(assister, Store_GetClientCredits(assister)+mg_bonus_assist.IntValue, "[MiniGames] - Assist kill");
             Chat(assister, "%T", "store bonus assist", assister, victim, mg_bonus_assist.IntValue);
@@ -473,7 +473,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
     {
         if (IsWeaponKnife(weapon))
         {
-            if (g_smxStore && mg_bonus_kill_via_knife.IntValue > 0)
+            if (g_smxStore && mg_bonus_kill_via_knife.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
             {
                 Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_knife.IntValue, "[MiniGames] - Knife kill");
                 Chat(attacker, "%T", "store bonus knife", attacker, victim, mg_bonus_kill_via_knife.IntValue);
@@ -482,7 +482,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         }
         else
         {
-            if (g_smxStore && mg_bonus_kill_via_gun.IntValue > 0)
+            if (g_smxStore && mg_bonus_kill_via_gun.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
             {
                 Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun.IntValue, "[MiniGames] - normal kill");
                 Chat(attacker, "%T", "store bonus kill", attacker, victim, mg_bonus_kill_via_gun.IntValue);
@@ -494,7 +494,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 
     if (headshot)
     {
-        if (g_smxStore && mg_bonus_kill_via_gun_hs.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_gun_hs.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun_hs.IntValue, "[MiniGames] - Headshot kill");
             Chat(attacker, "%T", "store bonus headshot", attacker, victim, mg_bonus_kill_via_gun_hs.IntValue);
@@ -506,7 +506,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 
     if (IsWeaponKnife(weapon))
     {
-        if (g_smxStore && mg_bonus_kill_via_knife.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_knife.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_knife.IntValue, "[MiniGames] - Knife kill");
             Chat(attacker, "%T", "store bonus knife", attacker, victim, mg_bonus_kill_via_knife.IntValue);
@@ -517,7 +517,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 
     if (IsWeaponDodgeBall(weapon))
     {
-        if (g_smxStore && mg_bonus_kill_via_dodge.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_dodge.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_dodge.IntValue, "[MiniGames] - Dodgeball kill");
             Chat(attacker, "%T", "store bonus dodgeball", attacker, victim, mg_bonus_kill_via_dodge.IntValue);
@@ -527,7 +527,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 
     if (IsWeaponTaser(weapon))
     {
-        if (g_smxStore && mg_bonus_kill_via_taser.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_taser.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_taser.IntValue, "[MiniGames] - Taser kill");
             Chat(attacker, "%T", "store bonus taser", attacker, victim, mg_bonus_kill_via_taser.IntValue);
@@ -538,7 +538,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 
     if (IsWeaponInferno(weapon))
     {
-        if (g_smxStore && mg_bonus_kill_via_inferno.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_inferno.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_inferno.IntValue, "[MiniGames] - Inferno kill");
             Chat(attacker, "%T", "store bonus inferno", attacker, victim, mg_bonus_kill_via_inferno.IntValue);
@@ -549,7 +549,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 
     if (IsWeaponGrenade(weapon))
     {
-        if (g_smxStore && mg_bonus_kill_via_grenade.IntValue > 0)
+        if (g_smxStore && mg_bonus_kill_via_grenade.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
         {
             Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_grenade.IntValue, "[MiniGames] - Grenade kill");
             Chat(attacker, "%T", "store bonus grenade", attacker, victim, mg_bonus_kill_via_grenade.IntValue);
@@ -558,7 +558,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         return;
     }
 
-    if (g_smxStore && mg_bonus_kill_via_gun.IntValue > 0)
+    if (g_smxStore && mg_bonus_kill_via_gun.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
     {
         Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun.IntValue, "[MiniGames] - normal kill");
         Chat(attacker, "%T", "store bonus kill", attacker, victim, mg_bonus_kill_via_gun.IntValue);
@@ -595,7 +595,7 @@ void Stats_OnRoundEnd()
         if (ClientValid(client) && IsPlayerAlive(client))
         {
             t_Session[client].m_iSurvivals++;
-            if (g_smxStore && mg_bonus_survival.IntValue > 0)
+            if (g_smxStore && mg_bonus_survival.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
             {
                 Store_SetClientCredits(client, Store_GetClientCredits(client)+mg_bonus_survival.IntValue, "[MiniGames] - Survival");
                 Chat(client, "%T", "store bonus survival", client, mg_bonus_survival.IntValue);
