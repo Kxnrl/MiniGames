@@ -176,7 +176,7 @@ public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int
                 ResetValue(volume, 100, 0);
                 MapMusic_SetVolume(client, volume);
             }
-            default: Games_SetOptions(client, slot+2);
+            default: Games_SetOptions(client, slot-2);
         }
         Command_Options(client, 0);
     }

@@ -199,7 +199,7 @@ public void OnAllPluginsLoaded()
     // check library
     g_extGeoIP2 = LibraryExists("GeoIP2");
     g_extA2SFirewall = LibraryExists("A2SFirewall");
-    g_smxStore = LibraryExists("Store");
+    g_smxStore = LibraryExists("store");
     g_smxMapMuisc = LibraryExists("MapMusic");
 
     if (LibraryExists("updater"))
