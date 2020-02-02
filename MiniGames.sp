@@ -171,6 +171,10 @@ public void OnPluginStart()
     // team controller
     AddCommandListener(Command_Jointeam, "jointeam");
 
+    // fix HDR/LDR crash.
+    AddCommandListener(Command_MapChange, "changelevel");
+    AddCommandListener(Command_MapChange, "map");
+
     // game events
     HookEventEx("round_prestart",       Event_RoundStart,       EventHookMode_Post);
     HookEventEx("round_freeze_end",     Event_RoundStarted,     EventHookMode_Post);
@@ -717,4 +721,16 @@ public Action CS_OnCSWeaponDrop(int client, int weapon)
     GetWeaponClassname(weapon, -1, classname, 32);
 
     return (strcmp(classname, "weapon_taser") == 0) ? Plugin_Stop : Plugin_Continue;
+}
+
+public Action Command_MapChange(int client, const char[] command, int args)
+{
+    for(int i = 1; i <= MaxClients; i++)
+    {
+        if (!IsClientConnected(i) || IsFakeClient(i))
+            continue;
+
+        ClientCommand(i , "retry");
+    }
+    return Plugin_Continue;
 }
