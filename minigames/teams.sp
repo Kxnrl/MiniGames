@@ -71,9 +71,6 @@ void Teams_OnRoundEnd()
 
 public Action Teams_RandomTeam(Handle timer)
 {
-    if (g_tWarmup != null)
-        return Plugin_Stop;
-
     if (GetTeamClientCount(TEAM_TE) <= 1 && GetTeamClientCount(TEAM_CT) <= 1)
     {
         ChatAll("%t", "cancel random team");

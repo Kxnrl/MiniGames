@@ -233,7 +233,7 @@ void Ranks_OnMapEnd()
     HookScoreboard(false);
 }
 
-void Ranks_OnClientPutInServer(int client)
+void Ranks_OnClientConnected(int client)
 {
     t_iCompLevel[client] = 0;
     t_iRank[client]      = 0;

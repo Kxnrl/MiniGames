@@ -195,6 +195,9 @@ public void OnPluginStart()
     if (g_offsetNoBlock == -1)
         SetFailState("NoBlock offset -> not found.");
 
+    // global tick timer
+    CreateTimer(1.0, Timer_Tick, _, TIMER_REPEAT);
+
     LoadTranslations("com.kxnrl.minigames.translations");
 }
 
@@ -404,11 +407,6 @@ public void OnConfigsExecuted()
     // fire to module
     Cvars_OnConfigsExecuted();
 
-    // set up warmup timer
-    if (g_tWarmup != null)
-        KillTimer(g_tWarmup);
-    g_tWarmup = CreateTimer(mp_warmuptime.FloatValue + 0.5, Timer_WarmupEnd);
-    
     // check message for A2SFirewall
     if (!g_extA2SFirewall)
     {
@@ -448,11 +446,6 @@ public void OnMapEnd()
     // fire to module
     Games_OnMapEnd();
     Ranks_OnMapEnd();
-
-    // clear timer
-    if (g_tWarmup != null)
-        KillTimer(g_tWarmup);
-    g_tWarmup = null;
 }
 
 public void OnClientConnected(int client)
@@ -468,9 +461,10 @@ public void OnClientConnected(int client)
     Games_OnClientConnected(client);
     Stats_OnClientConnected(client);
     Teams_OnClientConnected(client);
+    Ranks_OnClientConnected(client);
 }
 
-public void OnClientPutInServer(int client)
+public void OnClientPostAdminCheck(int client)
 {
     // refresh players
     g_GamePlayers = GetClientCount(true);
@@ -498,8 +492,7 @@ public void OnClientPutInServer(int client)
     }
 
     // fire to module
-    Ranks_OnClientPutInServer(client);
-    Stats_OnClientPutInServer(client);
+    Stats_OnClientPostAdminCheck(client);
 
     // hook this to check weapon
     SDKHookEx(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
@@ -535,6 +528,11 @@ public void OnClientDisconnect(int client)
     SDKUnhook(client, SDKHook_SetTransmit, Hook_OnSetTransmit);
 }
 
+public void  OnClientDisconnect_Post(int client)
+{
+    Stats_OnClientDisconnectPost();
+}
+
 public void Hook_OnPostWeaponEquip(int client, int weapon)
 {
     if (!IsValidEdict(weapon))
@@ -559,27 +557,6 @@ public Action Hook_OnSetTransmit(int entity, int client)
 
     // Set Transmit
     return (g_iTeam[client] == g_iTeam[entity]) ? Plugin_Handled : Plugin_Continue;
-}
-
-public Action Timer_WarmupEnd(Handle timer)
-{
-    g_tWarmup = null;
-    Stats_OnWarmupEnd();
-
-    // custom gamemode maybe cause WARMUPTIME 0:01
-    CreateTimer(5.0, Timer_CheckWarmupEnd, _, TIMER_FLAG_NO_MAPCHANGE);
-    return Plugin_Stop;
-}
-
-public Action Timer_CheckWarmupEnd(Handle timer)
-{
-    if (GameRules_GetProp("m_bWarmupPeriod") != 1)
-        return Plugin_Stop;
-
-    // force end warmup
-    ServerCommand("mp_warmup_end");
-
-    return Plugin_Stop;
 }
 
 public Action Command_BlockRadio(int client, const char[] command, int args)
@@ -613,9 +590,6 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
 
 public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
-    if (g_tWarmup != null)
-        return;
-
     int client = GetClientOfUserId(event.GetInt("userid"));
     int attacker = GetClientOfUserId(event.GetInt("attacker"));
     int assister = GetClientOfUserId(event.GetInt("assister"));
@@ -628,9 +602,6 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
 
 public void Event_PlayerHurts(Event event, const char[] name, bool dontBroadcast)
 {
-    if (g_tWarmup != null)
-        return;
-
     int client = GetClientOfUserId(event.GetInt("userid"));
     int attacker = GetClientOfUserId(event.GetInt("attacker"));
     int damage = event.GetInt("dmg_health");
@@ -732,5 +703,12 @@ public Action Command_MapChange(int client, const char[] command, int args)
 
         ClientCommand(i , "retry");
     }
+    return Plugin_Continue;
+}
+
+public Action Timer_Tick(Handle timer)
+{
+    Stats_CheckStatus();
+
     return Plugin_Continue;
 }

@@ -75,7 +75,6 @@ void Cvars_OnPluginStart()
     mp_t_default_melee      = FindConVar("mp_t_default_melee");
     mp_t_default_primary    = FindConVar("mp_t_default_primary");
     mp_t_default_secondary  = FindConVar("mp_t_default_secondary");
-    mp_warmuptime           = FindConVar("mp_warmuptime");
     sv_tags                 = FindConVar("sv_tags");
     sv_enablebunnyhopping   = FindConVar("sv_enablebunnyhopping");
     sv_autobunnyhopping     = FindConVar("sv_autobunnyhopping");

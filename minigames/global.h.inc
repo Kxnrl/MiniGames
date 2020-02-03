@@ -104,7 +104,6 @@ char g_szTicket[MAXPLAYERS+1][32];
 
 // vars
 Database g_hMySQL  = null;
-Handle   g_tWarmup = null;
 
 int g_iTeam[MAXPLAYERS+1];
 int g_iUId[MAXPLAYERS+1];
@@ -118,7 +117,6 @@ char g_szMap[128];
 ConVar mg_geoiplanguage             = null;
 ConVar mg_transmitblock             = null;
 
-ConVar mp_warmuptime                = null;
 ConVar sv_enablebunnyhopping        = null;
 ConVar mp_damage_headshot_only      = null;
 

@@ -83,10 +83,10 @@ void Stats_OnMapStart()
     t_bEnabled = false;
 }
 
-void Stats_OnWarmupEnd()
+void Stats_CheckStatus()
 {
     // check tracking
-    t_bEnabled = (GetClientCount(true) >= 6 && g_tWarmup == null);
+    t_bEnabled = (GetClientCount(true) >= 6 && GameRules_GetProp("m_bWarmupPeriod") == 0);
 }
 
 void Stats_OnClientConnected(int client)
@@ -101,10 +101,10 @@ void Stats_OnClientConnected(int client)
     t_Session[client].m_iTotalOnline = GetTime();
 }
 
-void Stats_OnClientPutInServer(int client)
+void Stats_OnClientPostAdminCheck(int client)
 {
     // check tracking
-    t_bEnabled = (GetClientCount(true) >= 6 && g_tWarmup == null);
+    Stats_CheckStatus();
 
     // ignore bot and gotv
     if (IsFakeClient(client) || IsClientSourceTV(client))
@@ -116,13 +116,16 @@ void Stats_OnClientPutInServer(int client)
 
 void Stats_OnClientDisconnect(int client)
 {
-    t_bEnabled = (GetClientCount(true) >= 6 && g_tWarmup == null);
-
     if (!IsClientInGame(client))
         return;
 
     Stats_PublicMessage(client, true);
     Stats_SaveClient(client);
+}
+
+void Stats_OnClientDisconnectPost()
+{
+    Stats_CheckStatus();
 }
 
 /*******************************************************/
@@ -131,7 +134,11 @@ void Stats_OnClientDisconnect(int client)
 static void Stats_LoadClient(int client)
 {
     char steamid[32];
-    GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true);
+    if (!GetClientAuthId(client, AuthId_SteamID64, steamid, 32, true))
+    {
+        LogError("Failed to get steamid for %L", client);
+        return;
+    }
 
     char m_szQuery[128];
     FormatEx(m_szQuery, 128, "SELECT * FROM `k_minigames` WHERE `steamid` = '%s';", steamid);
@@ -330,7 +337,7 @@ public Action Stats_ReloadClientData(Handle timer, int userid)
     if (!client)
         return Plugin_Stop;
 
-    Stats_OnClientPutInServer(client);
+    Stats_OnClientPostAdminCheck(client);
 
     return Plugin_Stop;
 }
