@@ -709,6 +709,7 @@ public Action Command_MapChange(int client, const char[] command, int args)
 public Action Timer_Tick(Handle timer)
 {
     Stats_CheckStatus();
+    Games_RanderColor();
 
     return Plugin_Continue;
 }

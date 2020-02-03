@@ -612,6 +612,32 @@ void Games_OnPlayerBlind(DataPack pack)
     }
 }
 
+void Games_RanderColor()
+{
+    for(int client = 1; client <= MaxClients; ++client)
+    if (IsClientInGame(client) && IsPlayerAlive(client))
+    {
+        // render color
+        RenderPlayerColor(client);
+    }
+}
+
+void RenderPlayerColor(int client)
+{
+    if (mg_render_player.BoolValue)
+    {
+        switch (GetClientTeam(client))
+        {
+            case 2: SetEntityRenderColor(client, 255, 0, 0, 255);
+            case 3: SetEntityRenderColor(client, 0, 0, 255, 255);
+        }
+
+        return;
+    }
+
+    SetEntityRenderColor(client, 255, 255, 255, 255);
+}
+
 /*******************************************************/
 /********************** Local API **********************/
 /*******************************************************/

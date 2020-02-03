@@ -144,6 +144,12 @@ public Action Timer_ChangeTeam(Handle timer)
                 CS_SwitchTeam(x, t_iNextTeam[x]);
                 t_iNextTeam[x] = TEAM_US;
                 Text(x, "%T", "self random team text", x, (t_iNextTeam[x] == TEAM_CT) ? "0066CC" : "FF0000", (t_iNextTeam[x] == TEAM_CT) ? "team ct" : "team te", x);
+            
+                if (IsPlayerAlive(x))
+                {
+                    // refreshColor;
+                    RenderPlayerColor(x);
+                }
             }
 
         t_iSwitchCD = -1;
