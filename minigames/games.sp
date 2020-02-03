@@ -624,6 +624,17 @@ void Games_RanderColor()
 
 void RenderPlayerColor(int client)
 {
+    Action res = Plugin_Continue;
+    Call_StartForward(g_fwdOnRenderModelColor);
+    Call_PushCell(client);
+    Call_Finish(res);
+
+    if (res >= Plugin_Handled)
+    {
+        // blocked
+        return;
+    }
+
     if (mg_render_player.BoolValue)
     {
         switch (GetClientTeam(client))
@@ -631,11 +642,12 @@ void RenderPlayerColor(int client)
             case 2: SetEntityRenderColor(client, 255, 0, 0, 255);
             case 3: SetEntityRenderColor(client, 0, 0, 255, 255);
         }
-
-        return;
     }
-
-    SetEntityRenderColor(client, 255, 255, 255, 255);
+    else
+    {
+        // set to full-chain
+        SetEntityRenderColor(client, 255, 255, 255, 255);
+    }
 }
 
 /*******************************************************/

@@ -109,7 +109,19 @@ public Action Teams_RandomTeam(Handle timer)
         int random = RandomInt(0, array_players.Length-1);
         int client = array_players.Get(random);
         array_players.Erase(random);
-        t_iNextTeam[client] = TEAM_TE;
+
+        int teamex = TEAM_TE;
+        if (Call_OnChangeTeam(client, teamex))
+        {
+            t_iNextTeam[client] = teamex;
+            if (teamex == TEAM_CT)
+                counts++;
+        }
+        else
+        {
+            if (g_iTeam[client] == TEAM_CT)
+                counts++;
+        }
     }
 
     delete array_players;
@@ -219,4 +231,28 @@ static int Teams_GetAllowTeam()
 
     // ct side
     return TEAM_CT;
+}
+
+static bool Call_OnChangeTeam(int client, int &team)
+{
+    int local = team;
+    Action res = Plugin_Continue; 
+
+    Call_StartForward(g_fwdOnRandomTeamPlayer);
+    Call_PushCell(client);
+    Call_PushCellRef(local);
+    Call_Finish(res);
+
+    if (res >= Plugin_Handled)
+    {
+        return false;
+    }
+
+    if (res == Plugin_Changed)
+    {
+        team = local;
+        return true;
+    }
+
+    return true;
 }

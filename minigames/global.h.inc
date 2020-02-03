@@ -79,8 +79,10 @@ bool g_extGeoIP2;
 bool g_extA2SFirewall;
 
 // forwards
-Handle g_fwdOnRandomTeam;
-Handle g_fwdOnVacEnabled;
+GlobalForward g_fwdOnRandomTeam;
+GlobalForward g_fwdOnVacEnabled;
+GlobalForward g_fwdOnRandomTeamPlayer;
+GlobalForward g_fwdOnRenderModelColor;
 
 // options
 enum kOptions

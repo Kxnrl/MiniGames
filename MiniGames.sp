@@ -152,8 +152,11 @@ public void OnPluginStart()
         SetFailState("This plugin only for CSGO!");
 
     // Forwards
-    g_fwdOnRandomTeam = CreateGlobalForward("MG_OnRandomTeam", ET_Event, Param_Cell, Param_Cell);
-    g_fwdOnVacEnabled = CreateGlobalForward("MG_OnVacEnabled", ET_Event, Param_Cell, Param_Cell);
+    g_fwdOnRandomTeam = new GlobalForward("MG_OnRandomTeam", ET_Event, Param_Cell, Param_Cell);
+    g_fwdOnVacEnabled = new GlobalForward("MG_OnVacEnabled", ET_Event, Param_Cell, Param_Cell);
+    
+    g_fwdOnRandomTeamPlayer = new GlobalForward("MG_OnRandomTeamPlayer", ET_Hook, Param_Cell, Param_CellByRef);
+    g_fwdOnRenderModelColor = new GlobalForward("MG_OnRenderModelColor", ET_Hook, Param_Cell);
 
     // Database
     ConnectToDatabase(0);
