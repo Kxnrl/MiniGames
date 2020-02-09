@@ -551,7 +551,7 @@ public void Hook_OnPostWeaponEquip(int client, int weapon)
 public Action Hook_OnSetTransmit(int entity, int client)
 {
     // skip self
-    if (entity == client)
+    if (entity == client || !IsPlayerAlive(client))
         return Plugin_Continue;
 
     // Function not enabled.
