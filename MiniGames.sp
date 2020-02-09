@@ -550,6 +550,10 @@ public void Hook_OnPostWeaponEquip(int client, int weapon)
 
 public Action Hook_OnSetTransmit(int entity, int client)
 {
+    // skip self
+    if (entity == client)
+        return Plugin_Continue;
+
     // Function not enabled.
     if (!mg_transmitblock.BoolValue)
         return Plugin_Continue;
