@@ -56,7 +56,9 @@ public Action Command_Stats(int client, int args)
     pack.m_iSurvivals    = t_Session[client].m_iSurvivals    + t_StatsDB[client].m_iSurvivals;
     pack.m_iPlayRounds   = t_Session[client].m_iPlayRounds   + t_StatsDB[client].m_iPlayRounds;
     pack.m_iTotalScores  = t_Session[client].m_iTotalScores  + t_StatsDB[client].m_iTotalScores;
-    pack.m_iTotalOnline  = t_Session[client].m_iTotalOnline  + t_StatsDB[client].m_iTotalOnline;
+
+    // fixes
+    pack.m_iTotalOnline  = GetTime() - t_Session[client].m_iTotalOnline + t_StatsDB[client].m_iTotalOnline;
 
     DisplayRankDetails(client, username, pack);
 
