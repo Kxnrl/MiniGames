@@ -33,6 +33,7 @@
 #include <store>
 #include <mapmusic>
 #include <updater>
+#include <fys.pupd>
 #define REQUIRE_PLUGIN
 
 // extensions
@@ -217,6 +218,11 @@ public void OnAllPluginsLoaded()
         ConVar_Easy_SetInt("sm_updater", 2);
         Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
     }
+}
+
+public void Pupd_OnCheckAllPlugins()
+{
+    Pupd_CheckPlugin(false, "https://build.kxnrl.com/updater/MiniGames/");
 }
 
 public void OnPluginEnd()

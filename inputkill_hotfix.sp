@@ -6,6 +6,10 @@
 #include <minigames>
 #include <dhooks>
 
+#undef REQUIRE_PLUGIN
+#include <fys.pupd>
+#define REQUIRE_PLUGIN
+
 #define PI_NAME     "MiniGames - Input 'Kill' hotfix"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
@@ -46,6 +50,11 @@ public void OnPluginStart()
     DHookAddParam(AcceptInput, HookParamType_CBaseEntity);
     DHookAddParam(AcceptInput, HookParamType_Object, 20);
     DHookAddParam(AcceptInput, HookParamType_Int);
+}
+
+public void Pupd_OnCheckAllPlugins()
+{
+    Pupd_CheckPlugin(false, "https://build.kxnrl.com/updater/MiniGames/");
 }
 
 public void OnClientPutInServer(int client)

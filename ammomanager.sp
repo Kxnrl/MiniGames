@@ -7,6 +7,10 @@
 #include <dhooks>
 #include <minigames>
 
+#undef REQUIRE_PLUGIN
+#include <fys.pupd>
+#define REQUIRE_PLUGIN
+
 #define PI_NAME     "Ammo Manager - Lite for MiniGames"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss + PerfectLaugh"
 #define PI_DESC     "DARLING in the FRANXX"
@@ -55,6 +59,11 @@ public void OnPluginStart()
     PrepSDKCall_SetReturnInfo(SDKType_PlainOldData, SDKPass_ByValue);
     if ((SDKCall_GetMaxClip1 = EndPrepSDKCall()) == null)
         SetFailState("Failed to prepare SDKCall SDKCall_GetMaxClip1.");
+}
+
+public void Pupd_OnCheckAllPlugins()
+{
+    Pupd_CheckPlugin(false, "https://build.kxnrl.com/updater/MiniGames/");
 }
 
 public void OnConfigsExecuted()

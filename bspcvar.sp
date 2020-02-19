@@ -7,6 +7,10 @@
 #include <sdkhooks>
 #include <minigames>
 
+#undef REQUIRE_PLUGIN
+#include <fys.pupd>
+#define REQUIRE_PLUGIN
+
 #define PI_NAME     "MiniGames - BSP Cvars"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
@@ -47,6 +51,11 @@ public void OnPluginStart()
 
     g_CvarList = new ArrayList(ByteCountToCells(128));
     InitCvars();
+}
+
+public void Pupd_OnCheckAllPlugins()
+{
+    Pupd_CheckPlugin(false, "https://build.kxnrl.com/updater/MiniGames/");
 }
 
 public void OnEntityCreated(int entity, const char[] classname)

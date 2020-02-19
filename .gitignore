@@ -78,6 +78,7 @@ include/version_auto.inc
 #include/store.inc
 include/mapmusic.inc
 include/geoip2.inc
+include/fys.pupd.inc
 
 # OSX
 # =========================
