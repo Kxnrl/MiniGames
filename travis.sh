@@ -81,8 +81,8 @@ RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./$LATEST $RSYNC_USER@$
 if [ "$1" = "1.10" ]; then
 echo "Upload RAW rsync ..."
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/MiniGames.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
-RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/bspcvar.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/bspcvar/updater/plugins/
-RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/ammomanager.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/bspcvar/updater/plugins/
+RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/bspcvar.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
+RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/ammomanager.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/inputkill_hotfix.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./translations/com.kxnrl.minigames.translations.txt $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/translations/
 fi
