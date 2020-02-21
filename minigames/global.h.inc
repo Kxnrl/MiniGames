@@ -104,6 +104,8 @@ native void A2SFirewall_GetClientTicket(int client, char[] ticket, int maxLen);
 
 char g_szTicket[MAXPLAYERS+1][32];
 
+int g_iMoveChild[2048];
+
 // vars
 Database g_hMySQL  = null;
 

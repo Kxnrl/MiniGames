@@ -572,6 +572,53 @@ public Action Hook_OnSetTransmit(int entity, int client)
     return (g_iTeam[client] == g_iTeam[entity]) ? Plugin_Handled : Plugin_Continue;
 }
 
+public Action Hook_OnSetTransmitMoveChild(int entity, int client)
+{
+    if (!IsPlayerAlive(client))
+        return Plugin_Continue;
+
+    // Function not enabled.
+    if (!mg_transmitblock.BoolValue)
+        return Plugin_Continue;
+
+    // Follo client's option
+    if (!g_kOptions[client][kO_Transmit])
+        return Plugin_Continue;
+
+    // Set Transmit
+    return (g_iTeam[client] == g_iTeam[g_iMoveChild[entity]]) ? Plugin_Handled : Plugin_Continue;
+}
+
+public void Store_OnHatsCreated(int client, int entity, int slot)
+{
+    g_iMoveChild[entity] = client;
+    SDKHookEx(entity, SDKHook_SetTransmit, Hook_OnSetTransmitMoveChild);
+}
+
+public void Store_OnTrailsCreated(int client, int entity)
+{
+    g_iMoveChild[entity] = client;
+    SDKHookEx(entity, SDKHook_SetTransmit, Hook_OnSetTransmitMoveChild);
+}
+
+public void Store_OnParticlesCreated(int client, int entity)
+{
+    g_iMoveChild[entity] = client;
+    SDKHookEx(entity, SDKHook_SetTransmit, Hook_OnSetTransmitMoveChild);
+}
+
+public void Store_OnNeonCreated(int client, int entity)
+{
+    g_iMoveChild[entity] = client;
+    SDKHookEx(entity, SDKHook_SetTransmit, Hook_OnSetTransmitMoveChild);
+}
+
+public void Store_OnPetsCreated(int client, int entity)
+{
+    g_iMoveChild[entity] = client;
+    SDKHookEx(entity, SDKHook_SetTransmit, Hook_OnSetTransmitMoveChild);
+}
+
 public Action Command_BlockRadio(int client, const char[] command, int args)
 {
     // block radio command
