@@ -225,7 +225,7 @@ static void Cvars_SetCvarDefault()
 
     phys_pushscale.SetInt              (1200, true, true);
     cs_enable_player_physics_box.SetInt(  1, true, true);
-    sv_turbophysics.SetInt(  1, true, true);
+    sv_turbophysics.SetInt(  0, true, true);
     
     sv_autobunnyhopping.SetInt(0, true, false);
 
