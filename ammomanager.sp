@@ -27,8 +27,8 @@ public Plugin myinfo =
 };
 
 // windows only
-#define OFFSET_GetMaxClip1              351
-#define OFFSET_GetReserveAmmoMax        355
+#define OFFSET_GetMaxClip1              352
+#define OFFSET_GetReserveAmmoMax        356
 #define SIGOFFSET_SetReserveAmmoCount   9
 #define SIGNATURE_SetReserveAmmoCount   "\x55\x8B\xEC\x51\x8B\x45\x14\x53\x56"
 
