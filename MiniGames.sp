@@ -180,6 +180,9 @@ public void OnPluginStart()
     AddCommandListener(Command_MapChange, "changelevel");
     AddCommandListener(Command_MapChange, "map");
 
+    // usermessage events
+    HookUserMessage(GetUserMessageId("TextMsg"), Event_TextMsg, true);
+
     // game events
     HookEventEx("round_prestart",       Event_RoundStart,       EventHookMode_Post);
     HookEventEx("round_freeze_end",     Event_RoundStarted,     EventHookMode_Post);
@@ -659,6 +662,67 @@ public Action CH_PassFilter(int client, int target, bool &result)
 
     result = false;
     return Plugin_Handled;
+}
+
+public Action Event_TextMsg(UserMsg msg_id, Protobuf msg, const int[] players, int playersNum, bool reliable, bool init)
+{
+    static char blocks[][] = 
+    {
+        "#Player_Cash_Award_Killed_Enemy",
+        "#Team_Cash_Award_Win_Hostages_Rescue",
+        "#Team_Cash_Award_Win_Defuse_Bomb",
+        "#Team_Cash_Award_Win_Time",
+        "#Team_Cash_Award_Elim_Bomb",
+        "#Team_Cash_Award_Elim_Hostage",
+        "#Team_Cash_Award_T_Win_Bomb",
+        "#Player_Point_Award_Assist_Enemy_Plural",
+        "#Player_Point_Award_Assist_Enemy",
+        "#Player_Point_Award_Killed_Enemy_Plural",
+        "#Player_Point_Award_Killed_Enemy",
+        "#Player_Cash_Award_Kill_Hostage",
+        "#Player_Cash_Award_Damage_Hostage",
+        "#Player_Cash_Award_Get_Killed",
+        "#Player_Cash_Award_Respawn",
+        "#Player_Cash_Award_Interact_Hostage",
+        "#Player_Cash_Award_Killed_Enemy",
+        "#Player_Cash_Award_Rescued_Hostage",
+        "#Player_Cash_Award_Bomb_Defused",
+        "#Player_Cash_Award_Bomb_Planted",
+        "#Player_Cash_Award_Killed_Enemy_Generic",
+        "#Player_Cash_Award_Killed_VIP",
+        "#Player_Cash_Award_Kill_Teammate",
+        "#Team_Cash_Award_Win_Hostage_Rescue",
+        "#Team_Cash_Award_Loser_Bonus",
+        "#Team_Cash_Award_Loser_Zero",
+        "#Team_Cash_Award_Rescued_Hostage",
+        "#Team_Cash_Award_Hostage_Interaction",
+        "#Team_Cash_Award_Hostage_Alive",
+        "#Team_Cash_Award_Planted_Bomb_But_Defused",
+        "#Team_Cash_Award_CT_VIP_Escaped",
+        "#Team_Cash_Award_T_VIP_Killed",
+        "#Team_Cash_Award_no_income",
+        "#Team_Cash_Award_Generic",
+        "#Team_Cash_Award_Custom",
+        "#Team_Cash_Award_no_income_suicide",
+        "#Player_Cash_Award_ExplainSuicide_YouGotCash",
+        "#Player_Cash_Award_ExplainSuicide_TeammateGotCash",
+        "#Player_Cash_Award_ExplainSuicide_EnemyGotCash",
+        "#Player_Cash_Award_ExplainSuicide_Spectators",
+        "#Chat_SavePlayer_Savior",
+        "#Chat_SavePlayer_Saved",
+        "#Chat_SavePlayer_Spectator",
+    };
+
+    char text[64];
+    msg.ReadString("params", text, 64, 0);
+    for (int i = 0; i < sizeof(blocks); i++)
+    if (strcmp(text, blocks[i]) == 0)
+    {
+        // block this
+        return Plugin_Handled;
+    }
+
+    return Plugin_Continue;
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
