@@ -116,7 +116,7 @@ public Action Command_Options(int client, int args)
     
     if (g_smxMapMuisc)
     {
-        FormatEx(line, 32, "%T:  %T", "options mapmusic toggle", client, !MapMusic_GetStatus(client) ? "menu item Off" : "menu item On", client);
+        FormatEx(line, 32, "%T:  %T", "options mapmusic toggle", client, MapMusic_GetStatus(client) ? "menu item Off" : "menu item On", client);
         options.AddItem("yukiim", line);
 
         FormatEx(line, 32, "%T:  %d", "options mapmusic volume", client, MapMusic_GetVolume(client));
