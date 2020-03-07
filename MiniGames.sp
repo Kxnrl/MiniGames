@@ -630,7 +630,7 @@ public Action Command_BlockRadio(int client, const char[] command, int args)
 public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3], float angles[3], int& weapon, int& subtype, int& cmdnum, int& tickcount, int& seed, int mouse[2])
 {
     // fire to module
-    Games_OnPlayerRunCmd(client);
+    Games_OnPlayerRunCmd(client, buttons);
     Ranks_OnPlayerRunCmd(client, buttons);
 
     return Plugin_Continue;

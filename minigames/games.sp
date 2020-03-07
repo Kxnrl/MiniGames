@@ -392,10 +392,13 @@ void Games_OnClientCookiesCached(int client)
     }
 }
 
-void Games_OnPlayerRunCmd(int client)
+void Games_OnPlayerRunCmd(int client, int& buttons)
 {
     if (!IsPlayerAlive(client))
         return;
+
+    // block keybind crouch jump
+    Games_BlockKeybindCJ(client, buttons);
 
     float CurVelVec[3];
     GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
@@ -408,6 +411,27 @@ void Games_OnPlayerRunCmd(int client)
 
     // Duck spaming
     Games_DuckSpam(client);
+}
+
+static void Games_BlockKeybindCJ(int client, int& buttons)
+{
+    if (!mg_block_keybind_cj.BoolValue)
+        return;
+
+    static bool m_bWasDucking[MAXPLAYERS+1], m_bJumping[MAXPLAYERS+1];
+
+    bool newDuck = view_as<bool>((buttons & IN_DUCK));
+    bool newJumping = view_as<bool>((buttons & IN_JUMP));
+    bool newOnGround = view_as<bool>((GetEntityFlags(client) & FL_ONGROUND));
+
+    if (!m_bJumping[client] && !m_bWasDucking[client] && newJumping && newOnGround && newDuck)
+    {
+        buttons &= ~IN_DUCK;
+        Text(client, "Keybind Crouch Jump is not allow.");
+    }
+
+    m_bWasDucking[client] = view_as<bool>((buttons & IN_DUCK));
+    m_bJumping[client] = view_as<bool>((buttons & IN_JUMP));
 }
 
 static void Games_DuckSpam(int client)
