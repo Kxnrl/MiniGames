@@ -180,6 +180,9 @@ public void OnPluginStart()
     AddCommandListener(Command_MapChange, "changelevel");
     AddCommandListener(Command_MapChange, "map");
 
+    // ent_fire global
+    RegAdminCmd("sm_ef", Command_EntFire, ADMFLAG_CONVARS);
+
     // usermessage events
     HookUserMessage(GetUserMessageId("TextMsg"), Event_TextMsg, true);
 
@@ -862,4 +865,37 @@ public Action Timer_Tick(Handle timer)
     Games_RanderColor();
 
     return Plugin_Continue;
+}
+
+public Action Command_EntFire(int client, int args)
+{
+    if (args < 2 || args > 4)
+    {
+        ReplyToCommand(client, "Usage: sm_ef <target> <action> [value] [delay]");
+        return Plugin_Handled;
+    }
+
+    char target[32];
+    GetCmdArg(1, target, 32);
+
+    char action[32];
+    GetCmdArg(2, action, 32);
+
+    char value[32];
+    if (args >= 3)
+    {
+        GetCmdArg(3, value, 32);
+    }
+
+    float delay = 0.0;
+    if (args >= 4)
+    {
+        char buffer[8];
+        GetCmdArg(4, buffer, 8);
+        delay = StringToFloat(buffer);
+    }
+
+    EntFire(target, action, value, delay);
+    ReplyToCommand(client, "EntFire done.");
+    return Plugin_Handled;
 }

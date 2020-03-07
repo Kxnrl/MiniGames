@@ -411,3 +411,29 @@ stock bool ClientValid(int client)
 {
     return (client > 0 && client <= MaxClients && IsClientInGame(client) && !IsFakeClient(client) && !IsClientSourceTV(client));
 }
+
+stock void EntFire(const char[] target, const char[] action, const char[] value, const float delay = 0.0)
+{
+    char buffer[512];
+    FormatEx(buffer, 512, "OnUser1 %s:%s:%s:%.2f:1", target, action, value, delay);
+
+    int dummy = CreateEntityByName("info_target");
+
+    if (dummy == -1)
+    {
+        LogError("Failed to create entity to do ent_fire with [%s].", buffer);
+        return;
+    }
+
+    DispatchSpawn(dummy);
+    ActivateEntity(dummy);
+
+    SetVariantString(buffer);
+    AcceptEntityInput(dummy, "AddOutput");
+
+    SetVariantString("OnUser2 !self:Kill::0.1:1");
+    AcceptEntityInput(dummy, "AddOutput");
+
+    AcceptEntityInput(dummy, "FireUser1");
+    AcceptEntityInput(dummy, "FireUser2");
+}
