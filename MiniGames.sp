@@ -39,6 +39,7 @@
 // extensions
 #undef REQUIRE_EXTENSIONS
 #include <geoip2>  //https://github.com/Kxnrl/GeoIP2
+#include <collisionhook>
 #define REQUIRE_EXTENSIONS
 
 // header
@@ -633,6 +634,31 @@ public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3
     Ranks_OnPlayerRunCmd(client, buttons);
 
     return Plugin_Continue;
+}
+
+public Action CH_PassFilter(int client, int target, bool &result)
+{
+    // validate players
+    if (!(1 <= client <= MaxClients) || !(1 <= target <= MaxClients))
+        return Plugin_Continue;
+
+    if (!mg_collisionhook.BoolValue)
+        return Plugin_Continue;
+
+    // mark local player
+    if (!IsPlayerAlive(client))
+        return Plugin_Continue;
+
+    // mark target player
+    if (!IsClientInGame(client) || !IsPlayerAlive(client))
+        return Plugin_Continue;
+
+    // check team
+    if (g_iTeam[client] != g_iTeam[target])
+        return Plugin_Continue;
+
+    result = false;
+    return Plugin_Handled;
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)

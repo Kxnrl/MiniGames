@@ -120,6 +120,7 @@ char g_szMap[128];
 // convars
 ConVar mg_geoiplanguage             = null;
 ConVar mg_transmitblock             = null;
+ConVar mg_collisionhook             = null;
 
 ConVar sv_enablebunnyhopping        = null;
 ConVar mp_damage_headshot_only      = null;
