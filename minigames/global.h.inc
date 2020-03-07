@@ -150,6 +150,7 @@ ConVar mg_bonus_requires_players    = null;
 
 ConVar phys_pushscale               = null;
 ConVar cs_enable_player_physics_box = null;
+ConVar sv_turbophysics              = null;
 
 
 // stock functions

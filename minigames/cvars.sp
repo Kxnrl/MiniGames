@@ -89,7 +89,6 @@ void Cvars_OnPluginStart()
     mp_join_grace_time      = FindConVar("mp_join_grace_time");
     mp_freezetime           = FindConVar("mp_freezetime");
     mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
-    mp_equipment_reset_rounds = FindConVar("mp_equipment_reset_rounds");
     
     phys_pushscale               = FindConVar("phys_pushscale");
     cs_enable_player_physics_box = FindConVar("cs_enable_player_physics_box");
@@ -227,8 +226,8 @@ static void Cvars_SetCvarDefault()
 
     phys_pushscale.SetInt              (1200, true, true);
     cs_enable_player_physics_box.SetInt(  1, true, true);
-    sv_turbophysics.SetInt(  0, true, true);
-    
+    sv_turbophysics.SetInt             (  0, true, true);
+
     sv_autobunnyhopping.SetInt(0, true, false);
 
     mp_join_grace_time.SetInt(  3, true, false);
