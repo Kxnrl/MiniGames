@@ -768,7 +768,17 @@ public void Event_PlayerHurts(Event event, const char[] name, bool dontBroadcast
 
 public Action Event_PlayerTeams(Event event, const char[] name, bool dontBroadcast)
 {
-    g_iTeam[GetClientOfUserId(event.GetInt("userid"))] = event.GetInt("team");
+    int newteam = event.GetInt("team");
+    int oldteam = event.GetInt("oldteam");
+    int client  = GetClientOfUserId(event.GetInt("userid"));
+    
+    g_iTeam[client] = newteam;
+
+    if (newteam == CS_TEAM_SPECTATOR && oldteam > CS_TEAM_SPECTATOR && IsPlayerAlive(client))
+    {
+        // force suicide
+        ForcePlayerSuicide(client);
+    }
 
     event.BroadcastDisabled = true;
     return Plugin_Changed;
