@@ -89,9 +89,11 @@ void Cvars_OnPluginStart()
     mp_join_grace_time      = FindConVar("mp_join_grace_time");
     mp_freezetime           = FindConVar("mp_freezetime");
     mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
-
+    mp_equipment_reset_rounds = FindConVar("mp_equipment_reset_rounds");
+    
     phys_pushscale               = FindConVar("phys_pushscale");
     cs_enable_player_physics_box = FindConVar("cs_enable_player_physics_box");
+    sv_turbophysics              = FindConVar("sv_turbophysics");
 
     mp_ct_default_melee.AddChangeHook(Cvars_OnSettingChanged);
     mp_ct_default_primary.AddChangeHook(Cvars_OnSettingChanged);
@@ -216,15 +218,17 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("sv_ignoregrenaderadio",             1, true, false);
     ConVar_Easy_SetInt("sv_infinite_ammo",                  0, true, false);
     ConVar_Easy_SetInt("weapon_reticle_knife_show",         1, true, false);
+    ConVar_Easy_SetInt("mp_equipment_reset_rounds",         1, true, false);
 
     sv_staminamax.SetFloat(         100.0, true, false);
     sv_staminajumpcost.SetFloat(     0.10, true, false);
     sv_staminalandcost.SetFloat(     0.05, true, false);
     sv_staminarecoveryrate.SetFloat( 66.0, true, false);
 
-    phys_pushscale.SetInt              (900, true, true);
+    phys_pushscale.SetInt              (1200, true, true);
     cs_enable_player_physics_box.SetInt(  1, true, true);
-
+    sv_turbophysics.SetInt(  0, true, true);
+    
     sv_autobunnyhopping.SetInt(0, true, false);
 
     mp_join_grace_time.SetInt(  3, true, false);
