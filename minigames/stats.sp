@@ -76,7 +76,7 @@ void Stats_OnWinPanel()
 {
     for(int client = 1; client <= MaxClients; ++ client)
         if (ClientValid(client))
-            Stats_OnClientConnected(client);
+            Stats_SaveClient(client);
 }
 
 void Stats_OnMapStart()
