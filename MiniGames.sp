@@ -581,6 +581,10 @@ public Action Hook_OnSetTransmit(int entity, int client)
 
 public Action Hook_OnSetTransmitMoveChild(int entity, int client)
 {
+    // block in demo
+    if (IsClientSourceTV(client))
+        return Plugin_Handled;
+
     if (!IsPlayerAlive(client))
         return Plugin_Continue;
 
