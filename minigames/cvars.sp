@@ -263,6 +263,9 @@ static void Cvars_EnforceOptions()
     ConVar_Easy_SetInt("sv_force_transmit_players", 0, true, false);
     ConVar_Easy_SetInt("sv_force_transmit_ents",    0, true, false);
     ConVar_Easy_SetInt("sv_occlude_players",        0, true, false);
+
+    // store module
+    ConVar_Easy_SetInt("store_thirdperson_enabled", 0, true, false);
 }
 
 void Cvars_OnConfigsExecuted()
