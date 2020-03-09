@@ -28,6 +28,9 @@ static ConVar sv_staminalandcost;
 static ConVar sv_staminarecoveryrate;
 static ConVar sv_autobunnyhopping;
 static ConVar sv_timebetweenducks;
+static ConVar phys_pushscale;
+static ConVar cs_enable_player_physics_box;
+static ConVar sv_turbophysics;
 
 static ConVar mp_join_grace_time;
 static ConVar mp_freezetime;
