@@ -23,6 +23,7 @@ static Handle t_hHudSync[4] = null;
 static Handle t_tRoundTimer = null;
 static float t_fRoundStart = -1.0;
 static int t_iRoundNumber = 0;
+static bool t_bPressed[2048];
 
 static Handle t_kOCookies[kO_MaxOptions];
 
@@ -529,6 +530,10 @@ void Games_OnRoundStarted()
         if (ClientValid(client))
             if (QueryClientConVar(client, "cl_hud_playercount_pos", Games_HudPosition, 0) == QUERYCOOKIE_FAILED)
                 bVACHudPosition[client] = false;
+
+    // clear buttons
+    for(int button = 1; button < 2048; button++)
+        t_bPressed[button] = false;
 }
 
 public void Games_HudPosition(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
@@ -571,6 +576,30 @@ void Games_OnRoundEnd()
     t_tRoundTimer = null;
 
     t_iWallHackCD = -1;
+}
+
+void Games_OnEntityCreated(int entity)
+{
+    if (0 < entity < 2048)
+        t_bPressed[entity] = false;
+}
+
+void Games_OnButtonPressed(int button, int client)
+{
+    if (!mg_button_watcher.BoolValue)
+        return;
+
+    if (!ClientValid(client))
+        return;
+
+    if (t_bPressed[button])
+        return;
+
+    t_bPressed[button] = true;
+
+    char buffer[32];
+    GetEntPropString(button, Prop_Data, "m_iName", buffer, 32);
+    ChatAll("\x0C%N \x05 按下了按钮 \x0B %d\x0A.\x0B%s", client, button, buffer);
 }
 
 static void Games_ShowCurrentSpeed(int client, float speed)

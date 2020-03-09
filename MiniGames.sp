@@ -186,6 +186,9 @@ public void OnPluginStart()
     // usermessage events
     HookUserMessage(GetUserMessageId("TextMsg"), Event_TextMsg, true);
 
+    // entity output
+    HookEntityOutput("func_button", "OnPressed", Event_OnPressed);
+
     // game events
     HookEventEx("round_prestart",       Event_RoundStart,       EventHookMode_Post);
     HookEventEx("round_freeze_end",     Event_RoundStarted,     EventHookMode_Post);
@@ -549,6 +552,11 @@ public void  OnClientDisconnect_Post(int client)
     Stats_OnClientDisconnectPost();
 }
 
+public void OnEntityCreated(int entity, const char[] classname)
+{
+    Games_OnEntityCreated(entity);
+}
+
 public void Hook_OnPostWeaponEquip(int client, int weapon)
 {
     if (!IsValidEdict(weapon))
@@ -730,6 +738,11 @@ public Action Event_TextMsg(UserMsg msg_id, Protobuf msg, const int[] players, i
     }
 
     return Plugin_Continue;
+}
+
+public void Event_OnPressed(const char[] output, int entity, int client, float delay)
+{
+    Games_OnButtonPressed(entity, client);
 }
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
