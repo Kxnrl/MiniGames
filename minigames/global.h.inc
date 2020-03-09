@@ -245,15 +245,24 @@ stock int GetWeaponClassname(int weapon, int index, char[] classname, int maxLen
         case 63 : return strcopy(classname, maxLen, "weapon_cz75a");
         case 64 : return strcopy(classname, maxLen, "weapon_revolver");
         case 500: return strcopy(classname, maxLen, "weapon_bayonet");
+        case 503: return strcopy(classname, maxLen, "weapon_knife_css");
+        case 505: return strcopy(classname, maxlen, "weapon_knife_flip");
         case 506: return strcopy(classname, maxLen, "weapon_knife_gut");
-        case 505: return strcopy(classname, maxLen, "weapon_knife_flip");
-        case 508: return strcopy(classname, maxLen, "weapon_knife_m9_bayonet");
         case 507: return strcopy(classname, maxLen, "weapon_knife_karambit");
+        case 508: return strcopy(classname, maxLen, "weapon_knife_m9_bayonet");
         case 509: return strcopy(classname, maxLen, "weapon_knife_tactical");
-        case 515: return strcopy(classname, maxLen, "weapon_knife_butterfly");
         case 512: return strcopy(classname, maxLen, "weapon_knife_falchion");
-        case 516: return strcopy(classname, maxLen, "weapon_knife_push");
         case 514: return strcopy(classname, maxLen, "weapon_knife_survival_bowie");
+        case 515: return strcopy(classname, maxLen, "weapon_knife_butterfly");   
+        case 516: return strcopy(classname, maxLen, "weapon_knife_push");
+        case 517: return strcopy(classname, maxLen, "weapon_knife_cord");
+        case 518: return strcopy(classname, maxLen, "weapon_knife_canis");
+        case 519: return strcopy(classname, maxLen, "weapon_knife_ursus");
+        case 520: return strcopy(classname, maxLen, "weapon_knife_gypsy_jackknife");
+        case 521: return strcopy(classname, maxLen, "weapon_knife_outdoor");
+        case 522: return strcopy(classname, maxLen, "weapon_knife_stiletto");
+        case 523: return strcopy(classname, maxLen, "weapon_knife_widowmaker");
+        case 525: return strcopy(classname, maxLen, "weapon_knife_skeleton");
     }
 
     return strlen(classname);
