@@ -246,7 +246,7 @@ stock int GetWeaponClassname(int weapon, int index, char[] classname, int maxLen
         case 64 : return strcopy(classname, maxLen, "weapon_revolver");
         case 500: return strcopy(classname, maxLen, "weapon_bayonet");
         case 503: return strcopy(classname, maxLen, "weapon_knife_css");
-        case 505: return strcopy(classname, maxlen, "weapon_knife_flip");
+        case 505: return strcopy(classname, maxLen, "weapon_knife_flip");
         case 506: return strcopy(classname, maxLen, "weapon_knife_gut");
         case 507: return strcopy(classname, maxLen, "weapon_knife_karambit");
         case 508: return strcopy(classname, maxLen, "weapon_knife_m9_bayonet");
