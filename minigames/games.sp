@@ -642,7 +642,7 @@ void Games_OnPlayerBlind(DataPack pack)
     int client = GetClientOfUserId(pack.ReadCell());
     float time = pack.ReadFloat();
     
-    if (!ClientValid(victim) || !ClientValid(client))
+    if (!ClientValid(victim) || !IsPlayerAlive(victim) || !ClientValid(client))
         return;
 
     if (victim == client)
