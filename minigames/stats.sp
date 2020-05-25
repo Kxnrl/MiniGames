@@ -7,7 +7,7 @@
 /*  Description:   MiniGames Game Mod.                            */
 /*                                                                */
 /*                                                                */
-/*  Copyright (C) 2018  Kyle                                      */
+/*  Copyright (C) 2020  Kyle                                      */
 /*  2018/03/05 16:51:01                                           */
 /*                                                                */
 /*  This code is licensed under the GPLv3 License.                */
@@ -20,6 +20,7 @@ static stats_t t_StatsDB[MAXPLAYERS+1];
 
 static bool t_bLoaded[MAXPLAYERS+1];
 static bool t_bEnabled = false;
+static  int t_iRoundCredits[MAXPLAYERS+1];
 
 
 void Stats_OnPluginStart()
@@ -449,6 +450,7 @@ void Stats_OnClientSpawn(int client)
         return;
 
     t_Session[client].m_iPlayRounds++;
+    t_iRoundCredits[client] = 0;
 }
 
 void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, const char[] weapon)
@@ -464,12 +466,8 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
     {
         t_Session[assister].m_iAssists++;
         t_Session[assister].m_iTotalScores++;
-        
-        if (g_smxStore && mg_bonus_assist.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
-        {
-            Store_SetClientCredits(assister, Store_GetClientCredits(assister)+mg_bonus_assist.IntValue, "[MiniGames] - Assist kill");
-            Chat(assister, "%T", "store bonus assist", assister, victim, mg_bonus_assist.IntValue);
-        }
+
+        GiveCredits(assister, mg_bonus_assist.IntValue, "[MiniGames] - Assist kill", "%T", "store bonus assist", assister, victim, mg_bonus_assist.IntValue);
     }
 
     if (attacker == victim || attacker == 0)
@@ -482,96 +480,60 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
     {
         if (IsWeaponKnife(weapon))
         {
-            if (g_smxStore && mg_bonus_kill_via_knife.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
-            {
-                Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_knife.IntValue, "[MiniGames] - Knife kill");
-                Chat(attacker, "%T", "store bonus knife", attacker, victim, mg_bonus_kill_via_knife.IntValue);
-            }
             t_Session[attacker].m_iKnifeKills++;
+            GiveCredits(attacker, mg_bonus_kill_via_knife.IntValue, "[MiniGames] - Knife kill", "%T", "store bonus knife", attacker, victim, mg_bonus_kill_via_knife.IntValue);
         }
         else
         {
-            if (g_smxStore && mg_bonus_kill_via_gun.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
-            {
-                Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun.IntValue, "[MiniGames] - normal kill");
-                Chat(attacker, "%T", "store bonus kill", attacker, victim, mg_bonus_kill_via_gun.IntValue);
-            }
             t_Session[attacker].m_iHeadshots++;
+            GiveCredits(attacker, mg_bonus_kill_via_gun.IntValue, "[MiniGames] - normal kill", "%T", "store bonus kill", attacker, victim, mg_bonus_kill_via_gun.IntValue);
         }
         return;
     }
 
     if (headshot)
     {
-        if (g_smxStore && mg_bonus_kill_via_gun_hs.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
-        {
-            Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun_hs.IntValue, "[MiniGames] - Headshot kill");
-            Chat(attacker, "%T", "store bonus headshot", attacker, victim, mg_bonus_kill_via_gun_hs.IntValue);
-        }
         t_Session[attacker].m_iHeadshots++;
         t_Session[attacker].m_iTotalScores+=2;
+        GiveCredits(attacker, mg_bonus_kill_via_gun_hs.IntValue, "[MiniGames] - Headshot kill", "%T", "store bonus headshot", attacker, victim, mg_bonus_kill_via_gun_hs.IntValue);
         return;
     }
 
     if (IsWeaponKnife(weapon))
     {
-        if (g_smxStore && mg_bonus_kill_via_knife.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
-        {
-            Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_knife.IntValue, "[MiniGames] - Knife kill");
-            Chat(attacker, "%T", "store bonus knife", attacker, victim, mg_bonus_kill_via_knife.IntValue);
-        }
         t_Session[attacker].m_iKnifeKills++;
+        GiveCredits(attacker, mg_bonus_kill_via_knife.IntValue, "[MiniGames] - Knife kill", "%T", "store bonus knife", attacker, victim, mg_bonus_kill_via_knife.IntValue);
         return;
     }
 
     if (IsWeaponDodgeBall(weapon))
     {
-        if (g_smxStore && mg_bonus_kill_via_dodge.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
-        {
-            Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_dodge.IntValue, "[MiniGames] - Dodgeball kill");
-            Chat(attacker, "%T", "store bonus dodgeball", attacker, victim, mg_bonus_kill_via_dodge.IntValue);
-        }
+        GiveCredits(attacker, mg_bonus_kill_via_dodge.IntValue, "[MiniGames] - Dodgeball kill", "%T", "store bonus dodgeball", attacker, victim, mg_bonus_kill_via_dodge.IntValue);
         return;
     }
 
     if (IsWeaponTaser(weapon))
     {
-        if (g_smxStore && mg_bonus_kill_via_taser.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
-        {
-            Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_taser.IntValue, "[MiniGames] - Taser kill");
-            Chat(attacker, "%T", "store bonus taser", attacker, victim, mg_bonus_kill_via_taser.IntValue);
-        }
         t_Session[attacker].m_iTaserKills++;
+        GiveCredits(attacker, mg_bonus_kill_via_taser.IntValue, "[MiniGames] - Taser kill", "%T", "store bonus taser", attacker, victim, mg_bonus_kill_via_taser.IntValue);
         return;
     }
 
     if (IsWeaponInferno(weapon))
     {
-        if (g_smxStore && mg_bonus_kill_via_inferno.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
-        {
-            Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_inferno.IntValue, "[MiniGames] - Inferno kill");
-            Chat(attacker, "%T", "store bonus inferno", attacker, victim, mg_bonus_kill_via_inferno.IntValue);
-        }
         t_Session[attacker].m_iMolotovKills++;
+        GiveCredits(attacker, mg_bonus_kill_via_inferno.IntValue, "[MiniGames] - Inferno kill", "%T", "store bonus inferno", attacker, victim, mg_bonus_kill_via_inferno.IntValue);
         return;
     }
 
     if (IsWeaponGrenade(weapon))
     {
-        if (g_smxStore && mg_bonus_kill_via_grenade.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
-        {
-            Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_grenade.IntValue, "[MiniGames] - Grenade kill");
-            Chat(attacker, "%T", "store bonus grenade", attacker, victim, mg_bonus_kill_via_grenade.IntValue);
-        }
         t_Session[attacker].m_iGrenadeKills++;
+        GiveCredits(attacker, mg_bonus_kill_via_grenade.IntValue, "[MiniGames] - Grenade kill", "%T", "store bonus grenade", attacker, victim, mg_bonus_kill_via_grenade.IntValue);
         return;
     }
 
-    if (g_smxStore && mg_bonus_kill_via_gun.IntValue > 0 && g_GamePlayers >= mg_bonus_requires_players.IntValue)
-    {
-        Store_SetClientCredits(attacker, Store_GetClientCredits(attacker)+mg_bonus_kill_via_gun.IntValue, "[MiniGames] - normal kill");
-        Chat(attacker, "%T", "store bonus kill", attacker, victim, mg_bonus_kill_via_gun.IntValue);
-    }
+    GiveCredits(attacker, mg_bonus_kill_via_gun.IntValue, "[MiniGames] - normal kill", "%T", "store bonus kill", attacker, victim, mg_bonus_kill_via_gun.IntValue);
 }
 
 void Stats_PlayerHurts(int victim, int attacker, int damage, const char[] weapon)
@@ -638,6 +600,19 @@ public void MySQL_VoidQueryCallback(Database db, DBResultSet results, const char
         LogToFileEx(path, "Error: %s", error);
     }
     delete pack;
+}
+
+static void GiveCredits(int client, int credits, const char[] reason, const char[] chat, any ...)
+{
+    if (!g_smxStore || g_GamePlayers < mg_bonus_requires_players.IntValue || credits <= 0 || t_iRoundCredits[client] >= mg_bonus_max_round_credits.IntValue)
+        return;
+
+    t_iRoundCredits[client] += credits;
+    Store_SetClientCredits(client, Store_GetClientCredits(client)+credits, reason);
+
+    char message[256];
+    VFormat(message, 256, chat, 5);
+    Chat(client, message);
 }
 
 /*******************************************************/

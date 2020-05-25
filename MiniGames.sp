@@ -7,7 +7,7 @@
 /*  Description:   MiniGames Game Mod.                            */
 /*                                                                */
 /*                                                                */
-/*  Copyright (C) 2018  Kyle                                      */
+/*  Copyright (C) 2020  Kyle                                      */
 /*  2018/03/02 04:19:06                                           */
 /*                                                                */
 /*  This code is licensed under the GPLv3 License.                */

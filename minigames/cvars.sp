@@ -7,7 +7,7 @@
 /*  Description:   MiniGames Game Mod.                            */
 /*                                                                */
 /*                                                                */
-/*  Copyright (C) 2018  Kyle                                      */
+/*  Copyright (C) 2020  Kyle                                      */
 /*  2018/03/05 16:51:01                                           */
 /*                                                                */
 /*  This code is licensed under the GPLv3 License.                */
@@ -75,6 +75,7 @@ void Cvars_OnPluginStart()
     mg_bonus_survival         = AutoExecConfig_CreateConVar("mg_bonus_survival",           "2", "How many credits to earn when player survive",                            _, true, 0.0, true, 1000.0);
     mg_bonus_assist           = AutoExecConfig_CreateConVar("mg_bonus_assist",             "1", "How many credits to earn when player assist kills",                       _, true, 0.0, true, 1000.0);
     mg_bonus_requires_players = AutoExecConfig_CreateConVar("mg_bonus_requires_players",   "8", "How many player requires to enable bouns",                                _, true, 1.0, true,   64.0);
+    mg_bonus_max_round_credits= AutoExecConfig_CreateConVar("mg_bonus_max_round_credits",  "5", "Max credtis can be earned per round",                                     _, true, 0.0, true, 1000.0);
 
     mp_ct_default_melee     = FindConVar("mp_ct_default_melee");
     mp_ct_default_primary   = FindConVar("mp_ct_default_primary");

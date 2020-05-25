@@ -7,7 +7,7 @@
 /*  Description:   MiniGames Game Mod.                            */
 /*                                                                */
 /*                                                                */
-/*  Copyright (C) 2018  Kyle                                      */
+/*  Copyright (C) 2020  Kyle                                      */
 /*  2018/03/05 16:51:01                                           */
 /*                                                                */
 /*  This code is licensed under the GPLv3 License.                */
@@ -18,7 +18,7 @@
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "1.9." ... MYBUILD
+#define PI_VERSION  "2.0." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
@@ -148,6 +148,7 @@ ConVar mg_bonus_kill_via_dodge      = null;
 ConVar mg_bonus_survival            = null;
 ConVar mg_bonus_assist              = null;
 ConVar mg_bonus_requires_players    = null;
+ConVar mg_bonus_max_round_credits   = null;
 
 
 // stock functions
