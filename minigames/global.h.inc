@@ -137,6 +137,7 @@ ConVar mg_spawn_helmet              = null;
 ConVar mg_randomteam                = null;
 ConVar mg_wallhack_delay            = null;
 ConVar mg_render_player             = null;
+ConVar mg_broadcast_leave           = null;
 
 ConVar mg_bonus_kill_via_gun        = null;
 ConVar mg_bonus_kill_via_gun_hs     = null;

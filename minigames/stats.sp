@@ -122,7 +122,12 @@ void Stats_OnClientDisconnect(int client)
     if (!IsClientInGame(client))
         return;
 
-    Stats_PublicMessage(client, true);
+    if (mg_broadcast_leave.BoolValue)
+    {
+        // disconnect message
+        Stats_PublicMessage(client, true);
+    }
+    
     Stats_SaveClient(client);
 }
 
