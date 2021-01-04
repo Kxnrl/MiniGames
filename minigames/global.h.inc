@@ -30,6 +30,11 @@ public Plugin myinfo =
     url         = PI_URL
 };
 
+#define TEAM_US 0
+#define TEAM_OB 1
+#define TEAM_TE 2
+#define TEAM_CT 3
+
 // enum
 enum struct stats_t
 {
@@ -149,7 +154,7 @@ ConVar mg_bonus_assist              = null;
 ConVar mg_bonus_requires_players    = null;
 ConVar mg_bonus_max_round_credits   = null;
 
-static char g_PlaceHolder[] = "                                                                                                                               ";
+static char g_PlaceHolder[] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 
 // stock functions
 stock bool IsWarmup()
@@ -453,4 +458,17 @@ stock void EntFire(const char[] target, const char[] action, const char[] value,
 
     AcceptEntityInput(dummy, "FireUser1");
     AcceptEntityInput(dummy, "FireUser2");
+}
+
+stock void ValidateTeamPlayers(int &cts, int &tes, int skip = -1)
+{
+    cts = 0, tes = 0;
+    for (int i = 1; i <= MaxClients; i++) if (IsClientInGame(i) && i != skip)
+    {
+        switch (GetClientTeam(i))
+        {
+            case TEAM_CT: cts++;
+            case TEAM_TE: tes++;
+        }
+    }
 }

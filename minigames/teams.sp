@@ -14,17 +14,15 @@
 /*                                                                */
 /******************************************************************/
 
-#define TEAM_US 0
-#define TEAM_OB 1
-#define TEAM_TE 2
-#define TEAM_CT 3
-
 static int t_iSwitchCD = -1;
+static Handle t_SwitchTimer = null;
 
 void Teams_OnMapStart()
 {
     AddToStringTable(FindStringTable("soundprecache"), "*maoling/faceit_match_found_tune.mp3");
     AddFileToDownloadsTable("sound/maoling/faceit_match_found_tune.mp3");
+
+    t_SwitchTimer = null;
 }
 
 void Teams_OnPlayerConnected(int userid)
@@ -38,7 +36,7 @@ public Action Timer_FullConnected(Handle timer, int userid)
     if (!ClientValid(client) || g_iTeam[client] > TEAM_OB)
         return Plugin_Stop;
 
-    int newteam = Teams_GetAllowTeam();
+    int newteam = Teams_GetAllowTeam(client);
     Chat(client, "%T %T", "switch team on full connected", client, newteam == TEAM_CT ? "color team ct" : "color team te", client);
     ChangeClientTeam(client, newteam);
 
@@ -48,6 +46,8 @@ public Action Timer_FullConnected(Handle timer, int userid)
 void Teams_OnRoundStart()
 {
     t_iSwitchCD = -1;
+
+    delete t_SwitchTimer;
 }
 
 void Teams_OnRoundEnd()
@@ -56,20 +56,23 @@ void Teams_OnRoundEnd()
 
     // timer to delay random team
     if (mg_randomteam.BoolValue)
-        CreateTimer(1.5, Teams_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
+        t_SwitchTimer = CreateTimer(1.5, Teams_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Teams_RandomTeam(Handle timer)
 {
-    if (GetTeamClientCount(TEAM_TE) <= 1 && GetTeamClientCount(TEAM_CT) <= 1)
+    int cts, tes;
+    ValidateTeamPlayers(cts, tes);
+    if (cts <= 1 && tes <= 1)
     {
         ChatAll("%t", "cancel random team");
+        t_SwitchTimer = null;
         return Plugin_Stop;
     }
 
     // timer countdown
     t_iSwitchCD = 3;
-    CreateTimer(1.0, Timer_ChangeTeam, _, TIMER_REPEAT);
+    t_SwitchTimer = CreateTimer(1.0, Timer_ChangeTeam, _, TIMER_REPEAT);
     ChatAll("%t", "broadcast random team chat");
     TextAll("%t", "broadcast random team text", t_iSwitchCD);
 
@@ -79,12 +82,16 @@ public Action Teams_RandomTeam(Handle timer)
 public Action Timer_ChangeTeam(Handle timer)
 {
     if (t_iSwitchCD < 0)
+    {
+        t_SwitchTimer = null;
         return Plugin_Stop;
+    }
 
     // countdown
     if (--t_iSwitchCD == 0)
     {
         Teams_ChangeTeam();
+        t_SwitchTimer = null;
         return Plugin_Stop;
     }
 
@@ -108,13 +115,13 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
     // if client join game at the moment.
     if (oldteam <= TEAM_OB)
     {
-        if (newteam == Teams_GetAllowTeam())
+        if (newteam == Teams_GetAllowTeam(client))
         {
             // same ?
             return Plugin_Continue;
         }
 
-        ChangeClientTeam(client, Teams_GetAllowTeam());
+        ChangeClientTeam(client, Teams_GetAllowTeam(client));
         return Plugin_Handled;
     }
 
@@ -130,31 +137,22 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
     }
 
     // force change
-    if (IsPlayerAlive(client) || newteam == TEAM_OB)
-    {
-        ChangeClientTeam(client, newteam);
-        return Plugin_Handled;
-    }
-
+    ChangeClientTeam(client, newteam);
     return Plugin_Handled;
 }
 
-static int Teams_GetAllowTeam()
+static int Teams_GetAllowTeam(int client)
 {
     // allow team.
-    int cts = GetTeamClientCount(TEAM_CT);
-    int tes = GetTeamClientCount(TEAM_TE);
+    int cts, tes;
+    ValidateTeamPlayers(cts, tes, client);
 
     // random t or ct
     if (cts == tes)
         return RandomInt(TEAM_TE, TEAM_CT);
 
-    // force t side
-    if (cts > tes)
-        return TEAM_TE;
-
-    // ct side
-    return TEAM_CT;
+    // force
+    return (cts > tes) ? TEAM_TE : TEAM_CT;
 }
 
 static void Teams_ChangeTeam()
