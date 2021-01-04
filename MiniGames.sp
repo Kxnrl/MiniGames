@@ -80,6 +80,9 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     MarkNativeAsOptional("A2SFirewall_GetClientTicket");
     MarkNativeAsOptional("A2SFirewall_IsClientChecked");
 
+    // Transmit Manager
+    MarkNativeAsOptional("TransmitManager_AddEntityHooks");
+
     // GeoIP2
     MarkNativeAsOptional("GeoIP2_Country");
     MarkNativeAsOptional("GeoIP2_City");
