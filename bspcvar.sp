@@ -14,7 +14,7 @@
 #define PI_NAME     "MiniGames - BSP Cvars"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "1.9." ... MYBUILD
+#define PI_VERSION  "2.1." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 Handle g_AcceptInput;
@@ -140,7 +140,7 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
     int split = ExplodeString(command, " ", values, 4, 32);
     if (split == 2)
     {
-        if (strcmp(values[0], "mp_startmoney") == 0 || strcmp(values[0], "mp_freezetime") == 0 || strcmp(values[0], "mp_flashlight") == 0)
+        if (strcmp(values[0], "mp_startmoney") == 0 || strcmp(values[0], "mp_freezetime") == 0 || strcmp(values[0], "mp_flashlight") == 0 || strcmp(values[0], "host_timescale") == 0)
         {
             DHookSetReturn(hReturn, false);
             return MRES_Supercede;

@@ -18,6 +18,8 @@
 #pragma semicolon 1
 #pragma newdecls required
 
+#include <sourcemod>
+
 // requires
 #include <sdktools>
 #include <sdkhooks>
@@ -30,16 +32,18 @@
 
 // plugin
 #undef REQUIRE_PLUGIN
-#include <store>
-#include <mapmusic>
-#include <updater>
-#include <fys.pupd>
+#include <store>             //https://github.com/Kxnrl/Store
+#include <mapmusic>          //https://github.com/Kxnrl/MapMusic-API
+#include <updater>           //https://forums.alliedmods.net/showthread.php?t=169095
+#include <fys.pupd>          //https://git.kxnrl.com/fys-update-service
 #define REQUIRE_PLUGIN
 
 // extensions
 #undef REQUIRE_EXTENSIONS
-#include <geoip2>  //https://github.com/Kxnrl/GeoIP2
-#include <collisionhook>
+#include <geoip2>            //https://github.com/Kxnrl/GeoIP2
+#include <collisionhook>     //https://bitbucket.org/VoiDeD/collisionhook/downloads
+#include <TransmitManager>   //https://github.com/Kxnrl/sm-ext-TransmitManager
+#include <MovementManager>   //https://github.com/Kxnrl/sm-ext-Movement
 #define REQUIRE_EXTENSIONS
 
 // header
@@ -156,8 +160,7 @@ public void OnPluginStart()
     // Forwards
     g_fwdOnRandomTeam = new GlobalForward("MG_OnRandomTeam", ET_Event, Param_Cell, Param_Cell);
     g_fwdOnVacEnabled = new GlobalForward("MG_OnVacEnabled", ET_Event, Param_Cell, Param_Cell);
-    
-    g_fwdOnRandomTeamPlayer = new GlobalForward("MG_OnRandomTeamPlayer", ET_Hook, Param_Cell, Param_CellByRef);
+
     g_fwdOnRenderModelColor = new GlobalForward("MG_OnRenderModelColor", ET_Hook, Param_Cell);
 
     // Database
@@ -222,6 +225,7 @@ public void OnAllPluginsLoaded()
     g_extA2SFirewall = LibraryExists("A2SFirewall");
     g_smxStore = LibraryExists("store");
     g_smxMapMuisc = LibraryExists("MapMusic");
+    g_extTransmitManager = LibraryExists("TransmitManager");
 
     if (LibraryExists("updater"))
     {
@@ -233,6 +237,7 @@ public void OnAllPluginsLoaded()
 public void Pupd_OnCheckAllPlugins()
 {
     Pupd_CheckPlugin(false, "https://build.kxnrl.com/updater/MiniGames/");
+    Pupd_CheckTranslation("com.kxnrl.minigames.translations.txt", "https://build.kxnrl.com/updater/MiniGames/translation/");
 }
 
 public void OnPluginEnd()
@@ -252,6 +257,8 @@ public void OnLibraryAdded(const char[] name)
         g_extA2SFirewall = true;
     else if (strcmp(name, "GeoIP2") == 0)
         g_extGeoIP2 = true;
+    else if (strcmp(name, "TransmitManager") == 0)
+        g_extTransmitManager = true;
     else if (strcmp(name, "store") == 0)
         g_smxStore = true;
     else if (strcmp(name, "MapMusic") == 0)
@@ -268,10 +275,9 @@ public void OnLibraryRemoved(const char[] name)
     if (strcmp(name, "A2SFirewall") == 0)
         g_extA2SFirewall = false;
     else if (strcmp(name, "GeoIP2") == 0)
-    {
         g_extGeoIP2 = false;
-        LogError("GeoIP2 removed");
-    }
+    else if (strcmp(name, "TransmitManager") == 0)
+        g_extTransmitManager = false;
     else if (strcmp(name, "store") == 0)
         g_smxStore = false;
     else if (strcmp(name, "MapMusic") == 0)
@@ -284,10 +290,10 @@ static void ConnectToDatabase(int retry)
         return;
 
     char config[16];
-    if (SQL_CheckConfig("minigames")) strcopy(config, 16, "minigames");
-    if (SQL_CheckConfig("kxnrl")) strcopy(config, 16, "kxnrl");
-    if (SQL_CheckConfig("csgo")) strcopy(config, 16, "csgo");
-    if (!config[0]) strcopy(config, 16, "default");
+    if      (SQL_CheckConfig("minigames")) strcopy(config, 16, "minigames");
+    else if (SQL_CheckConfig("kxnrl"))     strcopy(config, 16, "kxnrl");
+    else if (SQL_CheckConfig("csgo"))      strcopy(config, 16, "csgo");
+    else                                   strcopy(config, 16, "default");
 
     // connect to database
     Database.Connect(Database_OnConnected, config, retry);
@@ -307,7 +313,8 @@ public void Database_OnConnected(Database db, const char[] error, int retry)
     }
 
     g_hMySQL = db;
-    g_hMySQL.SetCharset("utf8");
+    if (!g_hMySQL.SetCharset("utf8mb4"))
+        LogError("Failed to set mysql charset.");
 
     char m_szQuery[2048];
     FormatEx(m_szQuery, 2048, "CREATE TABLE IF NOT EXISTS `k_minigames` (               \
@@ -437,6 +444,17 @@ public void OnConfigsExecuted()
         }
     }
 
+    // check message for TransmitManager
+    if (!g_extTransmitManager)
+    {
+        static bool print_tm = false;
+        if (!print_tm)
+        {
+            print_tm = true;
+            LogMessage("TransmitManager not install! -> For hide teammate feature, please install TransmitManager.ext! please contact 'https://steamcommunity.com/profiles/76561198048432253' or Download from 'https://github.com/Kxnrl/sm-ext-TransmitManager'.");
+        }
+    }
+
     // check message for MapMusic
     if (!g_smxMapMuisc)
     {
@@ -479,8 +497,22 @@ public void OnClientConnected(int client)
     // fire to module
     Games_OnClientConnected(client);
     Stats_OnClientConnected(client);
-    Teams_OnClientConnected(client);
     Ranks_OnClientConnected(client);
+}
+
+public void OnClientPutInServer(int client)
+{
+    // refresh players
+    g_GamePlayers = GetClientCount(true);
+
+    // hook this to check weapon
+    SDKHook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
+
+    // hook this to fix nade block
+    SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage); 
+
+    // hook this to set transmit
+    TransmitManager_AddEntityHooks(client);
 }
 
 public void OnClientPostAdminCheck(int client)
@@ -512,12 +544,6 @@ public void OnClientPostAdminCheck(int client)
 
     // fire to module
     Stats_OnClientPostAdminCheck(client);
-
-    // hook this to check weapon
-    SDKHookEx(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
-
-    // hook this to set transmit
-    SDKHookEx(client, SDKHook_SetTransmit, Hook_OnSetTransmit);
 }
 
 public void OnClientCookiesCached(int client)
@@ -534,6 +560,9 @@ public void OnClientDisconnect(int client)
     if (!ClientValid(client))
         return;
 
+    // unhook
+    SDKUnhook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
+
     // if client is not passed.
     if (g_extA2SFirewall && !A2SFirewall_IsClientChecked(client))
         return;
@@ -541,10 +570,6 @@ public void OnClientDisconnect(int client)
     // fire to module
     Ranks_OnClientDisconnect(client);
     Stats_OnClientDisconnect(client);
-
-    // unhook
-    SDKUnhook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
-    SDKUnhook(client, SDKHook_SetTransmit, Hook_OnSetTransmit);
 }
 
 public void  OnClientDisconnect_Post(int client)
@@ -569,73 +594,61 @@ public void Hook_OnPostWeaponEquip(int client, int weapon)
     RequestFrame(Games_OnEquipPost, pack);
 }
 
-public Action Hook_OnSetTransmit(int entity, int client)
-{
-    // skip self
-    if (entity == client || !IsPlayerAlive(client))
+public Action Hook_OnTakeDamage(int victim, int& attacker, int& inflictor, float& damage, int& damagetype, int& weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+{ 
+    if (victim < 1 || victim > MaxClients || attacker < 1 || attacker > MaxClients || damage > 1.0 || !IsValidEdict(weapon))
+        return Plugin_Continue; 
+
+    char classname[32];
+    if (!GetEntityClassname(weapon, classname, 32))
         return Plugin_Continue;
 
-    // Function not enabled.
-    if (!mg_transmitblock.BoolValue)
-        return Plugin_Continue;
+    if (StrContains(classname, "smokegrenade") > -1 || StrContains(classname, "decoy") > -1) 
+    {
+        // remove player's speed
+        float vVel[3];
+        GetEntPropVector(victim, Prop_Data, "m_vecVelocity", vVel);
+        float speed = SquareRoot(Pow(vVel[0], 2.0) + Pow(vVel[1], 2.0));
 
-    // Follo client's option
-    if (!g_kOptions[client][kO_Transmit])
-        return Plugin_Continue;
+        if (speed > 18.0)
+        {
+            float mult = speed / 18.0;
 
-    // Set Transmit
-    return (g_iTeam[client] == g_iTeam[entity]) ? Plugin_Handled : Plugin_Continue;
-}
+            vVel[0] /= mult;
+            vVel[1] /= mult;
+            vVel[2] = 0.0;
 
-public Action Hook_OnSetTransmitMoveChild(int entity, int client)
-{
-    // block in demo
-    if (IsClientSourceTV(client))
-        return Plugin_Handled;
+            //TeleportEntity(victim, NULL_VECTOR, NULL_VECTOR, vVel);
+            SetEntPropVector(victim, Prop_Data, "m_vecBaseVelocity", vVel);
+        }
+    }
 
-    if (!IsPlayerAlive(client))
-        return Plugin_Continue;
-
-    // Function not enabled.
-    if (!mg_transmitblock.BoolValue)
-        return Plugin_Continue;
-
-    // Follo client's option
-    if (!g_kOptions[client][kO_Transmit])
-        return Plugin_Continue;
-
-    // Set Transmit
-    return (g_iTeam[client] == g_iTeam[g_iMoveChild[entity]]) ? Plugin_Handled : Plugin_Continue;
-}
+    return Plugin_Continue; 
+} 
 
 public void Store_OnHatsCreated(int client, int entity, int slot)
 {
-    g_iMoveChild[entity] = client;
-    SDKHookEx(entity, SDKHook_SetTransmit, Hook_OnSetTransmitMoveChild);
+    HookTransmit(entity, client);
 }
 
 public void Store_OnTrailsCreated(int client, int entity)
 {
-    g_iMoveChild[entity] = client;
-    SDKHookEx(entity, SDKHook_SetTransmit, Hook_OnSetTransmitMoveChild);
+    HookTransmit(entity, client);
 }
 
 public void Store_OnParticlesCreated(int client, int entity)
 {
-    g_iMoveChild[entity] = client;
-    SDKHookEx(entity, SDKHook_SetTransmit, Hook_OnSetTransmitMoveChild);
+    HookTransmit(entity, client);
 }
 
 public void Store_OnNeonCreated(int client, int entity)
 {
-    g_iMoveChild[entity] = client;
-    SDKHookEx(entity, SDKHook_SetTransmit, Hook_OnSetTransmitMoveChild);
+    HookTransmit(entity, client);
 }
 
 public void Store_OnPetsCreated(int client, int entity)
 {
-    g_iMoveChild[entity] = client;
-    SDKHookEx(entity, SDKHook_SetTransmit, Hook_OnSetTransmitMoveChild);
+    HookTransmit(entity, client);
 }
 
 public Action Command_BlockRadio(int client, const char[] command, int args)
@@ -890,6 +903,7 @@ public Action Timer_Tick(Handle timer)
 {
     Stats_CheckStatus();
     Games_RanderColor();
+    Hooks_UpdateState();
 
     return Plugin_Continue;
 }
@@ -925,4 +939,54 @@ public Action Command_EntFire(int client, int args)
     EntFire(target, action, value, delay);
     ReplyToCommand(client, "EntFire done.");
     return Plugin_Handled;
+}
+
+void HookTransmit(int entity, int client)
+{
+    if (!g_extTransmitManager)
+        return;
+
+    TransmitManager_AddEntityHooks(entity);
+    TransmitManager_SetEntityOwner(entity, client);
+}
+
+void Hooks_UpdateState()
+{
+    if (!g_extTransmitManager)
+        return;
+
+    if (!mg_transmitblock.BoolValue)
+    {
+        for(int i = 1; i <= MaxClients; i++)
+        {
+            if (!IsClientInGame(i) || IsFakeClient(i))
+                continue;
+
+            for (int j = 1; j <= MaxClients; j++) if (IsClientInGame(j) && !IsFakeClient(j))
+            {
+                TransmitManager_SetEntityState(i, j, true);
+            }
+        }
+        return;
+    }
+
+    for(int i = 1; i <= MaxClients; i++)
+    {
+        if (!IsClientInGame(i) || IsFakeClient(i))
+            continue;
+
+        for (int j = 1; j <= MaxClients; j++) if (IsClientInGame(j) && !IsFakeClient(j))
+        {
+            if (!g_kOptions[j][kO_Transmit])
+            {
+                // disabled.
+                TransmitManager_SetEntityState(i, j, true);
+            }
+            else
+            {
+                // check team?
+                TransmitManager_SetEntityState(i, j, g_iTeam[j] != g_iTeam[i]);
+            }
+        }
+    }
 }

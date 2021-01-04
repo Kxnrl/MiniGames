@@ -169,8 +169,8 @@
     "broadcast random team text"
     {
         "#format"   "{1:d}"
-        "en"        "The traitor will appear in {1}s"
-        "chi"       "25仔将于   {1}s   后出现!"
+        "en"        "The traitor will appear in <font color='#ff0000'>{1}s</font>"
+        "chi"       "<font color='#2384ef'>25仔将于 <font color='#ff0000'> {1}s </font> 后出现!"
     }
 
     "self random team text"
@@ -183,7 +183,7 @@
     "self random not change text"
     {
         "en"        "Randomly team switched"
-        "chi"       "25仔已经出现"
+        "chi"       "<font color='#2384ef'>25仔已经出现</font>"
     }
 
     "team ct"
@@ -435,13 +435,13 @@
     "menu item Off"
     {
         "en"        "Disabled"
-        "chi"       "屏蔽"
+        "chi"       "关"
     }
     
     "menu item On"
     {
         "en"        "Enabled"
-        "chi"       "显示"
+        "chi"       "开"
     }
     
     "options mapmusic toggle"

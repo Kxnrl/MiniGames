@@ -89,7 +89,7 @@ void Stats_OnMapStart()
 void Stats_CheckStatus()
 {
     // check tracking
-    t_bEnabled = (GetClientCount(true) >= 6 && GameRules_GetProp("m_bWarmupPeriod") == 0);
+    t_bEnabled = (GetClientCount(true) >= 6 && !IsWarmup());
 }
 
 void Stats_OnClientConnected(int client)

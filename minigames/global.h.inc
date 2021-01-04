@@ -18,7 +18,7 @@
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "2.0." ... MYBUILD
+#define PI_VERSION  "2.1." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
@@ -77,11 +77,11 @@ bool g_smxStore;
 bool g_smxMapMuisc;
 bool g_extGeoIP2;
 bool g_extA2SFirewall;
+bool g_extTransmitManager;
 
 // forwards
 GlobalForward g_fwdOnRandomTeam;
 GlobalForward g_fwdOnVacEnabled;
-GlobalForward g_fwdOnRandomTeamPlayer;
 GlobalForward g_fwdOnRenderModelColor;
 
 // options
@@ -103,8 +103,6 @@ native bool A2SFirewall_IsClientChecked(int client);
 native void A2SFirewall_GetClientTicket(int client, char[] ticket, int maxLen);
 
 char g_szTicket[MAXPLAYERS+1][32];
-
-int g_iMoveChild[2048];
 
 // vars
 Database g_hMySQL  = null;
@@ -151,8 +149,13 @@ ConVar mg_bonus_assist              = null;
 ConVar mg_bonus_requires_players    = null;
 ConVar mg_bonus_max_round_credits   = null;
 
+static char g_PlaceHolder[] = "                                                                                                                               ";
 
 // stock functions
+stock bool IsWarmup()
+{
+    return GameRules_GetProp("m_bWarmupPeriod") == 1;
+}
 stock void Chat(int client, const char[] buffer, any ...)
 {
     if (g_kOptions[client][kO_HudChat])
@@ -285,8 +288,11 @@ stock void Text(int client, const char[] buffer, any ...)
         return;
     }
 
+    char text[384];
     TextMsg.SetInt("msg_dst", 4);
-    TextMsg.AddString("params", msg);
+    TextMsg.AddString("params", "#SFUI_ContractKillStart");
+    Format(text, 2048, "</font>%s%s", msg, g_PlaceHolder);
+    TextMsg.AddString("params", text);
     TextMsg.AddString("params", "");
     TextMsg.AddString("params", "");
     TextMsg.AddString("params", "");
@@ -311,8 +317,11 @@ stock void TextAll(const char[] buffer, any ...)
                 continue;
             }
 
+            char text[384];
             TextMsg.SetInt("msg_dst", 4);
-            TextMsg.AddString("params", msg);
+            TextMsg.AddString("params", "#SFUI_ContractKillStart");
+            Format(text, 2048, "</font>%s%s", msg, g_PlaceHolder);
+            TextMsg.AddString("params", text);
             TextMsg.AddString("params", "");
             TextMsg.AddString("params", "");
             TextMsg.AddString("params", "");

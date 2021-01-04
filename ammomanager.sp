@@ -14,7 +14,7 @@
 #define PI_NAME     "Ammo Manager - Lite for MiniGames"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss + PerfectLaugh"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "1.9." ... MYBUILD
+#define PI_VERSION  "2.1." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
@@ -32,7 +32,7 @@ public Plugin myinfo =
 #define SIGOFFSET_SetReserveAmmoCount   9
 #define SIGNATURE_SetReserveAmmoCount   "\x55\x8B\xEC\x51\x8B\x45\x14\x53\x56"
 
-#define MAX_RESERVE_AMMO_MAX       416
+#define MAX_RESERVE_AMMO_MAX            416
 
 Handle SDKCall_SetReserveAmmoCount;
 Handle SDKCall_GetMaxClip1;

@@ -18,6 +18,13 @@ public SharedPlugin __pl_MiniGames =
 #endif
 };
 
+enum struct team_t
+{
+	int client;
+	int currentTeam;
+	int nextTeam;
+}
+
 native int MG_SetSpecHudContent(int client, const char[] vformat, any ...);
 native int MG_GetTotalScores(int client);
 native int MG_GetTotalKills(int client);
@@ -29,7 +36,7 @@ native int MG_GetTotalTaserKills(int client);
 native int MG_GetRanks(int client);
 native int MG_GetLevel(int client);
 
-forward bool MG_OnRandomTeam(int       terrorists, int       counterTerrorists);
+forward bool MG_OnRandomTeam(int       terrorists, int       counterTerrorists, ArrayList array_players); // team_t;
 forward bool MG_OnVacEnabled(int Alive_terrorists, int Alive_counterTerrorists);
 
 forward Action MG_OnRandomTeamPlayer(int client, int &team);

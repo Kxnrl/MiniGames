@@ -509,7 +509,7 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
 void Games_OnRoundStarted()
 {
     // check warmup
-    if (GameRules_GetProp("m_bWarmupPeriod") == 1)
+    if (IsWarmup())
         return;
 
     // round count
