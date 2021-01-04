@@ -10,7 +10,7 @@ native bool TransmitManager_SetEntityState(int entity, int client, bool can);
 /**
  * _________________Do not edit below this line!_______________________
  */
-public Extension __ext_movement = 
+public Extension __ext_transmit = 
 {
 	name = "TransmitManager",
 	file = "TransmitManager.ext",
