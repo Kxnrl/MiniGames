@@ -26,11 +26,20 @@ public Plugin myinfo =
     url         = PI_URL
 };
 
-// windows only
+#define _WIN32
+//#define _LINUX
+
+#if defined _WIN32
 #define OFFSET_GetMaxClip1              352
 #define OFFSET_GetReserveAmmoMax        356
 #define SIGOFFSET_SetReserveAmmoCount   9
 #define SIGNATURE_SetReserveAmmoCount   "\x55\x8B\xEC\x51\x8B\x45\x14\x53\x56"
+#else
+#define OFFSET_GetMaxClip1              358
+#define OFFSET_GetReserveAmmoMax        362
+#define SIGOFFSET_SetReserveAmmoCount   12
+#define SIGNATURE_SetReserveAmmoCount   "\x55\x89\xE5\x57\x56\x53\x83\xEC\x2C\x8B\x4D\x18"
+#endif
 
 #define MAX_RESERVE_AMMO_MAX            416
 
