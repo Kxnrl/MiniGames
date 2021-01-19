@@ -601,7 +601,7 @@ public void Hook_OnPostWeaponEquip(int client, int weapon)
 
 public Action Hook_OnTakeDamage(int victim, int& attacker, int& inflictor, float& damage, int& damagetype, int& weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 { 
-    if (victim < 1 || victim > MaxClients || attacker < 1 || attacker > MaxClients || damage > 1.0 || !IsValidEdict(weapon))
+    if (attacker < 1 || attacker > MaxClients || damage > 1.0 || !IsValidEdict(weapon))
         return Plugin_Continue; 
 
     char classname[32];
@@ -619,13 +619,18 @@ public Action Hook_OnTakeDamage(int victim, int& attacker, int& inflictor, float
         {
             float mult = speed / 18.0;
 
-            vVel[0] /= mult;
-            vVel[1] /= mult;
-            vVel[2] = 0.0;
+            if (mult > 0.0)
+            {
+                vVel[0] /= mult;
+                vVel[1] /= mult;
+                vVel[2] = 0.0;
 
-            //TeleportEntity(victim, NULL_VECTOR, NULL_VECTOR, vVel);
-            SetEntPropVector(victim, Prop_Data, "m_vecBaseVelocity", vVel);
+                TeleportEntity(victim, NULL_VECTOR, NULL_VECTOR, vVel);
+                //SetEntPropVector(victim, Prop_Data, "m_vecBaseVelocity", vVel);
+            }
         }
+
+        PrintToChat(victim, "Hit by %s", classname);
     }
 
     return Plugin_Continue; 
