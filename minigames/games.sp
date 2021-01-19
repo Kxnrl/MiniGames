@@ -206,10 +206,35 @@ void Games_OnMapStart()
         t_hHudSync[3] = CreateHudSynchronizer();
 
     // timer to update hud
-    CreateTimer(1.0, Games_UpdateGameHUD, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+    CreateTimer(1.0, Games_TickInterval, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public Action Games_UpdateGameHUD(Handle timer)
+public Action Games_TickInterval(Handle timer)
+{
+    Games_UpdateGameHUD();
+    Games_CleanupWeapon();
+    return Plugin_Continue;
+}
+
+// prevent EngineError no free edict...
+static void Games_CleanupWeapon()
+{
+    if (!IsWarmup())
+        return;
+
+    int entity = INVALID_ENT_REFERENCE;
+    while ((entity = FindEntityByClassname(entity, "weapon_*")) != INVALID_ENT_REFERENCE)
+    {
+        int client = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
+        if (client == -1)
+        {
+            // direct kill
+            AcceptEntityInput(entity, "KillHierarchy");
+        }
+    }
+}
+
+static void Games_UpdateGameHUD()
 {
     // spec hud
     for(int client = 1; client <= MaxClients; ++client)
@@ -290,8 +315,6 @@ public Action Games_UpdateGameHUD(Handle timer)
             if (ClientValid(client))
                 ClearSyncHud(client, t_hHudSync[1]);
     }
-
-    return Plugin_Continue;
 }
 
 void Games_OnMapEnd()
