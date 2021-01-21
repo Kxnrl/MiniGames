@@ -190,6 +190,7 @@ public void Cvars_OnLateSpawnChanged(ConVar convar, const char[] oldValue, const
 
 static void Cvars_SetCvarDefault()
 {
+    ConVar_Easy_SetInt("mp_autokick",                       0, true, false);
     ConVar_Easy_SetInt("mp_buytime",                       60, true, false);
     ConVar_Easy_SetInt("mp_roundtime_hostage",              0, true, false);
     ConVar_Easy_SetInt("mp_roundtime_defuse",               0, true, false);
@@ -265,10 +266,10 @@ static void Cvars_EnforceOptions()
 
     // sv var
     ConVar_Easy_SetInt("sv_alternateticks",         1, true, false);
-    ConVar_Easy_SetInt("sv_forcepreload",           1, true, false);
+    ConVar_Easy_SetInt("sv_forcepreload",           0, true, false);
     ConVar_Easy_SetInt("sv_force_transmit_players", 0, true, false);
     ConVar_Easy_SetInt("sv_force_transmit_ents",    0, true, false);
-    ConVar_Easy_SetInt("sv_occlude_players",        0, true, false);
+    ConVar_Easy_SetInt("sv_occlude_players",        1, true, false);
 
     // store module
     ConVar_Easy_SetInt("store_thirdperson_enabled", 0, true, false);
