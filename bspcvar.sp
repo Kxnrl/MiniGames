@@ -93,6 +93,13 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
         return MRES_Ignored;
     }
 
+    if (StrContains(command, "acts", false) == 0)
+    {
+        ServerCommand("%s", command);
+        DHookSetReturn(hReturn, false);
+        return MRES_Supercede;
+    }
+
     if (StrContains(command, "say", false) == 0)
     {
         // override
