@@ -154,7 +154,7 @@ ConVar mg_bonus_assist              = null;
 ConVar mg_bonus_requires_players    = null;
 ConVar mg_bonus_max_round_credits   = null;
 
-static char g_PlaceHolder[] = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+static char g_PlaceHolder[] = "                                                                                                                                                                                                                                                                ";
 
 // stock functions
 stock bool IsWarmup()
