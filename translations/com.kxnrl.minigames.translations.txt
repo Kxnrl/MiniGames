@@ -502,6 +502,6 @@
     {
         "#format"   "{1:N},{2:d},{3:d},{4:s}"
         "en"        " {1} pressed {2}<{3}>({4})"
-        "chi"       "{orange}%N {yellow} 按下了按钮 {pink}{2}{silver}<{blue}{3}{silver}>({olive}{4}{silver})"
+        "chi"       "{orange} {1} {yellow} 按下了按钮 {pink}{2}{silver}<{blue}{3}{silver}>({olive}{4}{silver})"
     }
 }
