@@ -622,7 +622,7 @@ void Games_OnButtonPressed(int button, int client)
 
     char buffer[32];
     GetEntPropString(button, Prop_Data, "m_iName", buffer, 32);
-    ChatAll("\x0C%N \x05 按下了按钮 \x0B %d\x0A.\x0B%s", client, button, buffer);
+    ChatAll("%t", "button pressed", client, button, GetEntProp(button, Prop_Data, "m_iHammerID"), buffer);
 }
 
 static void Games_ShowCurrentSpeed(int client, float speed)
