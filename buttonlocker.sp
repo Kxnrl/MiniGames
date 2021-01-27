@@ -58,8 +58,6 @@ public void Event_ButtonCreated(int button)
     if (index == -1)
         return;
 
-    PrintToChatAll("Event_ButtonCreated -> %d.%d -> %d", button, GetHammerId(button), index);
-
     HookSingleEntityOutput(button, "OnPressed", Event_OnPressed);
     SDKHook(button, SDKHook_Use, Event_ButtonUse);
 }
@@ -81,8 +79,6 @@ public void Event_OnPressed(const char[] output, int button, int client, float d
 
 public Action Event_ButtonUse(int button, int client, int caller, UseType type, float value)
 {
-    PrintToChatAll("Event_ButtonUse -> %d", button);
-
     if (g_iButtons <= 0)
         return Plugin_Continue;
 
@@ -91,14 +87,11 @@ public Action Event_ButtonUse(int button, int client, int caller, UseType type, 
 
     int iOffset = FindDataMapInfo(button, "m_bLocked");
 
-    PrintToChatAll("Event_ButtonUse -> %d -> lock?", button);
-
     if (iOffset != -1 && GetEntData(button, iOffset, 1))
         return Plugin_Handled;
 
     int index = FindIndexByButton(GetHammerId(button));
 
-    PrintToChatAll("Event_ButtonUse -> %d <%d>", button, index);
     if (index == -1)
         return Plugin_Continue;
 
@@ -110,7 +103,6 @@ public Action Event_ButtonUse(int button, int client, int caller, UseType type, 
         Text(client, "<font color='#39c5bb'>%s</font> 已被锁定 (剩余<font color='#ff0000'> %d </font>秒)", g_sButtons[index].m_Name, diff);
         return Plugin_Handled;
     }
-    PrintToChatAll("Event_ButtonUse -> %d <%d> | %d : %d", button, index, ends, time);
 
     return Plugin_Continue;
 }
