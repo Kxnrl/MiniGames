@@ -90,7 +90,7 @@ GlobalForward g_fwdOnVacEnabled;
 GlobalForward g_fwdOnRenderModelColor;
 
 // options
-enum kOptions
+enum
 {
     kO_HudSpec = 0,
     kO_HudVac,
@@ -99,8 +99,8 @@ enum kOptions
     kO_HudChat,
     kO_HudText,
     kO_Transmit,
+    kO_MaxOptions
 }
-#define kO_MaxOptions 7
 bool g_kOptions[MAXPLAYERS+1][kO_MaxOptions];
 
 // temp

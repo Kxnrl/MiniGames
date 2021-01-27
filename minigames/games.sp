@@ -31,11 +31,11 @@ static char t_szSpecHudContent[MAXPLAYERS+1][256];
 
 void Games_OnPluginStart()
 {
-    for(int i = 0; i < view_as<int>(kOptions); ++i)
+    for(int i = 0; i < kO_MaxOptions; ++i)
     {
         char cookieName[16];
         FormatEx(cookieName, 16, "MiniGames_Options_%d", i);
-        t_kOCookies[view_as<kOptions>(i)] = RegClientCookie(cookieName, cookieName, CookieAccess_Private);
+        t_kOCookies[i] = RegClientCookie(cookieName, cookieName, CookieAccess_Private);
     }
 
     RegConsoleCmd("sm_mg",      Command_Main);
@@ -185,9 +185,14 @@ public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int
 
 static void Games_SetOptions(int client, int option)
 {
-    kOptions options = view_as<kOptions>(option);
-    g_kOptions[client][options] = !g_kOptions[client][options];
-    SetClientCookie(client, t_kOCookies[options], g_kOptions[client][options] ? "1" : "0");
+    g_kOptions[client][option] = !g_kOptions[client][option];
+    SetClientCookie(client, t_kOCookies[option], g_kOptions[client][option] ? "1" : "0");
+
+    if (option == kO_Transmit)
+    {
+        // immed refresh state
+        Hooks_UpdateState();
+    }
 }
 
 void Games_OnMapStart()
@@ -402,17 +407,17 @@ void Games_OnClientConnected(int client)
 {
     t_szSpecHudContent[client][0] = '\0';
 
-    for(int i = 0; i < view_as<int>(kOptions); ++i)
-        g_kOptions[client][view_as<kOptions>(i)] = false;
+    for(int i = 0; i < kO_MaxOptions; ++i)
+        g_kOptions[client][i] = false;
 }
 
 void Games_OnClientCookiesCached(int client)
 {
     char buffer[4];
-    for(int i = 0; i < view_as<int>(kOptions); ++i)
+    for(int i = 0; i < kO_MaxOptions; ++i)
     {
-        GetClientCookie(client, t_kOCookies[view_as<kOptions>(i)], buffer, 4);
-        g_kOptions[client][view_as<kOptions>(i)] = (StringToInt(buffer) == 1);
+        GetClientCookie(client, t_kOCookies[i], buffer, 4);
+        g_kOptions[client][i] = (StringToInt(buffer) == 1);
     }
 }
 

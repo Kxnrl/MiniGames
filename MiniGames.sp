@@ -967,6 +967,7 @@ void Hooks_UpdateState()
 
     if (!mg_transmitblock.BoolValue)
     {
+        // force all transmit state
         for(int i = 1; i <= MaxClients; i++)
         {
             if (!IsClientInGame(i) || IsFakeClient(i))
@@ -980,22 +981,22 @@ void Hooks_UpdateState()
         return;
     }
 
-    for(int i = 1; i <= MaxClients; i++)
+    for(int entity = 1; entity <= MaxClients; entity++)
     {
-        if (!IsClientInGame(i) || IsFakeClient(i))
+        if (!IsClientInGame(entity) || IsFakeClient(entity))
             continue;
 
-        for (int j = 1; j <= MaxClients; j++) if (IsClientInGame(j) && !IsFakeClient(j))
+        for (int client = 1; client <= MaxClients; client++) if (IsClientInGame(client) && !IsFakeClient(client) && entity != client)
         {
-            if (!g_kOptions[j][kO_Transmit])
+            if (!g_kOptions[client][kO_Transmit])
             {
                 // disabled.
-                TransmitManager_SetEntityState(i, j, true);
+                TransmitManager_SetEntityState(entity, client, true);
             }
             else
             {
                 // check team?
-                TransmitManager_SetEntityState(i, j, g_iTeam[j] != g_iTeam[i]);
+                TransmitManager_SetEntityState(entity, client, g_iTeam[entity] != g_iTeam[client]);
             }
         }
     }
