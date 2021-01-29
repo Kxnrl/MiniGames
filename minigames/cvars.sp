@@ -61,7 +61,6 @@ void Cvars_OnPluginStart()
     mg_transmitblock    = AutoExecConfig_CreateConVar("mg_transmitblock",    "1",        "Allow client hide teammate.",                                      _, true, 0.0,   true, 1.0);
     mg_geoiplanguage    = AutoExecConfig_CreateConVar("mg_geoiplanguage",    "en",       "Language of GeoIP2-City. \nList of language: \nBrazilian Portuguese (pt-BR), English (en), French (fr), German (de), Japanese (ja), Russian (ru), Simplified Chinese (zh-CN), and Spanish (es)");
     mg_render_player    = AutoExecConfig_CreateConVar("mg_render_player",    "0",        "Allow render player model color.",                                 _, true, 0.0,   true, 1.0);
-    mg_collisionhook    = AutoExecConfig_CreateConVar("mg_collisionhook",    "0",        "Make players no collision.",                                       _, true, 0.0,   true, 1.0);
     mg_block_keybind_cj = AutoExecConfig_CreateConVar("mg_block_keybind_cj", "1",        "Block keybind crouch jump.",                                       _, true, 0.0,   true, 1.0);
     mg_button_watcher   = AutoExecConfig_CreateConVar("mg_button_watcher",   "1",        "Print button usage info.",                                         _, true, 0.0,   true, 1.0);
     mg_broadcast_leave  = AutoExecConfig_CreateConVar("mg_broadcast_leave",  "0",        "Broadcast on client disconnect.",                                  _, true, 0.0,   true, 1.0);
