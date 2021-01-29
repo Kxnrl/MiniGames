@@ -123,7 +123,6 @@ char g_szMap[128];
 // convars
 ConVar mg_geoiplanguage             = null;
 ConVar mg_transmitblock             = null;
-ConVar mg_collisionhook             = null;
 ConVar mg_block_keybind_cj          = null;
 ConVar mg_button_watcher            = null;
 

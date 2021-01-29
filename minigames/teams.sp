@@ -213,8 +213,8 @@ static void Teams_ChangeTeam()
 
         if (IsPlayerAlive(t.client) && t.nextTeam > TEAM_OB)
         {
-            RenderPlayerColor(t.client);
             CS_SwitchTeam(t.client, t.nextTeam);
+            RenderPlayerColor(t.client);
         }
         else
         {
