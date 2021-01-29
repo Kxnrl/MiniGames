@@ -34,12 +34,14 @@ cp -rf MiniGames.sp         addons/sourcemod/scripting
 cp -rf ammomanager.sp       addons/sourcemod/scripting
 cp -rf bspcvar.sp           addons/sourcemod/scripting
 cp -rf buttonlocker.sp      addons/sourcemod/scripting
+cp -rf defaultskin.sp       addons/sourcemod/scripting
 cp -rf inputkill_hotfix.sp  addons/sourcemod/scripting
 
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/MiniGames.sp -o"build/plugins/MiniGames.smx"
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/ammomanager.sp -o"build/plugins/ammomanager.smx"
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/bspcvar.sp -o"build/plugins/bspcvar.smx"
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/buttonlocker.sp -o"build/plugins/buttonlocker.smx"
+addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/defaultskin.sp -o"build/plugins/defaultskin.smx"
 addons/sourcemod/scripting/spcomp -E -v0 addons/sourcemod/scripting/inputkill_hotfix.sp -o"build/plugins/inputkill_hotfix.smx"
 
 if [ ! -f "build/plugins/MiniGames.smx" ]; then
@@ -62,6 +64,11 @@ if [ ! -f "build/plugins/buttonlocker.smx" ]; then
     exit 1;
 fi
 
+if [ ! -f "build/plugins/defaultskin.smx" ]; then
+    echo "Compile failed!"
+    exit 1;
+fi
+
 if [ ! -f "build/plugins/inputkill_hotfix.smx" ]; then
     echo "Compile failed!"
     exit 1;
@@ -75,6 +82,7 @@ mv MiniGames.sp         build/scripting
 mv ammomanager.sp       build/scripting
 mv bspcvar.sp           build/scripting
 mv buttonlocker.sp      build/scripting
+mv defaultskin.sp       build/scripting
 mv inputkill_hotfix.sp  build/scripting
 mv translations         build
 
@@ -91,6 +99,7 @@ echo "Upload RAW rsync ..."
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/MiniGames.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/bspcvar.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/buttonlocker.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
+RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/defaultskin.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/ammomanager.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./plugins/inputkill_hotfix.smx $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/plugins/
 RSYNC_PASSWORD=$RSYNC_PSWD rsync -avz --port $RSYNC_PORT ./translations/com.kxnrl.minigames.translations.txt $RSYNC_USER@$RSYNC_HOST::TravisCI/MiniGames/updater/translations/

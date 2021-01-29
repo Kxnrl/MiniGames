@@ -16,6 +16,15 @@
 #define PI_VERSION  "2.1." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
+public Plugin myinfo = 
+{
+    name        = PI_NAME,
+    author      = PI_AUTHOR,
+    description = PI_DESC,
+    version     = PI_VERSION,
+    url         = PI_URL
+};
+
 #define MAX_BUTTONS 32
 
 enum struct button_t
