@@ -214,18 +214,44 @@ public Action Games_TickInterval(Handle timer)
 // prevent EngineError no free edict...
 static void Games_CleanupWeapon()
 {
+    bool cleanMapWeapon = false;
+
     if (!IsWarmup())
-        return;
+    {
+        int edicts = 0;
+        for (int i = 1; i < 2048; i++) if (IsValidEdict(i))
+        {
+            // counting
+            edicts++;
+        }
+
+        if (edicts < 1500)
+        {
+            // we have enough entity
+            return;
+        }
+    }
+    else
+    {
+        // we clean all
+        cleanMapWeapon = true;
+    }
 
     int entity = INVALID_ENT_REFERENCE;
     while ((entity = FindEntityByClassname(entity, "weapon_*")) != INVALID_ENT_REFERENCE)
     {
         int client = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
-        if (client == -1)
-        {
-            // direct kill
-            AcceptEntityInput(entity, "KillHierarchy");
-        }
+
+        // if have owner client
+        if (client != -1)
+            continue;
+
+        // ignore map weapons/grenades?
+        if (!cleanMapWeapon && GetEntProp(entity, Prop_Data, "m_iHammerID") > -1)
+            continue;
+
+        // direct kill
+        AcceptEntityInput(entity, "KillHierarchy");
     }
 }
 
