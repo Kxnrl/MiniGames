@@ -512,8 +512,8 @@ public void OnClientPutInServer(int client)
     // hook this to check weapon
     SDKHook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
 
-    // hook this to fix nade block
-    SDKHook(client, SDKHook_OnTakeDamage, Hook_OnTakeDamage); 
+    // Fix weapon stack
+    SDKHook(client, SDKHook_WeaponCanUse,    Hook_OnWeaponCanUse);
 
     // hook this to set transmit
     TransmitManager_AddEntityHooks(client);
@@ -542,7 +542,6 @@ public void OnClientPostAdminCheck(int client)
             char ticket[32];
             A2SFirewall_GetClientTicket(client, ticket, 32);
             strcopy(g_szTicket[client], 32, ticket);
-            Chat(client, "Your connection ticket is \x04 %s", ticket);
         }
     }
 
@@ -584,6 +583,7 @@ public void  OnClientDisconnect_Post(int client)
 public void OnEntityCreated(int entity, const char[] classname)
 {
     Games_OnEntityCreated(entity);
+    Hooks_OnEntityCreated(entity, classname);
 }
 
 public void Hook_OnPostWeaponEquip(int client, int weapon)
@@ -598,42 +598,26 @@ public void Hook_OnPostWeaponEquip(int client, int weapon)
     RequestFrame(Games_OnEquipPost, pack);
 }
 
-public Action Hook_OnTakeDamage(int victim, int& attacker, int& inflictor, float& damage, int& damagetype, int& weapon, float damageForce[3], float damagePosition[3], int damagecustom)
-{ 
-    if (attacker < 1 || attacker > MaxClients || damage > 1.0 || !IsValidEdict(weapon))
-        return Plugin_Continue; 
+public Action Hook_OnWeaponCanUse(int client, int weapon)
+{
+    if (!IsPlayerAlive(client) || !IsValidEdict(weapon))
+        return Plugin_Handled;
 
-    char classname[32];
-    if (!GetEntityClassname(weapon, classname, 32))
+    if (GetTime() > g_iNext[client])
         return Plugin_Continue;
 
-    if (StrContains(classname, "smokegrenade") > -1 || StrContains(classname, "decoy") > -1) 
-    {
-        // remove player's speed
-        float vVel[3];
-        GetEntPropVector(victim, Prop_Data, "m_vecVelocity", vVel);
-        float speed = SquareRoot(Pow(vVel[0], 2.0) + Pow(vVel[1], 2.0));
+    if (HasPlayerWeapon(client))
+        return Plugin_Continue;
 
-        if (speed > 18.0)
-        {
-            float mult = speed / 18.0;
+    // is weapon not grenade...
+    if (!IsUtilities(weapon))
+        return Plugin_Continue;
 
-            if (mult > 0.0)
-            {
-                vVel[0] /= mult;
-                vVel[1] /= mult;
-                vVel[2] = 0.0;
+    if (GetEntProp(weapon, Prop_Data, "m_iHammerID") <= 0)
+        RequestFrame(Hook_KillGamePlayerEquipNade, EntIndexToEntRef(weapon));
 
-                TeleportEntity(victim, NULL_VECTOR, NULL_VECTOR, vVel);
-                //SetEntPropVector(victim, Prop_Data, "m_vecBaseVelocity", vVel);
-            }
-        }
-
-        PrintToChat(victim, "Hit by %s", classname);
-    }
-
-    return Plugin_Continue; 
-} 
+    return Plugin_Handled;
+}
 
 public void Store_OnHatsCreated(int client, int entity, int slot)
 {
@@ -752,7 +736,7 @@ public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast
     CreateTimer(0.1, Games_OnClientSpawn, userid);
 
     // for no block
-    SetEntData(client, g_offsetNoBlock, 2, 4, true);
+    SetEntData(client, g_offsetNoBlock, COLLISION_GROUP_DEBRIS_TRIGGER, 4, true);
 }
 
 public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast)
@@ -974,4 +958,72 @@ void Hooks_UpdateState()
             }
         }
     }
+}
+
+// Fix dodgeball~~
+// by Kyle
+void Hooks_OnEntityCreated(int entity, const char[] classname)
+{
+    if (StrContains(classname, "_projectile") > 0)
+        SDKHook(entity, SDKHook_SpawnPost, Hooks_OnEntitySpawnedPost);
+}
+
+void Hooks_OnEntitySpawnedPost(int entity)
+{
+    SDKUnhook(entity, SDKHook_SpawnPost, Hooks_OnEntitySpawnedPost);
+
+    if (!IsValidEdict(entity))
+        return;
+
+    int client = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
+    if (client == -1)
+        return;
+
+    // mark last used grenade to prevent weaon stack;
+    g_iNext[client] = GetTime() + 1;
+
+    char model[128];
+    GetEntPropString(entity, Prop_Data, "m_ModelName", model, 128);
+
+    float fPos[3];
+    GetEntPropVector(entity, Prop_Send, "m_vecOrigin", fPos);
+
+    float fAgl[3];
+    GetEntPropVector(entity, Prop_Send, "m_angRotation", fAgl);
+
+    int trigger_multiple = CreateEntityByName("trigger_multiple");
+    if (trigger_multiple == -1)
+        return;
+
+    SetEntPropEnt(trigger_multiple, Prop_Send, "m_hOwnerEntity", client);
+
+    DispatchKeyValueVector(trigger_multiple, "origin",  fPos);
+    DispatchKeyValueVector(trigger_multiple, "angles",  fAgl);
+
+    DispatchKeyValue(trigger_multiple, "model", model);
+    DispatchKeyValue(trigger_multiple, "spawnflags", "1");
+
+    DispatchSpawn(trigger_multiple);
+
+    TeleportEntity(trigger_multiple, fPos, fAgl, NULL_VECTOR);
+
+    SetVariantString("!activator");
+    AcceptEntityInput(trigger_multiple, "SetParent", entity, trigger_multiple, 0);
+
+    SetVariantString("OnUser4 !self:Kill::5.0:1");
+    AcceptEntityInput(trigger_multiple, "AddOutput");
+    AcceptEntityInput(trigger_multiple, "FireUser4");
+}
+
+void Hook_KillGamePlayerEquipNade(int ref)
+{
+    int entity = EntRefToEntIndex(ref);
+    if (!IsValidEdict(entity))
+        return;
+
+    int client = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
+    if (client > -1)
+        return;
+
+    AcceptEntityInput(entity, "Kill");
 }

@@ -74,6 +74,34 @@ enum struct stats_t
     }
 }
 
+enum Collision_Group_t
+{
+    COLLISION_GROUP_NONE,
+    COLLISION_GROUP_DEBRIS,                     // Collides with nothing but world and static stuff
+    COLLISION_GROUP_DEBRIS_TRIGGER,             // Same as debris, but hits triggers
+    COLLISION_GROUP_INTERACTIVE_DEBRIS,         // Collides with everything except other interactive debris or debris
+    COLLISION_GROUP_INTERACTIVE,                // Collides with everything except interactive debris or debris
+    COLLISION_GROUP_PLAYER,
+    COLLISION_GROUP_BREAKABLE_GLASS,
+    COLLISION_GROUP_VEHICLE,
+    COLLISION_GROUP_PLAYER_MOVEMENT,            // For HL2, same as Collision_Group_Player, for
+                                                // TF2, this filters out other players and CBaseObjects
+    COLLISION_GROUP_NPC,                        // Generic NPC group
+    COLLISION_GROUP_IN_VEHICLE,                 // for any entity inside a vehicle
+    COLLISION_GROUP_WEAPON,                     // for any weapons that need collision detection
+    COLLISION_GROUP_VEHICLE_CLIP,               // vehicle clip brush to restrict vehicle movement
+    COLLISION_GROUP_PROJECTILE,                 // Projectiles!
+    COLLISION_GROUP_DOOR_BLOCKER,               // Blocks entities not permitted to get near moving doors
+    COLLISION_GROUP_PASSABLE_DOOR,              // Doors that the player shouldn't collide with
+    COLLISION_GROUP_DISSOLVING,                 // Things that are dissolving are in this group
+    COLLISION_GROUP_PUSHAWAY,                   // Nonsolid on client and server, pushaway in player code
+
+    COLLISION_GROUP_NPC_ACTOR,                  // Used so NPCs in scripts ignore the player.
+    COLLISION_GROUP_NPC_SCRIPTED,               // USed for NPCs in scripts that should not collide with each other
+
+    LAST_SHARED_COLLISION_GROUP
+};
+
 // staic var
 char g_szBlockRadio[][] = {"kill", "explode", "coverme", "takepoint", "holdpos", "regroup", "followme", "takingfire", "go", "fallback", "sticktog", "getinpos", "stormfront", "report", "roger", "enemyspot", "needbackup", "sectorclear", "inposition", "reportingin","getout", "negative", "enemydown", "cheer", "thanks", "nice", "compliment", "player_ping"};
 
@@ -113,6 +141,7 @@ char g_szTicket[MAXPLAYERS+1][32];
 Database g_hMySQL  = null;
 
 int g_iTeam[MAXPLAYERS+1];
+int g_iNext[MAXPLAYERS+1];
 int g_iUId[MAXPLAYERS+1];
 
 int g_offsetNoBlock = -1;
@@ -470,4 +499,25 @@ stock void ValidateTeamPlayers(int &cts, int &tes, int skip = -1)
             case TEAM_TE: tes++;
         }
     }
+}
+
+stock bool HasPlayerWeapon(int client)
+{
+    // primary, secondary, knife
+    for (int i = 0; i <= 2; i++)
+    {
+        if (GetPlayerWeaponSlot(client, i) > -1)
+            return true;
+    }
+    return false;
+}
+
+stock bool IsUtilities(int weapon)
+{
+    char classname[32];
+    GetEdictClassname(weapon, classname, 32);
+
+    static char utilities[] = "weapon_smokegrenade|weapon_flashbang|weapon_hegrenade|weapon_molotov|weapon_incendiary";
+
+    return StrContains(utilities, classname) > -1;
 }
