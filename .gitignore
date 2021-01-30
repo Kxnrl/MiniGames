@@ -80,6 +80,8 @@ include/mapmusic.inc
 include/geoip2.inc
 include/fys.pupd.inc
 
+mgfixes.sp
+
 # OSX
 # =========================
 

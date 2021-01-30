@@ -8,6 +8,7 @@
 
 #undef REQUIRE_PLUGIN
 #include <fys.pupd>
+#include <fys.opts>
 #define REQUIRE_PLUGIN
 
 #define PI_NAME     "MiniGames - Button locker"
@@ -37,6 +38,32 @@ enum struct button_t
 
 int g_iButtons;
 button_t g_sButtons[MAX_BUTTONS];
+bool g_pOpts;
+
+public void OnAllPluginsLoaded()
+{
+    g_pOpts = LibraryExists("fys-Opts");
+}
+
+public void OnLibraryAdded(const char[] name)
+{
+    g_pOpts = LibraryExists("fys-Opts");
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+    g_pOpts = LibraryExists("fys-Opts");
+}
+
+public void OnMapStart()
+{
+    PrecacheSound("buttons/button8.wav");
+}
+
+bool IsClientBanned(int client)
+{
+    return g_pOpts && Opts_GetOptBool(client, "MiniGames.Button.Banned", false);
+}
 
 public void Pupd_OnCheckAllPlugins()
 {
@@ -99,6 +126,12 @@ public Action Event_ButtonUse(int button, int client, int caller, UseType type, 
     if (iOffset != -1 && GetEntData(button, iOffset, 1))
         return Plugin_Handled;
 
+    if (IsClientBanned(client))
+    {
+        EmitSoundToClient(client, "buttons/button8.wav");
+        return Plugin_Handled;
+    }
+
     int index = FindIndexByButton(GetHammerId(button));
 
     if (index == -1)
@@ -110,6 +143,7 @@ public Action Event_ButtonUse(int button, int client, int caller, UseType type, 
     if (diff > 0)
     {
         Text(client, "<font color='#39c5bb'>%s</font> 已被锁定 (剩余<font color='#ff0000'> %d </font>秒)", g_sButtons[index].m_Name, diff);
+        EmitSoundToAll("buttons/button8.wav");
         return Plugin_Handled;
     }
 
