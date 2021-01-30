@@ -97,8 +97,6 @@ public Action Timer_ChangeTeam(Handle timer)
 
     TextAll("%t", "broadcast random team text", t_iSwitchCD);
 
-    Hooks_UpdateState();
-
     return Plugin_Continue;
 }
 
@@ -238,4 +236,6 @@ static void Teams_ChangeTeam()
 
     t_iSwitchCD = -1;
     EmitSoundToAll("*maoling/faceit_match_found_tune.mp3");
+
+    Hooks_UpdateState();
 }

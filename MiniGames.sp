@@ -946,15 +946,15 @@ void Hooks_UpdateState()
 
         for (int client = 1; client <= MaxClients; client++) if (IsClientInGame(client) && !IsFakeClient(client) && entity != client)
         {
-            if (!g_kOptions[client][kO_Transmit])
+            if (!g_kOptions[client][kO_Transmit] || g_iTeam[entity] != g_iTeam[client])
             {
                 // disabled.
                 TransmitManager_SetEntityState(entity, client, true);
             }
             else
             {
-                // check team?
-                TransmitManager_SetEntityState(entity, client, g_iTeam[entity] != g_iTeam[client]);
+                // can't see teammate
+                TransmitManager_SetEntityState(entity, client, false);
             }
         }
     }

@@ -34,7 +34,7 @@ void Games_OnPluginStart()
     for(int i = 0; i < kO_MaxOptions; ++i)
     {
         char cookieName[16];
-        FormatEx(cookieName, 16, "MiniGames_Options_%d", i);
+        FormatEx(cookieName, 16, "MG_Options_%d", i);
         t_kOCookies[i] = RegClientCookie(cookieName, cookieName, CookieAccess_Private);
     }
 
@@ -115,17 +115,11 @@ public Action Command_Options(int client, int args)
     FormatEx(line, 32, "%T", "options title", client);
     options.SetTitle("[MG]  %s\n ", line);
     
-    if (g_smxMapMuisc)
-    {
-        FormatEx(line, 32, "%T:  %T", "options mapmusic toggle", client, MapMusic_GetStatus(client) ? "menu item Off" : "menu item On", client);
-        options.AddItem("yukiim", line);
+    FormatEx(line, 32, "%T:  %T", "options mapmusic toggle", client, g_smxMapMuisc && MapMusic_GetStatus(client) ? "menu item Off" : "menu item On", client);
+    options.AddItem("yukiim", line, g_smxMapMuisc ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 
-        FormatEx(line, 32, "%T:  %d", "options mapmusic volume", client, MapMusic_GetVolume(client));
-        options.AddItem("yukiim", line);
-    }
-
-    FormatEx(line, 32, "%T:  %T", "options transmit", client, g_kOptions[client][kO_Transmit] ? "menu item On" : "menu item Off", client);
-    options.AddItem("yukiim", line);
+    FormatEx(line, 32, "%T:  %d", "options mapmusic volume", client, g_smxMapMuisc ? MapMusic_GetVolume(client) : 100);
+    options.AddItem("yukiim", line, g_smxMapMuisc ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 
     FormatEx(line, 32, "%T:  %T", "options hudspec", client, g_kOptions[client][kO_HudSpec] ? "menu item Off" : "menu item On", client);
     options.AddItem("s", line);
@@ -139,11 +133,14 @@ public Action Command_Options(int client, int args)
     FormatEx(line, 32, "%T:  %T", "options hudhurt", client, g_kOptions[client][kO_HudHurt] ? "menu item Off" : "menu item On", client);
     options.AddItem("u", line);
 
-    FormatEx(line, 32, "%T:  %T", "options hudtext", client, g_kOptions[client][kO_HudText] ? "menu item Off" : "menu item On", client);
-    options.AddItem("o", line);
-    
     FormatEx(line, 32, "%T:  %T", "options hudchat", client, g_kOptions[client][kO_HudChat] ? "menu item Off" : "menu item On", client);
     options.AddItem("s", line);
+
+    FormatEx(line, 32, "%T:  %T", "options hudtext", client, g_kOptions[client][kO_HudText] ? "menu item Off" : "menu item On", client);
+    options.AddItem("o", line);
+
+    FormatEx(line, 32, "%T:  %T", "options transmit", client, g_kOptions[client][kO_Transmit] ? "menu item On" : "menu item Off", client);
+    options.AddItem("yukiim", line);
 
     options.ExitButton = false;
     options.ExitBackButton = true;
@@ -160,13 +157,6 @@ public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int
         Command_Main(client, slot);
     else if (action == MenuAction_Select)
     {
-        if (!g_smxMapMuisc)
-        {
-            Games_SetOptions(client, slot);
-            Command_Options(client, 0);
-            return;
-        }
-
         switch (slot)
         {
             case 0 : MapMusic_SetStatus(client, !MapMusic_GetStatus(client));
@@ -179,7 +169,7 @@ public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int
             }
             default: Games_SetOptions(client, slot-2);
         }
-        Command_Options(client, 0);
+        FakeClientCommandEx(client, "sm_options");
     }
 }
 

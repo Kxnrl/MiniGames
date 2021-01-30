@@ -489,13 +489,13 @@
     "options hudtext"
     {
         "en"        "HUD [Text]"
-        "chi"       "屏蔽队友模型"
+        "chi"       "HUD [文本]"
     }
 
     "options transmit"
     {
         "en"        "Hide teammate"
-        "chi"       "HUD [文本]"
+        "chi"       "屏蔽队友模型"
     }
 
     "button pressed"
