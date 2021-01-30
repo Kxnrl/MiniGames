@@ -108,6 +108,15 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
         return MRES_Supercede;
     }
 
+    if (StrContains(command, "sm_say", false) == 0)
+    {
+        // override
+        ReplaceString(command, 256, "sm_say", "say", false);
+        ServerCommand("%s", command);
+        DHookSetReturn(hReturn, false);
+        return MRES_Supercede;
+    }
+
     if (StrContains(command, "sm", false) == 0)
     {
         LogMessage("[BSP CVAR]  Blocked sm command [%s]", command);
