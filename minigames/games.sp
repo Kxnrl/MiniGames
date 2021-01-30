@@ -651,7 +651,8 @@ void Games_PlayerHurts(int client, int hitgroup)
     }
 
     //ShowSyncHudText(client, t_hHudSync[3], "◞　◟\n◝　◜");
-    ShowSyncHudText(client, t_hHudSync[3], "＼ ／\n／ ＼");
+    //ShowSyncHudText(client, t_hHudSync[3], "＼ ／\n／ ＼");
+    ShowSyncHudText(client, t_hHudSync[3], "╳");
 }
 
 void Games_OnPlayerBlind(DataPack pack)

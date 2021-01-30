@@ -204,13 +204,13 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_friendlyfire",                   0, true, false);
     ConVar_Easy_SetInt("mp_autoteambalance",                0, true, false);
     ConVar_Easy_SetInt("mp_force_pick_time",                3, true, false);
-    ConVar_Easy_SetInt("mp_display_kill_assists",           0, true, false);
+    ConVar_Easy_SetInt("mp_display_kill_assists",           1, true, false);
     ConVar_Easy_SetInt("mp_maxrounds",                      0, true, false);
     ConVar_Easy_SetInt("mp_halftime",                       0, true, false);
     ConVar_Easy_SetInt("mp_match_can_clinch",               0, true, false);
     ConVar_Easy_SetInt("mp_playerid",                       2, true, false);
     ConVar_Easy_SetInt("phys_timescale",                    1, true, false);
-    ConVar_Easy_SetInt("sv_damage_print_enable",            1, true, false);
+    ConVar_Easy_SetInt("sv_damage_print_enable",            0, true, false);
     ConVar_Easy_SetInt("sv_airaccelerate",               9999, true, false);
     ConVar_Easy_SetInt("sv_accelerate_use_weapon_speed",    0, true, false);
     ConVar_Easy_SetInt("sv_maxvelocity",                 3500, true, false);
@@ -239,7 +239,7 @@ static void Cvars_SetCvarDefault()
     mp_join_grace_time.SetInt(  3, true, false);
     mp_freezetime.SetInt(       3, true, false);
 
-    sv_tags.SetString("MG,MiniGames,FUN", false, false);
+    sv_tags.SetString("MG,MiniGames,FUN,Skin", false, false);
 }
 
 static void Cvars_EnforceOptions()
