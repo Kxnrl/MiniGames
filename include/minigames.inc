@@ -39,5 +39,4 @@ native int MG_GetLevel(int client);
 forward bool MG_OnRandomTeam(int       terrorists, int       counterTerrorists, ArrayList array_players); // team_t;
 forward bool MG_OnVacEnabled(int Alive_terrorists, int Alive_counterTerrorists);
 
-forward Action MG_OnRandomTeamPlayer(int client, int &team);
 forward Action MG_OnRenderModelColor(int client);

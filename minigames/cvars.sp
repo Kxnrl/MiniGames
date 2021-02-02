@@ -585,7 +585,9 @@ public Action Command_SetCvar(int args)
 {
     if (args != 2)
     {
-        LogError("Error trigger command mg_setcvar! Wrong args!");
+        char cmd[128];
+        GetCmdArgString(cmd, 128);
+        LogError("Error trigger command mg_setcvar! Wrong args! -> [%s]", cmd);
         return Plugin_Handled;
     }
 
