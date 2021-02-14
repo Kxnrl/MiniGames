@@ -119,9 +119,6 @@ void Cvars_OnPluginStart()
     // AutoExec
     AutoExecConfig_ExecuteFile();
 
-    // bspconvar_whitelist.cfg
-    Cvars_CheckWhitelist();
-
     // Bhop
     RegServerCmd("mg_setbhop_allow", Command_SetBhopAllow);
     RegServerCmd("mg_setbhop_auto",  Command_SetBhopAuto);
@@ -604,89 +601,4 @@ public Action MuteConVarChanged(Event event, const char[] name, bool dontBroadca
 {
     event.BroadcastDisabled = true;
     return Plugin_Changed;
-}
-
-static void Cvars_CheckWhitelist()
-{
-    ArrayList list = new ArrayList(ByteCountToCells(512));
-
-    if (!FileExists("bspconvar_whitelist.txt"))
-    {
-        LogError("Why not has bspconvar_whitelist?");
-        Cvars_CreateWhitelist(list);
-        delete list;
-        return;
-    }
-
-    File file = OpenFile("bspconvar_whitelist.txt","r+");
-    if (file == null)
-    {
-        LogError("Failed to check bspconvar_whitelist.txt");
-        delete list;
-        return;
-    }
-
-    bool found = false;
-    char files[512];
-    int mychar = -1;
-    while(file.ReadLine(files, 512))
-    {
-        TrimString(files);
-        if (StrContains(files, "\"convars\"") == 0 || StrContains(files, "//") == 0 || strlen(files) < 5)
-            continue;
-
-        mychar = FindCharInString(files, '1', false);
-        if (mychar != -1)
-            files[mychar] = '\0';
-
-        TrimString(files);
-
-        list.PushString(files);
-        if (StrContains(files, "mg_setcvar") != -1)
-            found = true;
-    }
-
-    file.Close();
-
-    if (found)
-    {
-        delete list;
-        return;
-    }
-
-    Cvars_CreateWhitelist(list);
-
-    delete list;
-}
-
-static void Cvars_CreateWhitelist(ArrayList list)
-{
-    LogMessage("bspconvar_whitelist.txt does not exists, Auto-generated.");
-
-    File file = OpenFile("bspconvar_whitelist.txt","w");
-    if (file == null)
-    {
-        LogError("Failed to generate bspconvar_whitelist.txt");
-        return;
-    }
-
-    file.WriteLine("\"convars\"");
-    file.WriteLine("{");
-
-    char line[512];
-    for(int i = 0; i < list.Length; ++i)
-    {
-        list.GetString(i, line, 512);
-        file.WriteLine("    %s    1", line);
-    }
-
-    file.WriteLine("    say               1");
-    file.WriteLine("    mg_setcvar        1");
-    file.WriteLine("    mg_setbhop_allow  1");
-    file.WriteLine("    mg_setbhop_auto   1");
-    file.WriteLine("    mg_setbhop_speed  1");
-
-    file.WriteLine("}");
-
-    file.Close();
 }
