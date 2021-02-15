@@ -749,6 +749,7 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
     event.GetString("weapon", weapon, 32, "");
 
     Stats_OnClientDeath(client, attacker, assister, headshot, weapon);
+    Hooks_UpdateState();
 }
 
 public void Event_PlayerHurts(Event event, const char[] name, bool dontBroadcast)
@@ -946,7 +947,7 @@ void Hooks_UpdateState()
 
         for (int client = 1; client <= MaxClients; client++) if (IsClientInGame(client) && !IsFakeClient(client) && entity != client)
         {
-            if (!g_kOptions[client][kO_Transmit] || g_iTeam[entity] != g_iTeam[client])
+            if (!g_kOptions[client][kO_Transmit] || g_iTeam[entity] != g_iTeam[client] || !IsPlayerAlive(client))
             {
                 // disabled.
                 TransmitManager_SetEntityState(entity, client, true);
