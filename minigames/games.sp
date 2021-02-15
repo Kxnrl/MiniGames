@@ -703,10 +703,24 @@ void Games_OnPlayerBlind(DataPack pack)
     // Anti Team flash, fucking idiot teammate. just fucking retarded.
     if (g_iTeam[victim] == g_iTeam[client])
     {
-        SetEntPropFloat(client, Prop_Send, "m_flFlashMaxAlpha", 0.5);
-        int damage = RoundToCeil(time * 10);
+        int damage = RoundToCeil(time * 6);
         ChatAll("%t", "flashing target", client, victim, damage);
-        SlapPlayer(client, damage, true);
+        
+        SetEntPropFloat(client, Prop_Send, "m_flFlashMaxAlpha", 0.5);
+
+        if (IsPlayerAlive(client))
+        {
+            if (GetClientHealth(client) < damage)
+            {
+                // suicide
+                ForcePlayerSuicide(client);
+            }
+            else
+            {
+                // take damage
+                SlapPlayer(client, damage, true);
+            }
+        }
     }
 }
 
