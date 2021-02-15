@@ -167,6 +167,8 @@ static void Teams_ChangeTeam()
             array_buffers.Push(x);
         }
 
+    ShuffleArray(array_buffers);
+
     // CT always same/more of TE
     int numCTs = RoundToCeil(array_buffers.Length * 0.5); 
     int numTEs = array_buffers.Length - numCTs; 
@@ -176,15 +178,14 @@ static void Teams_ChangeTeam()
 
     while (array_buffers.Length > 0)
     {
-        int random = RandomInt(0, array_buffers.Length-1);
-        int client = array_buffers.Get(random);
-        array_buffers.Erase(random);
+        int client = array_buffers.Get(0);
+        array_buffers.Erase(0);
 
         team_t t;
         t.currentTeam = GetClientTeam(client);
         t.nextTeam = (--players >= 0) ? TEAM_CT : TEAM_TE;
         t.client = client;
-        array_players.PushArray(t, sizeof(t));
+        array_players.PushArray(t, sizeof(team_t));
     }
 
     bool block = false;

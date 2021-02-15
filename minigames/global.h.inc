@@ -521,3 +521,23 @@ stock bool IsUtilities(int weapon)
 
     return StrContains(utilities, classname) > -1;
 }
+
+stock void ShuffleArray(ArrayList array)
+{
+    ArrayList dummy = new ArrayList();
+
+    while (array.Length > 0)
+    {
+        int random = RandomInt(0, array.Length - 1);
+        dummy.Push(array.Get(random));
+        array.Erase(random);
+    }
+
+    while (dummy.Length > 0)
+    {
+        array.Push(dummy.Get(0));
+        dummy.Erase(0);
+    }
+
+    delete dummy;
+}
