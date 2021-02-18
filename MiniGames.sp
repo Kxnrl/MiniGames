@@ -1006,7 +1006,7 @@ void Hooks_OnEntitySpawnedPost(int entity)
 public Action Timer_FixWeapon(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
-    if (client && IsPlayerAlive(userid))
+    if (client && IsPlayerAlive(client))
     {
         // Check weapons
         WeaponSwitchFixes(client);
