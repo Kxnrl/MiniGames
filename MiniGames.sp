@@ -177,7 +177,7 @@ public void OnPluginStart()
     Stats_OnPluginStart();
 
     // block radio
-    for(int x; x < 27; ++x)
+    for(int x; x < sizeof(g_szBlockRadio); ++x)
     AddCommandListener(Command_BlockRadio, g_szBlockRadio[x]);
 
     // team controller
@@ -196,6 +196,9 @@ public void OnPluginStart()
     // entity output
     HookEntityOutput("func_button", "OnPressed", Event_OnPressed);
 
+    // weapon fix
+    PrepareSDKCalls();
+
     // game events
     HookEventEx("round_prestart",       Event_RoundStart,       EventHookMode_Post);
     HookEventEx("round_freeze_end",     Event_RoundStarted,     EventHookMode_Post);
@@ -210,6 +213,7 @@ public void OnPluginStart()
     HookEventEx("weapon_fire",          Event_WeaponFire,       EventHookMode_Post);
     HookEventEx("cs_win_panel_match",   Event_WinPanel,         EventHookMode_Post);
     HookEventEx("announce_phase_end",   Event_AnnouncePhaseEnd, EventHookMode_Post);
+    HookEventEx("grenade_thrown",       EventHook_Grenaded,     EventHookMode_Post);
 
     // for noblock
     g_offsetNoBlock = FindSendPropInfo("CBaseEntity", "m_CollisionGroup");
@@ -512,9 +516,6 @@ public void OnClientPutInServer(int client)
     // hook this to check weapon
     SDKHook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
 
-    // Fix weapon stack
-    SDKHook(client, SDKHook_WeaponCanUse,    Hook_OnWeaponCanUse);
-
     // hook this to set transmit
     TransmitManager_AddEntityHooks(client);
 }
@@ -596,27 +597,6 @@ public void Hook_OnPostWeaponEquip(int client, int weapon)
     pack.WriteCell(client);
     pack.WriteCell(EntIndexToEntRef(weapon));
     RequestFrame(Games_OnEquipPost, pack);
-}
-
-public Action Hook_OnWeaponCanUse(int client, int weapon)
-{
-    if (!IsPlayerAlive(client) || !IsValidEdict(weapon))
-        return Plugin_Handled;
-
-    if (GetTime() > g_iNext[client])
-        return Plugin_Continue;
-
-    if (HasPlayerWeapon(client))
-        return Plugin_Continue;
-
-    // is weapon not grenade...
-    if (!IsUtilities(weapon))
-        return Plugin_Continue;
-
-    if (GetEntProp(weapon, Prop_Data, "m_iHammerID") <= 0)
-        RequestFrame(Hook_KillGamePlayerEquipNade, EntIndexToEntRef(weapon));
-
-    return Plugin_Handled;
 }
 
 public void Store_OnHatsCreated(int client, int entity, int slot)
@@ -848,6 +828,11 @@ public void Event_AnnouncePhaseEnd(Event event, const char[] name, bool dontBroa
         EndMessage();
 }
 
+public void EventHook_Grenaded(Event event, const char[] name, bool dontBroadcast)
+{
+    CreateTimer(0.3, Timer_FixWeapon, event.GetInt("userid"), TIMER_FLAG_NO_MAPCHANGE);
+}
+
 public Action CS_OnCSWeaponDrop(int client, int weapon)
 {
     char classname[32];
@@ -1016,15 +1001,15 @@ void Hooks_OnEntitySpawnedPost(int entity)
     AcceptEntityInput(trigger_multiple, "FireUser4");
 }
 
-void Hook_KillGamePlayerEquipNade(int ref)
+// Fix grenade stack...
+// by Kyle & PerfectLaugh
+public Action Timer_FixWeapon(Handle timer, int userid)
 {
-    int entity = EntRefToEntIndex(ref);
-    if (!IsValidEdict(entity))
-        return;
-
-    int client = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
-    if (client > -1)
-        return;
-
-    AcceptEntityInput(entity, "Kill");
+    int client = GetClientOfUserId(userid);
+    if (client && IsPlayerAlive(userid))
+    {
+        // Check weapons
+        WeaponSwitchFixes(client);
+    }
+    return Plugin_Stop;
 }

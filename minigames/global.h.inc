@@ -137,6 +137,9 @@ native void A2SFirewall_GetClientTicket(int client, char[] ticket, int maxLen);
 
 char g_szTicket[MAXPLAYERS+1][32];
 
+// SDKCall
+Handle g_hWeaponSwitch;
+
 // vars
 Database g_hMySQL  = null;
 
@@ -501,27 +504,6 @@ stock void ValidateTeamPlayers(int &cts, int &tes, int skip = -1)
     }
 }
 
-stock bool HasPlayerWeapon(int client)
-{
-    // primary, secondary, knife
-    for (int i = 0; i <= 2; i++)
-    {
-        if (GetPlayerWeaponSlot(client, i) > -1)
-            return true;
-    }
-    return false;
-}
-
-stock bool IsUtilities(int weapon)
-{
-    char classname[32];
-    GetEdictClassname(weapon, classname, 32);
-
-    static char utilities[] = "weapon_smokegrenade|weapon_flashbang|weapon_hegrenade|weapon_molotov|weapon_incendiary";
-
-    return StrContains(utilities, classname) > -1;
-}
-
 stock void ShuffleArray(ArrayList array)
 {
     ArrayList dummy = new ArrayList();
@@ -540,4 +522,47 @@ stock void ShuffleArray(ArrayList array)
     }
 
     delete dummy;
+}
+
+stock void PrepareSDKCalls()
+{
+    GameData conf = new GameData("sdkhooks.games");
+    if (conf == null)
+        SetFailState("Could not find sdkhooks.games gamedata");
+
+    StartPrepSDKCall(SDKCall_Player);
+    PrepSDKCall_SetFromConf(conf, SDKConf_Virtual, "Weapon_Switch");
+    // success
+    PrepSDKCall_SetReturnInfo(SDKType_Bool, SDKPass_Plain);
+    // weapon
+    PrepSDKCall_AddParameter(SDKType_CBaseEntity, SDKPass_Pointer);
+    // viewmodel
+    PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
+    if ((g_hWeaponSwitch = EndPrepSDKCall()) == null)
+        SetFailState("Failed to prepare SDKCall.");
+}
+
+stock void WeaponSwitchFixes(int client)
+{
+    int size = GetEntPropArraySize(client, Prop_Send, "m_hMyWeapons");
+    int count = 0;
+
+    for (int i = 0; i < size; i++)
+    {
+        if (GetEntPropEnt(client, Prop_Send, "m_hMyWeapons", i) != INVALID_ENT_REFERENCE)
+        {
+            // counting
+            count++;
+        }
+    }
+
+    if (count != 1)
+        return;
+
+    int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+    if (weapon != INVALID_ENT_REFERENCE)
+    {
+        SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", INVALID_ENT_REFERENCE);
+        SDKCall(g_hWeaponSwitch, client, weapon, 0);
+    }
 }
