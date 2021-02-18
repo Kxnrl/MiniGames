@@ -837,8 +837,10 @@ public Action CS_OnCSWeaponDrop(int client, int weapon)
 {
     char classname[32];
     GetWeaponClassname(weapon, -1, classname, 32);
+    if (strcmp(classname, "weapon_taser") != 0)
+        return Plugin_Continue;
 
-    return (strcmp(classname, "weapon_taser") == 0) ? Plugin_Stop : Plugin_Continue;
+    return Cvars_AllowDropTaser() ? Plugin_Continue : Plugin_Stop;
 }
 
 public Action Command_MapChange(int client, const char[] command, int args)

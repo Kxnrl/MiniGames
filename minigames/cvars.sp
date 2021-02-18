@@ -31,6 +31,7 @@ static ConVar sv_timebetweenducks;
 static ConVar phys_pushscale;
 static ConVar cs_enable_player_physics_box;
 static ConVar sv_turbophysics;
+static ConVar mp_taser_recharge_time;
 
 static ConVar mp_join_grace_time;
 static ConVar mp_freezetime;
@@ -94,7 +95,8 @@ void Cvars_OnPluginStart()
     mp_join_grace_time      = FindConVar("mp_join_grace_time");
     mp_freezetime           = FindConVar("mp_freezetime");
     mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
-    
+    mp_taser_recharge_time  = FindConVar("mp_taser_recharge_time");
+
     phys_pushscale               = FindConVar("phys_pushscale");
     cs_enable_player_physics_box = FindConVar("cs_enable_player_physics_box");
     sv_turbophysics              = FindConVar("sv_turbophysics");
@@ -601,4 +603,9 @@ public Action MuteConVarChanged(Event event, const char[] name, bool dontBroadca
 {
     event.BroadcastDisabled = true;
     return Plugin_Changed;
+}
+
+bool Cvars_AllowDropTaser()
+{
+    return mp_taser_recharge_time.IntValue < 0;
 }
