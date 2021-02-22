@@ -229,7 +229,7 @@ static void Cvars_SetCvarDefault()
     sv_staminalandcost.SetFloat(     0.05, true, false);
     sv_staminarecoveryrate.SetFloat( 66.0, true, false);
 
-    phys_pushscale.SetInt              ( 12, true, true);
+    phys_pushscale.SetInt              (100, true, true);
     cs_enable_player_physics_box.SetInt(  1, true, true);
     sv_turbophysics.SetInt             (  0, true, true);
 
@@ -581,7 +581,7 @@ void Cvars_OnRoundStart()
 
     // fixed
     // if ball game has been choosen, just insert change handled in stripper.
-    phys_pushscale.IntValue = 12;
+    phys_pushscale.IntValue = 100;
 }
 
 public Action Command_SetCvar(int args)
