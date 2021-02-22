@@ -58,7 +58,7 @@ void Cvars_OnPluginStart()
     mg_spawn_helmet     = AutoExecConfig_CreateConVar("mg_spawn_helmet",     "0",        "Give helmet On player spawn",                                      _, true, 0.0,   true, 1.0);
     mg_bhopspeed        = AutoExecConfig_CreateConVar("mg_bhopspeed",        "250.0",    "Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)",  _, true, 200.0, true, 3500.0);
     mg_randomteam       = AutoExecConfig_CreateConVar("mg_randomteam",       "1",        "Scramble Team after Round End",                                    _, true, 0.0,   true, 1.0);
-    mg_wallhack_delay   = AutoExecConfig_CreateConVar("mg_wallhack_delay",   "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 150.0);
+    mg_wallhack_delay   = AutoExecConfig_CreateConVar("mg_wallhack_delay",   "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 600.0);
     mg_transmitblock    = AutoExecConfig_CreateConVar("mg_transmitblock",    "1",        "Allow client hide teammate.",                                      _, true, 0.0,   true, 1.0);
     mg_geoiplanguage    = AutoExecConfig_CreateConVar("mg_geoiplanguage",    "en",       "Language of GeoIP2-City. \nList of language: \nBrazilian Portuguese (pt-BR), English (en), French (fr), German (de), Japanese (ja), Russian (ru), Simplified Chinese (zh-CN), and Spanish (es)");
     mg_render_player    = AutoExecConfig_CreateConVar("mg_render_player",    "0",        "Allow render player model color.",                                 _, true, 0.0,   true, 1.0);
@@ -229,7 +229,7 @@ static void Cvars_SetCvarDefault()
     sv_staminalandcost.SetFloat(     0.05, true, false);
     sv_staminarecoveryrate.SetFloat( 66.0, true, false);
 
-    phys_pushscale.SetInt              (1200, true, true);
+    phys_pushscale.SetInt              ( 12, true, true);
     cs_enable_player_physics_box.SetInt(  1, true, true);
     sv_turbophysics.SetInt             (  0, true, true);
 
@@ -578,6 +578,10 @@ void Cvars_OnRoundStart()
     ConVar_Easy_SetInt("sv_full_alltalk",                   1, true, false);
     ConVar_Easy_SetInt("sv_talk_enemy_living",              1, true, false);
     ConVar_Easy_SetInt("sv_talk_enemy_dead",                1, true, false);
+
+    // fixed
+    // if ball game has been choosen, just insert change handled in stripper.
+    phys_pushscale.IntValue = 12;
 }
 
 public Action Command_SetCvar(int args)

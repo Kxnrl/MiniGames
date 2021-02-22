@@ -122,6 +122,12 @@ public MRESReturn Event_GetReserveAmmoMax(int pThis, Handle hReturn, Handle hPar
     if (!IsValidEdict(pThis))
         return MRES_Ignored;
 
+    // ignore taser
+    char classname[32];
+    GetEdictClassname(pThis, classname, 32);
+    if (strcmp(classname, "weapon_taser") == 0)
+        return MRES_Ignored;
+
     DHookSetReturn(hReturn, MAX_RESERVE_AMMO_MAX);
 
     return MRES_Supercede;
