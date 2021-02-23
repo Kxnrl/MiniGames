@@ -747,6 +747,12 @@ public void Event_PlayerHurts(Event event, const char[] name, bool dontBroadcast
 
 public Action Event_PlayerTeams(Event event, const char[] name, bool dontBroadcast)
 {
+    if (dontBroadcast || event.GetBool("disconnect"))
+    {
+        // skip
+        return Plugin_Continue;
+    }
+
     int newteam = event.GetInt("team");
     int oldteam = event.GetInt("oldteam");
     int client  = GetClientOfUserId(event.GetInt("userid"));
@@ -759,7 +765,7 @@ public Action Event_PlayerTeams(Event event, const char[] name, bool dontBroadca
         ForcePlayerSuicide(client);
     }
 
-    event.BroadcastDisabled = true;
+    event.SetBool("silent", true);
     return Plugin_Changed;
 }
 
