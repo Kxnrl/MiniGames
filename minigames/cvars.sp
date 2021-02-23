@@ -33,6 +33,11 @@ static ConVar cs_enable_player_physics_box;
 static ConVar sv_turbophysics;
 static ConVar mp_taser_recharge_time;
 
+static ConVar sv_teamid_overhead_always_prohibit;
+static ConVar sv_show_team_equipment_prohibit;
+static ConVar sv_teamid_overhead;
+static ConVar mp_playerid;
+
 static ConVar mp_join_grace_time;
 static ConVar mp_freezetime;
 
@@ -96,6 +101,11 @@ void Cvars_OnPluginStart()
     mp_freezetime           = FindConVar("mp_freezetime");
     mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
     mp_taser_recharge_time  = FindConVar("mp_taser_recharge_time");
+
+    sv_teamid_overhead_always_prohibit = FindConVar("sv_teamid_overhead_always_prohibit");
+    sv_show_team_equipment_prohibit    = FindConVar("sv_show_team_equipment_prohibit");
+    sv_teamid_overhead                 = FindConVar("sv_teamid_overhead");
+    mp_playerid                        = FindConVar("mp_playerid");
 
     phys_pushscale               = FindConVar("phys_pushscale");
     cs_enable_player_physics_box = FindConVar("cs_enable_player_physics_box");
@@ -208,7 +218,6 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_maxrounds",                      0, true, false);
     ConVar_Easy_SetInt("mp_halftime",                       0, true, false);
     ConVar_Easy_SetInt("mp_match_can_clinch",               0, true, false);
-    ConVar_Easy_SetInt("mp_playerid",                       2, true, false);
     ConVar_Easy_SetInt("phys_timescale",                    1, true, false);
     ConVar_Easy_SetInt("sv_damage_print_enable",            0, true, false);
     ConVar_Easy_SetInt("sv_airaccelerate",               9999, true, false);
@@ -222,6 +231,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("sv_friction",                       5, true, false);
     ConVar_Easy_SetInt("sv_ignoregrenaderadio",             1, true, false);
     ConVar_Easy_SetInt("sv_infinite_ammo",                  0, true, false);
+    ConVar_Easy_SetInt("sv_teamid_overhead_maxdist",     1500, true, false);
     ConVar_Easy_SetInt("weapon_reticle_knife_show",         1, true, false);
     ConVar_Easy_SetInt("mp_equipment_reset_rounds",         1, true, false);
 
@@ -229,6 +239,11 @@ static void Cvars_SetCvarDefault()
     sv_staminajumpcost.SetFloat(     0.10, true, false);
     sv_staminalandcost.SetFloat(     0.05, true, false);
     sv_staminarecoveryrate.SetFloat( 66.0, true, false);
+
+    sv_teamid_overhead_always_prohibit.SetBool(true,  true, false);
+    sv_show_team_equipment_prohibit.SetBool   (true,  true, false);
+    sv_teamid_overhead.SetBool                (true,  true, false);
+    mp_playerid.SetBool                       (false, true, false);
 
     phys_pushscale.SetInt              (100, true, true);
     cs_enable_player_physics_box.SetInt(  1, true, true);
