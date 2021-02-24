@@ -160,6 +160,7 @@ ConVar mg_button_watcher            = null;
 
 ConVar sv_enablebunnyhopping        = null;
 ConVar mp_damage_headshot_only      = null;
+ConVar mp_teammates_are_enemies     = null;
 
 ConVar mg_bhopspeed                 = null;
 ConVar mg_restrictawp               = null;

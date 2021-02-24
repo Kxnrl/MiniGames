@@ -917,7 +917,7 @@ void Hooks_UpdateState()
     if (!g_extTransmitManager)
         return;
 
-    if (!mg_transmitblock.BoolValue)
+    if (!mg_transmitblock.BoolValue || mp_teammates_are_enemies.BoolValue)
     {
         // force all transmit state
         for(int i = 1; i <= MaxClients; i++)

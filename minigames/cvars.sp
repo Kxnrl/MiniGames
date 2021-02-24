@@ -101,6 +101,7 @@ void Cvars_OnPluginStart()
     mp_freezetime           = FindConVar("mp_freezetime");
     mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
     mp_taser_recharge_time  = FindConVar("mp_taser_recharge_time");
+    mp_teammates_are_enemies= FindConVar("mp_teammates_are_enemies");
 
     sv_teamid_overhead_always_prohibit = FindConVar("sv_teamid_overhead_always_prohibit");
     sv_show_team_equipment_prohibit    = FindConVar("sv_show_team_equipment_prohibit");
@@ -118,6 +119,8 @@ void Cvars_OnPluginStart()
     mp_t_default_primary.AddChangeHook(Cvars_OnSettingChanged);
     mp_t_default_secondary.AddChangeHook(Cvars_OnSettingChanged);
     sv_autobunnyhopping.AddChangeHook(Cvars_OnSettingChanged);
+
+    mp_teammates_are_enemies.AddChangeHook(Cvars_OnFFAChanged);
 
     mp_join_grace_time.AddChangeHook(Cvars_OnLateSpawnChanged);
     mp_freezetime.AddChangeHook(Cvars_OnLateSpawnChanged);
@@ -143,6 +146,11 @@ void Cvars_OnPluginStart()
 
     // GENERATE CONFIG
     CreateAllMapConfigs();
+}
+
+public void Cvars_OnFFAChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+    Hooks_UpdateState();
 }
 
 public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
