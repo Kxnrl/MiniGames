@@ -159,6 +159,13 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
         return MRES_Supercede;
     }
 
+    if (StrContains(command, "phys_", false) == 0)
+    {
+        PrintToServer("[BSP CVAR]  Blocked physics convar [%s]", command);
+        DHookSetReturn(hReturn, false);
+        return MRES_Supercede;
+    }
+
     char values[4][32];
     int split = ExplodeString(command, " ", values, 4, 32);
     if (split == 2)
@@ -174,8 +181,9 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
     }
     else
     {
-        PrintToConsoleAll("[地图参数]   %s", command);
-        ServerCommand("%s", command);
+        PrintToServer("[BSP CVAR]  Blocked unknow convar [%s]", command);
+        DHookSetReturn(hReturn, false);
+        return MRES_Supercede;
     }
 
     DHookSetReturn(hReturn, false);
