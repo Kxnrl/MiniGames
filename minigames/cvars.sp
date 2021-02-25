@@ -71,6 +71,7 @@ void Cvars_OnPluginStart()
     mg_block_keybind_cj = AutoExecConfig_CreateConVar("mg_block_keybind_cj", "1",        "Block keybind crouch jump.",                                       _, true, 0.0,   true, 1.0);
     mg_button_watcher   = AutoExecConfig_CreateConVar("mg_button_watcher",   "1",        "Print button usage info.",                                         _, true, 0.0,   true, 1.0);
     mg_broadcast_leave  = AutoExecConfig_CreateConVar("mg_broadcast_leave",  "0",        "Broadcast on client disconnect.",                                  _, true, 0.0,   true, 1.0);
+    mg_slap_after_vac   = AutoExecConfig_CreateConVar("mg_slap_after_vac",   "1",        "Slap player after vac timer elapsed.",                             _, true, 0.0,   true, 1.0);
 
     mg_bonus_kill_via_gun     = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun",       "3", "How many credits to earn when player kill enemy with gun",                _, true, 0.0, true, 1000.0);
     mg_bonus_kill_via_gun_hs  = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun_hs",    "4", "How many credits to earn when player kill enemy with gun and headshot",   _, true, 0.0, true, 1000.0);

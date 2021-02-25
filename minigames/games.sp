@@ -614,6 +614,25 @@ public Action Games_RoundTimer(Handle timer)
         Call_PushCell(ct);
         Call_Finish();
     }
+    // Slap player after vac timer elapsed
+    else if (t_iWallHackCD == 0 && mg_slap_after_vac.BoolValue)
+    {
+        for(int client = 1; client <= MaxClients; ++client)
+            if (ClientValid(client) && IsPlayerAlive(client))
+            {
+                int health = GetClientHealth(client) - 1;
+                if (health < 0)
+                {
+                    // kill player
+                    ForcePlayerSuicide(client);
+                }
+                else
+                {
+                    // decrease health
+                    SetEntityHealth(client, health);
+                }
+            }
+    }
 
     return Plugin_Continue;
 }
