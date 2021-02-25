@@ -64,7 +64,7 @@ void Cvars_OnPluginStart()
     mg_spawn_helmet     = AutoExecConfig_CreateConVar("mg_spawn_helmet",     "0",        "Give helmet On player spawn",                                      _, true, 0.0,   true, 1.0);
     mg_bhopspeed        = AutoExecConfig_CreateConVar("mg_bhopspeed",        "250.0",    "Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)",  _, true, 200.0, true, 3500.0);
     mg_randomteam       = AutoExecConfig_CreateConVar("mg_randomteam",       "1",        "Scramble Team after Round End",                                    _, true, 0.0,   true, 1.0);
-    mg_wallhack_delay   = AutoExecConfig_CreateConVar("mg_wallhack_delay",   "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 600.0);
+    mg_wallhack_delay   = AutoExecConfig_CreateConVar("mg_wallhack_delay",   "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 180.0);
     mg_transmitblock    = AutoExecConfig_CreateConVar("mg_transmitblock",    "1",        "Allow client hide teammate.",                                      _, true, 0.0,   true, 1.0);
     mg_geoiplanguage    = AutoExecConfig_CreateConVar("mg_geoiplanguage",    "en",       "Language of GeoIP2-City. \nList of language: \nBrazilian Portuguese (pt-BR), English (en), French (fr), German (de), Japanese (ja), Russian (ru), Simplified Chinese (zh-CN), and Spanish (es)");
     mg_render_player    = AutoExecConfig_CreateConVar("mg_render_player",    "0",        "Allow render player model color.",                                 _, true, 0.0,   true, 1.0);
@@ -140,6 +140,9 @@ void Cvars_OnPluginStart()
     RegServerCmd("mg_setbhop_allow", Command_SetBhopAllow);
     RegServerCmd("mg_setbhop_auto",  Command_SetBhopAuto);
     RegServerCmd("mg_setbhop_speed", Command_SetBhopSpeed);
+
+    // Vac
+    RegServerCmd("mg_add_vac_timer", Command_VacTimer);
 
     // Cvar
     RegServerCmd("mg_setcvar", Command_SetCvar);
@@ -483,7 +486,7 @@ static void GenerateMapConfigs(const char[] map, const char[] path)
     file.Close();
 }
 
-public Action Command_SetBhopAllow(int args)
+static Action Command_SetBhopAllow(int args)
 {
     if (args != 1)
     {
@@ -519,7 +522,7 @@ public Action Command_SetBhopAllow(int args)
     return Plugin_Handled;
 }
 
-public Action Command_SetBhopAuto(int args)
+static Action Command_SetBhopAuto(int args)
 {
     if (args != 1)
     {
@@ -555,7 +558,7 @@ public Action Command_SetBhopAuto(int args)
     return Plugin_Handled;
 }
 
-public Action Command_SetBhopSpeed(int args)
+static Action Command_SetBhopSpeed(int args)
 {
     if (args != 1)
     {
@@ -577,6 +580,21 @@ public Action Command_SetBhopSpeed(int args)
     mg_bhopspeed.FloatValue = speed;
 
     ChatAll("%t", "map config changed float", "bhop speed", mg_bhopspeed.FloatValue);
+
+    return Plugin_Handled;
+}
+
+static Action Command_VacTimer(int args)
+{
+    if (args != 1)
+    {
+        LogError("Error trigger command mg_add_vac_timer!");
+        return Plugin_Handled;
+    }
+
+    char buffer[16];
+    GetCmdArg(1, buffer, 16);
+    Games_AddVacTimer(StringToInt(buffer));
 
     return Plugin_Handled;
 }

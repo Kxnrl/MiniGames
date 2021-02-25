@@ -782,3 +782,8 @@ int Games_GetRoundNumber()
 {
     return t_iRoundNumber;
 }
+
+void Games_AddVacTimer(int seconds)
+{
+    t_iWallHackCD += seconds;
+}
