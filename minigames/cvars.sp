@@ -30,6 +30,7 @@ static ConVar sv_autobunnyhopping;
 static ConVar sv_timebetweenducks;
 static ConVar phys_pushscale;
 static ConVar cs_enable_player_physics_box;
+static ConVar sv_standable_normal;
 static ConVar sv_turbophysics;
 static ConVar mp_taser_recharge_time;
 
@@ -97,6 +98,7 @@ void Cvars_OnPluginStart()
     sv_staminajumpcost      = FindConVar("sv_staminajumpcost");
     sv_staminalandcost      = FindConVar("sv_staminalandcost");
     sv_staminarecoveryrate  = FindConVar("sv_staminarecoveryrate");
+    sv_standable_normal     = FindConVar("sv_standable_normal");
     mp_join_grace_time      = FindConVar("mp_join_grace_time");
     mp_freezetime           = FindConVar("mp_freezetime");
     mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
@@ -606,6 +608,9 @@ void Cvars_OnRoundStart()
     // fixed
     // if ball game has been choosen, just insert change handled in stripper.
     phys_pushscale.IntValue = 24;
+    
+    // fix skate invoke
+    sv_standable_normal.FloatValue = 0.7;
 }
 
 public Action Command_SetCvar(int args)
