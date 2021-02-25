@@ -251,7 +251,7 @@ static void Cvars_SetCvarDefault()
     sv_teamid_overhead_always_prohibit.SetBool(true,  true, false);
     sv_show_team_equipment_prohibit.SetBool   (true,  true, false);
     sv_teamid_overhead.SetBool                (true,  true, false);
-    mp_playerid.SetBool                       (false, true, false);
+    mp_playerid.SetInt                        (2,     true, false);
 
     phys_pushscale.SetInt              (100, true, true);
     cs_enable_player_physics_box.SetInt(  1, true, true);
