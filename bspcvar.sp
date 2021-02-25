@@ -19,6 +19,7 @@
 
 Handle g_AcceptInput;
 ArrayList g_CvarList;
+ConVar cs_enable_player_physics_box;
 
 public Plugin myinfo = 
 {
@@ -51,6 +52,8 @@ public void OnPluginStart()
 
     g_CvarList = new ArrayList(ByteCountToCells(128));
     InitCvars();
+
+    cs_enable_player_physics_box = FindConVar("cs_enable_player_physics_box");
 }
 
 public void Pupd_OnCheckAllPlugins()
@@ -127,6 +130,15 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
     if (StrContains(command, "sm", false) == 0)
     {
         LogMessage("[BSP CVAR]  Blocked sm command [%s]", command);
+        DHookSetReturn(hReturn, false);
+        return MRES_Supercede;
+    }
+
+    // special convar
+    // cs_enable_player_physics_box
+    if (StrContains(command, "cs_enable_player_physics_box", false) > -1)
+    {
+        cs_enable_player_physics_box.BoolValue = true;
         DHookSetReturn(hReturn, false);
         return MRES_Supercede;
     }
