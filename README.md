@@ -30,6 +30,12 @@ CSGO game mode -> MiniGames for mg map.
 * Hide teammate support.
 * HDR/LDR fix.
 * Block suicide.
+* Ammo manager.
+* Entity 'game_player_equip' fix.
+* Bsp cvar whitelist manager.
+* Player default skin.
+* Button locker.
+* Input 'Kill' fix.
   
   
 ### Commands:
@@ -65,7 +71,7 @@ CSGO game mode -> MiniGames for mg map.
 #### Donate
 * [Steam Trade Offer](https://steamcommunity.com/tradeoffer/new/?partner=88166525&token=lszXBJeY)
   
-
   
-#### 2021 Happy new year
+  
+### 2021 Happy new year
 ![Happy new year](https://www.kxnrl.com/assets/images/2021Arlene.jpg)
