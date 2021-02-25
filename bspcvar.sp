@@ -132,27 +132,28 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
     if (StrContains(command, "cs_enable_player_physics_box", false) > -1)
     {
         cs_enable_player_physics_box.BoolValue = true;
+        PrintToConsoleAll("[BspConVar]  cs_enable_player_physics_box enabled");
         DHookSetReturn(hReturn, false);
         return MRES_Supercede;
     }
 
     if (StrContains(command, "sm", false) == 0)
     {
-        LogMessage("[BSP CVAR]  Blocked sm command [%s]", command);
+        LogMessage("[BspConVar]  Blocked sm command [%s]", command);
         DHookSetReturn(hReturn, false);
         return MRES_Supercede;
     }
 
     if (StrContains(command, "ammo_", false) == 0)
     {
-        PrintToServer("[BSP CVAR]  Blocked ammo convar [%s]", command);
+        PrintToServer("[BspConVar]  Blocked ammo convar [%s]", command);
         DHookSetReturn(hReturn, false);
         return MRES_Supercede;
     }
 
     if (StrContains(command, "phys_", false) == 0)
     {
-        PrintToServer("[BSP CVAR]  Blocked physics convar [%s]", command);
+        PrintToServer("[BspConVar]  Blocked physics convar [%s]", command);
         DHookSetReturn(hReturn, false);
         return MRES_Supercede;
     }
@@ -175,7 +176,7 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
 
         if (!isWhiteList)
         {
-            LogMessage("[BSP CVAR]  Blocked non-whitelist convar [%s]", command);
+            LogMessage("[BspConVar]  Blocked non-whitelist convar [%s]", command);
             DHookSetReturn(hReturn, false);
             return MRES_Supercede;
         }
@@ -183,17 +184,17 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
 
         if (g_CvarList.FindString(values[0]) == -1)
         {
-            LogMessage("[BSP CVAR]  Blocked non-whitelist convar [%s]", command);
+            LogMessage("[BspConVar]  Blocked non-whitelist convar [%s]", command);
             DHookSetReturn(hReturn, false);
             return MRES_Supercede;
         }
 
-        PrintToConsoleAll("[地图参数]  修改 [%s] 值: %s", values[0], values[1]);
+        PrintToConsoleAll("[BspConVar]  [%s] -> [%s]", values[0], values[1]);
         ServerCommand("mg_setcvar %s %s", values[0], values[1]);
 
     }
 
-    PrintToServer("[BSP CVAR]  Blocked unknow command [%s]", command);
+    PrintToServer("[BspConVar]  Blocked unknow command [%s]", command);
     DHookSetReturn(hReturn, false);
     return MRES_Supercede;
 }
