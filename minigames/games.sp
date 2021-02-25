@@ -595,7 +595,7 @@ public Action Games_RoundTimer(Handle timer)
         GetAlives(tt, te, ct);
 
         bool block = false;
-        Call_StartForward(g_fwdOnVacEnabled);
+        Call_StartForward(g_fwdOnVacElapsed);
         Call_PushCell(te);
         Call_PushCell(ct);
         Call_Finish(block);
@@ -608,6 +608,11 @@ public Action Games_RoundTimer(Handle timer)
         for(int client = 1; client <= MaxClients; ++client)
             if (ClientValid(client) && IsPlayerAlive(client))
                 SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 9999999.0);
+
+        Call_StartForward(g_fwdOnVacEnabled);
+        Call_PushCell(te);
+        Call_PushCell(ct);
+        Call_Finish();
     }
 
     return Plugin_Continue;

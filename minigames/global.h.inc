@@ -114,6 +114,7 @@ bool g_extTransmitManager;
 
 // forwards
 GlobalForward g_fwdOnRandomTeam;
+GlobalForward g_fwdOnVacElapsed;
 GlobalForward g_fwdOnVacEnabled;
 GlobalForward g_fwdOnRenderModelColor;
 
