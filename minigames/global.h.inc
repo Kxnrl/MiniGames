@@ -114,6 +114,7 @@ bool g_extTransmitManager;
 
 // forwards
 GlobalForward g_fwdOnRandomTeam;
+GlobalForward g_fwdOnVacElapsed;
 GlobalForward g_fwdOnVacEnabled;
 GlobalForward g_fwdOnRenderModelColor;
 
@@ -160,6 +161,7 @@ ConVar mg_button_watcher            = null;
 
 ConVar sv_enablebunnyhopping        = null;
 ConVar mp_damage_headshot_only      = null;
+ConVar mp_teammates_are_enemies     = null;
 
 ConVar mg_bhopspeed                 = null;
 ConVar mg_restrictawp               = null;
@@ -172,6 +174,7 @@ ConVar mg_randomteam                = null;
 ConVar mg_wallhack_delay            = null;
 ConVar mg_render_player             = null;
 ConVar mg_broadcast_leave           = null;
+ConVar mg_slap_after_vac            = null;
 
 ConVar mg_bonus_kill_via_gun        = null;
 ConVar mg_bonus_kill_via_gun_hs     = null;

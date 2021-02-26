@@ -595,7 +595,7 @@ public Action Games_RoundTimer(Handle timer)
         GetAlives(tt, te, ct);
 
         bool block = false;
-        Call_StartForward(g_fwdOnVacEnabled);
+        Call_StartForward(g_fwdOnVacElapsed);
         Call_PushCell(te);
         Call_PushCell(ct);
         Call_Finish(block);
@@ -608,6 +608,30 @@ public Action Games_RoundTimer(Handle timer)
         for(int client = 1; client <= MaxClients; ++client)
             if (ClientValid(client) && IsPlayerAlive(client))
                 SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 9999999.0);
+
+        Call_StartForward(g_fwdOnVacEnabled);
+        Call_PushCell(te);
+        Call_PushCell(ct);
+        Call_Finish();
+    }
+    // Slap player after vac timer elapsed
+    else if (t_iWallHackCD == 0 && mg_slap_after_vac.BoolValue)
+    {
+        for(int client = 1; client <= MaxClients; ++client)
+            if (ClientValid(client) && IsPlayerAlive(client))
+            {
+                int health = GetClientHealth(client) - 1;
+                if (health < 0)
+                {
+                    // kill player
+                    ForcePlayerSuicide(client);
+                }
+                else
+                {
+                    // decrease health
+                    SetEntityHealth(client, health);
+                }
+            }
     }
 
     return Plugin_Continue;
@@ -781,4 +805,9 @@ float Games_GetRoundTime()
 int Games_GetRoundNumber()
 {
     return t_iRoundNumber;
+}
+
+void Games_AddVacTimer(int seconds)
+{
+    t_iWallHackCD += seconds;
 }

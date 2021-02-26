@@ -30,8 +30,14 @@ static ConVar sv_autobunnyhopping;
 static ConVar sv_timebetweenducks;
 static ConVar phys_pushscale;
 static ConVar cs_enable_player_physics_box;
+static ConVar sv_standable_normal;
 static ConVar sv_turbophysics;
 static ConVar mp_taser_recharge_time;
+
+static ConVar sv_teamid_overhead_always_prohibit;
+static ConVar sv_show_team_equipment_prohibit;
+static ConVar sv_teamid_overhead;
+static ConVar mp_playerid;
 
 static ConVar mp_join_grace_time;
 static ConVar mp_freezetime;
@@ -58,13 +64,14 @@ void Cvars_OnPluginStart()
     mg_spawn_helmet     = AutoExecConfig_CreateConVar("mg_spawn_helmet",     "0",        "Give helmet On player spawn",                                      _, true, 0.0,   true, 1.0);
     mg_bhopspeed        = AutoExecConfig_CreateConVar("mg_bhopspeed",        "250.0",    "Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)",  _, true, 200.0, true, 3500.0);
     mg_randomteam       = AutoExecConfig_CreateConVar("mg_randomteam",       "1",        "Scramble Team after Round End",                                    _, true, 0.0,   true, 1.0);
-    mg_wallhack_delay   = AutoExecConfig_CreateConVar("mg_wallhack_delay",   "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 600.0);
+    mg_wallhack_delay   = AutoExecConfig_CreateConVar("mg_wallhack_delay",   "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 180.0);
     mg_transmitblock    = AutoExecConfig_CreateConVar("mg_transmitblock",    "1",        "Allow client hide teammate.",                                      _, true, 0.0,   true, 1.0);
     mg_geoiplanguage    = AutoExecConfig_CreateConVar("mg_geoiplanguage",    "en",       "Language of GeoIP2-City. \nList of language: \nBrazilian Portuguese (pt-BR), English (en), French (fr), German (de), Japanese (ja), Russian (ru), Simplified Chinese (zh-CN), and Spanish (es)");
     mg_render_player    = AutoExecConfig_CreateConVar("mg_render_player",    "0",        "Allow render player model color.",                                 _, true, 0.0,   true, 1.0);
     mg_block_keybind_cj = AutoExecConfig_CreateConVar("mg_block_keybind_cj", "1",        "Block keybind crouch jump.",                                       _, true, 0.0,   true, 1.0);
     mg_button_watcher   = AutoExecConfig_CreateConVar("mg_button_watcher",   "1",        "Print button usage info.",                                         _, true, 0.0,   true, 1.0);
     mg_broadcast_leave  = AutoExecConfig_CreateConVar("mg_broadcast_leave",  "0",        "Broadcast on client disconnect.",                                  _, true, 0.0,   true, 1.0);
+    mg_slap_after_vac   = AutoExecConfig_CreateConVar("mg_slap_after_vac",   "1",        "Slap player after vac timer elapsed.",                             _, true, 0.0,   true, 1.0);
 
     mg_bonus_kill_via_gun     = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun",       "3", "How many credits to earn when player kill enemy with gun",                _, true, 0.0, true, 1000.0);
     mg_bonus_kill_via_gun_hs  = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun_hs",    "4", "How many credits to earn when player kill enemy with gun and headshot",   _, true, 0.0, true, 1000.0);
@@ -92,10 +99,17 @@ void Cvars_OnPluginStart()
     sv_staminajumpcost      = FindConVar("sv_staminajumpcost");
     sv_staminalandcost      = FindConVar("sv_staminalandcost");
     sv_staminarecoveryrate  = FindConVar("sv_staminarecoveryrate");
+    sv_standable_normal     = FindConVar("sv_standable_normal");
     mp_join_grace_time      = FindConVar("mp_join_grace_time");
     mp_freezetime           = FindConVar("mp_freezetime");
     mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
     mp_taser_recharge_time  = FindConVar("mp_taser_recharge_time");
+    mp_teammates_are_enemies= FindConVar("mp_teammates_are_enemies");
+
+    sv_teamid_overhead_always_prohibit = FindConVar("sv_teamid_overhead_always_prohibit");
+    sv_show_team_equipment_prohibit    = FindConVar("sv_show_team_equipment_prohibit");
+    sv_teamid_overhead                 = FindConVar("sv_teamid_overhead");
+    mp_playerid                        = FindConVar("mp_playerid");
 
     phys_pushscale               = FindConVar("phys_pushscale");
     cs_enable_player_physics_box = FindConVar("cs_enable_player_physics_box");
@@ -108,6 +122,8 @@ void Cvars_OnPluginStart()
     mp_t_default_primary.AddChangeHook(Cvars_OnSettingChanged);
     mp_t_default_secondary.AddChangeHook(Cvars_OnSettingChanged);
     sv_autobunnyhopping.AddChangeHook(Cvars_OnSettingChanged);
+
+    mp_teammates_are_enemies.AddChangeHook(Cvars_OnFFAChanged);
 
     mp_join_grace_time.AddChangeHook(Cvars_OnLateSpawnChanged);
     mp_freezetime.AddChangeHook(Cvars_OnLateSpawnChanged);
@@ -126,6 +142,9 @@ void Cvars_OnPluginStart()
     RegServerCmd("mg_setbhop_auto",  Command_SetBhopAuto);
     RegServerCmd("mg_setbhop_speed", Command_SetBhopSpeed);
 
+    // Vac
+    RegServerCmd("mg_add_vac_timer", Command_VacTimer);
+
     // Cvar
     RegServerCmd("mg_setcvar", Command_SetCvar);
 
@@ -133,6 +152,11 @@ void Cvars_OnPluginStart()
 
     // GENERATE CONFIG
     CreateAllMapConfigs();
+}
+
+public void Cvars_OnFFAChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+    Hooks_UpdateState();
 }
 
 public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -202,12 +226,12 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_weapons_allow_map_placed",       1, true, false);
     ConVar_Easy_SetInt("mp_friendlyfire",                   0, true, false);
     ConVar_Easy_SetInt("mp_autoteambalance",                0, true, false);
-    ConVar_Easy_SetInt("mp_force_pick_time",                3, true, false);
+    ConVar_Easy_SetInt("mp_limitteams",                     0, true, false);
+    ConVar_Easy_SetInt("mp_force_pick_time",               15, true, false);
     ConVar_Easy_SetInt("mp_display_kill_assists",           1, true, false);
     ConVar_Easy_SetInt("mp_maxrounds",                      0, true, false);
     ConVar_Easy_SetInt("mp_halftime",                       0, true, false);
     ConVar_Easy_SetInt("mp_match_can_clinch",               0, true, false);
-    ConVar_Easy_SetInt("mp_playerid",                       2, true, false);
     ConVar_Easy_SetInt("phys_timescale",                    1, true, false);
     ConVar_Easy_SetInt("sv_damage_print_enable",            0, true, false);
     ConVar_Easy_SetInt("sv_airaccelerate",               9999, true, false);
@@ -221,6 +245,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("sv_friction",                       5, true, false);
     ConVar_Easy_SetInt("sv_ignoregrenaderadio",             1, true, false);
     ConVar_Easy_SetInt("sv_infinite_ammo",                  0, true, false);
+    ConVar_Easy_SetInt("sv_teamid_overhead_maxdist",     1500, true, false);
     ConVar_Easy_SetInt("weapon_reticle_knife_show",         1, true, false);
     ConVar_Easy_SetInt("mp_equipment_reset_rounds",         1, true, false);
 
@@ -229,8 +254,13 @@ static void Cvars_SetCvarDefault()
     sv_staminalandcost.SetFloat(     0.05, true, false);
     sv_staminarecoveryrate.SetFloat( 66.0, true, false);
 
-    phys_pushscale.SetInt              ( 12, true, true);
-    cs_enable_player_physics_box.SetInt(  1, true, true);
+    sv_teamid_overhead_always_prohibit.SetBool(true,  true, false);
+    sv_show_team_equipment_prohibit.SetBool   (true,  true, false);
+    sv_teamid_overhead.SetBool                (true,  true, false);
+    mp_playerid.SetInt                        (2,     true, false);
+
+    phys_pushscale.SetInt              ( 24, true, true);
+    cs_enable_player_physics_box.SetInt(  0, true, true);
     sv_turbophysics.SetInt             (  0, true, true);
 
     sv_autobunnyhopping.SetInt(0, true, false);
@@ -457,7 +487,7 @@ static void GenerateMapConfigs(const char[] map, const char[] path)
     file.Close();
 }
 
-public Action Command_SetBhopAllow(int args)
+static Action Command_SetBhopAllow(int args)
 {
     if (args != 1)
     {
@@ -493,7 +523,7 @@ public Action Command_SetBhopAllow(int args)
     return Plugin_Handled;
 }
 
-public Action Command_SetBhopAuto(int args)
+static Action Command_SetBhopAuto(int args)
 {
     if (args != 1)
     {
@@ -529,7 +559,7 @@ public Action Command_SetBhopAuto(int args)
     return Plugin_Handled;
 }
 
-public Action Command_SetBhopSpeed(int args)
+static Action Command_SetBhopSpeed(int args)
 {
     if (args != 1)
     {
@@ -551,6 +581,21 @@ public Action Command_SetBhopSpeed(int args)
     mg_bhopspeed.FloatValue = speed;
 
     ChatAll("%t", "map config changed float", "bhop speed", mg_bhopspeed.FloatValue);
+
+    return Plugin_Handled;
+}
+
+static Action Command_VacTimer(int args)
+{
+    if (args != 1)
+    {
+        LogError("Error trigger command mg_add_vac_timer!");
+        return Plugin_Handled;
+    }
+
+    char buffer[16];
+    GetCmdArg(1, buffer, 16);
+    Games_AddVacTimer(StringToInt(buffer));
 
     return Plugin_Handled;
 }
@@ -581,7 +626,10 @@ void Cvars_OnRoundStart()
 
     // fixed
     // if ball game has been choosen, just insert change handled in stripper.
-    phys_pushscale.IntValue = 12;
+    phys_pushscale.IntValue = 24;
+    
+    // fix skate invoke
+    sv_standable_normal.FloatValue = 0.7;
 }
 
 public Action Command_SetCvar(int args)

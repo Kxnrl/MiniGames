@@ -2,7 +2,7 @@
   
 |Build Status|Download|
 |---|---
-|[![Build Status](https://img.shields.io/travis/Kxnrl/MiniGames/master.svg?style=flat-square)](https://travis-ci.org/Kxnrl/MiniGames?branch=master) |[![Download](https://static.kxnrl.com/images/web/buttons/download.png)](https://build.kxnrl.com/MiniGames/)  
+|[![Build Status](https://img.shields.io/travis/Kxnrl/MiniGames/master.svg?style=flat-square)](https://travis-ci.com/Kxnrl/MiniGames?branch=master) |[![Download](https://static.kxnrl.com/images/web/buttons/download.png)](https://build.kxnrl.com/MiniGames/)  
   
   
 CSGO game mode -> MiniGames for mg map.
@@ -12,7 +12,7 @@ CSGO game mode -> MiniGames for mg map.
 * Player stats/analytics.
 * Ranking system.
 * Scramble/Random team.
-* VAC wallhack.
+* VAC wallhack/slap.
 * AutoBhop.
 * BHop speed limiter.
 * Settings enforce.
@@ -21,6 +21,21 @@ CSGO game mode -> MiniGames for mg map.
 * Duck spam fix.
 * Hit feedback HUD.
 * Team flash punisher.
+* Dodgeball fix.
+* Switch grenade fix.
+* Store credits support.
+* Player render color.
+* Speed HUD.
+* Button watcher.
+* Hide teammate support.
+* HDR/LDR fix.
+* Block suicide.
+* Ammo manager.
+* Entity 'game_player_equip' fix.
+* Bsp cvar whitelist manager.
+* Player default skin.
+* Button locker.
+* Input 'Kill' fix.
   
   
 ### Commands:
@@ -51,11 +66,12 @@ CSGO game mode -> MiniGames for mg map.
 
 #### Any other questions
 * [Steam](https://steamcommunity.com/profiles/76561198048432253/)
-* [Telegram](https://t.me/Kxnrl)
   
   
 #### Donate
 * [Steam Trade Offer](https://steamcommunity.com/tradeoffer/new/?partner=88166525&token=lszXBJeY)
-* **AliPay**: h673321480[AT]163.com
-* **Paypal**: 673321480[AT]qq.com
   
+  
+  
+### 2021 Happy new year
+![Happy new year](https://www.kxnrl.com/assets/images/2021Arlene.jpg)

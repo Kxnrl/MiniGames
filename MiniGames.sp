@@ -162,8 +162,9 @@ public void OnPluginStart()
         SetFailState("This plugin only for CSGO!");
 
     // Forwards
-    g_fwdOnRandomTeam = new GlobalForward("MG_OnRandomTeam", ET_Event, Param_Cell, Param_Cell, Param_Cell);
-    g_fwdOnVacEnabled = new GlobalForward("MG_OnVacEnabled", ET_Event, Param_Cell, Param_Cell);
+    g_fwdOnRandomTeam = new GlobalForward("MG_OnRandomTeam", ET_Event,  Param_Cell, Param_Cell, Param_Cell);
+    g_fwdOnVacElapsed = new GlobalForward("MG_OnVacElapsed", ET_Event,  Param_Cell, Param_Cell);
+    g_fwdOnVacEnabled = new GlobalForward("MG_OnVacEnabled", ET_Ignore, Param_Cell, Param_Cell);
 
     g_fwdOnRenderModelColor = new GlobalForward("MG_OnRenderModelColor", ET_Hook, Param_Cell);
 
@@ -747,6 +748,12 @@ public void Event_PlayerHurts(Event event, const char[] name, bool dontBroadcast
 
 public Action Event_PlayerTeams(Event event, const char[] name, bool dontBroadcast)
 {
+    if (dontBroadcast || event.GetBool("disconnect"))
+    {
+        // skip
+        return Plugin_Continue;
+    }
+
     int newteam = event.GetInt("team");
     int oldteam = event.GetInt("oldteam");
     int client  = GetClientOfUserId(event.GetInt("userid"));
@@ -759,7 +766,7 @@ public Action Event_PlayerTeams(Event event, const char[] name, bool dontBroadca
         ForcePlayerSuicide(client);
     }
 
-    event.BroadcastDisabled = true;
+    event.SetBool("silent", true);
     return Plugin_Changed;
 }
 
@@ -911,7 +918,7 @@ void Hooks_UpdateState()
     if (!g_extTransmitManager)
         return;
 
-    if (!mg_transmitblock.BoolValue)
+    if (!mg_transmitblock.BoolValue || mp_teammates_are_enemies.BoolValue)
     {
         // force all transmit state
         for(int i = 1; i <= MaxClients; i++)

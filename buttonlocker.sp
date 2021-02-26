@@ -34,6 +34,7 @@ enum struct button_t
     int m_Cooldown;
     int m_LastUsed;
     char m_Name[32];
+    bool m_Lock;
 }
 
 int g_iButtons;
@@ -42,6 +43,7 @@ bool g_pOpts;
 
 public void OnAllPluginsLoaded()
 {
+    HookEvent("round_start", Event_RoundStart);
     g_pOpts = LibraryExists("fys-Opts");
 }
 
@@ -143,11 +145,26 @@ public Action Event_ButtonUse(int button, int client, int caller, UseType type, 
     if (diff > 0)
     {
         Text(client, "<font color='#39c5bb'>%s</font> 已被锁定 (剩余<font color='#ff0000'> %d </font>秒)", g_sButtons[index].m_Name, diff);
-        EmitSoundToAll("buttons/button8.wav");
+        EmitSoundToClient(client, "buttons/button8.wav");
         return Plugin_Handled;
+    }
+    else if (g_sButtons[index].m_Lock)
+    {
+        Text(client, "<font color='#39c5bb'>%s</font> 已被锁定 (<font color='#ff0000'> 下局可选 </font>)", g_sButtons[index].m_Name, diff);
+        EmitSoundToClient(client, "buttons/button8.wav");
     }
 
     return Plugin_Continue;
+}
+
+public void Event_RoundStart(Event e, const char[] n, bool b)
+{
+    int time = GetTime();
+    for (int i = 0; i < g_iButtons; i++)
+    {
+        int ends = g_sButtons[i].m_LastUsed + g_sButtons[i].m_Cooldown;
+        g_sButtons[i].m_Lock = (ends - time) > 0;
+    }
 }
 
 void LoadConfigs()

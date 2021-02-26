@@ -19,6 +19,7 @@
 
 Handle g_AcceptInput;
 ArrayList g_CvarList;
+ConVar cs_enable_player_physics_box;
 
 public Plugin myinfo = 
 {
@@ -51,6 +52,8 @@ public void OnPluginStart()
 
     g_CvarList = new ArrayList(ByteCountToCells(128));
     InitCvars();
+
+    cs_enable_player_physics_box = FindConVar("cs_enable_player_physics_box");
 }
 
 public void Pupd_OnCheckAllPlugins()
@@ -124,20 +127,47 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
         return MRES_Supercede;
     }
 
-    if (StrContains(command, "sm", false) == 0)
+    // special convar
+    // cs_enable_player_physics_box
+    if (StrContains(command, "cs_enable_player_physics_box", false) > -1)
     {
-        LogMessage("[BSP CVAR]  Blocked sm command [%s]", command);
+        cs_enable_player_physics_box.BoolValue = true;
+        PrintToConsoleAll("[BspConVar]  cs_enable_player_physics_box enabled");
         DHookSetReturn(hReturn, false);
         return MRES_Supercede;
     }
 
-    if (StrContains(command, "sv_", false) == 0)
+    if (StrContains(command, "sm", false) == 0)
     {
+        LogMessage("[BspConVar]  Blocked sm command [%s]", command);
+        DHookSetReturn(hReturn, false);
+        return MRES_Supercede;
+    }
+
+    if (StrContains(command, "ammo_", false) == 0)
+    {
+        PrintToServer("[BspConVar]  Blocked ammo convar [%s]", command);
+        DHookSetReturn(hReturn, false);
+        return MRES_Supercede;
+    }
+
+    if (StrContains(command, "phys_", false) == 0)
+    {
+        PrintToServer("[BspConVar]  Blocked physics convar [%s]", command);
+        DHookSetReturn(hReturn, false);
+        return MRES_Supercede;
+    }
+
+    char values[2][32];
+    int split = ExplodeString(command, " ", values, 2, 32);
+    if (split == 2)
+    {
+        /*
         char whitelist[128]; bool isWhiteList = false;
         for(int index = 0; index < g_CvarList.Length; index++)
         {
             g_CvarList.GetString(index, whitelist, 128);
-            if (StrContains(command, whitelist, false) != -1)
+            if (strcmp(values[0], whitelist, false) == 0)
             {
                 isWhiteList = true;
                 break;
@@ -146,61 +176,101 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
 
         if (!isWhiteList)
         {
-            LogMessage("[BSP CVAR]  Blocked sv convar [%s]", command);
+            LogMessage("[BspConVar]  Blocked non-whitelist convar [%s]", command);
             DHookSetReturn(hReturn, false);
             return MRES_Supercede;
         }
-    }
+        */
 
-    if (StrContains(command, "ammo_", false) == 0)
-    {
-        PrintToServer("[BSP CVAR]  Blocked ammo convar [%s]", command);
-        DHookSetReturn(hReturn, false);
-        return MRES_Supercede;
-    }
-
-    char values[4][32];
-    int split = ExplodeString(command, " ", values, 4, 32);
-    if (split == 2)
-    {
-        if (strcmp(values[0], "mp_startmoney") == 0 || strcmp(values[0], "mp_freezetime") == 0 || strcmp(values[0], "mp_flashlight") == 0 || strcmp(values[0], "host_timescale") == 0)
+        if (g_CvarList.FindString(values[0]) == -1)
         {
+            LogMessage("[BspConVar]  Blocked non-whitelist convar [%s]", command);
             DHookSetReturn(hReturn, false);
             return MRES_Supercede;
         }
 
-        PrintToConsoleAll("[地图参数]  修改 [%s] 值: %s", values[0], values[1]);
+        PrintToConsoleAll("[BspConVar]  [%s] -> [%s]", values[0], values[1]);
         ServerCommand("mg_setcvar %s %s", values[0], values[1]);
-    }
-    else
-    {
-        PrintToConsoleAll("[地图参数]   %s", command);
-        ServerCommand("%s", command);
+
     }
 
+    PrintToServer("[BspConVar]  Blocked unknow command [%s]", command);
     DHookSetReturn(hReturn, false);
     return MRES_Supercede;
 }
 
 void InitCvars()
 {
+    //SV
     g_CvarList.PushString("sv_friction");
     g_CvarList.PushString("sv_waterfriction");
-
     g_CvarList.PushString("sv_accelerate");
     g_CvarList.PushString("sv_airaccelerate");
+    g_CvarList.PushString("sv_air_pushaway_dist");
     g_CvarList.PushString("sv_wateraccelerate");
-
     g_CvarList.PushString("sv_disable_show_team_select_menu");
     g_CvarList.PushString("sv_disable_radar");
     g_CvarList.PushString("sv_force_reflections");
     g_CvarList.PushString("sv_gravity");
-
+    g_CvarList.PushString("sv_falldamage_scale");
+    g_CvarList.PushString("sv_falldamage_to_below_player_multiplier");
+    g_CvarList.PushString("sv_falldamage_to_below_player_ratio");
     g_CvarList.PushString("sv_health_approach_enabled");
     g_CvarList.PushString("sv_health_approach_speed");
-
     g_CvarList.PushString("sv_hegrenade_damage_multiplier");
     g_CvarList.PushString("sv_hegrenade_radius_multiplier");
-    
     g_CvarList.PushString("sv_knife_attack_extend_from_player_aabb");
+    g_CvarList.PushString("sv_buy_status_override");
+    g_CvarList.PushString("sv_disable_immunity_alpha");
+    g_CvarList.PushString("sv_disable_radar");
+    g_CvarList.PushString("sv_env_entity_makers_enabled");
+    g_CvarList.PushString("sv_extract_ammo_from_dropped_weapons");
+    g_CvarList.PushString("sv_hide_roundtime_until_seconds");
+    g_CvarList.PushString("sv_highlight_distance");
+    g_CvarList.PushString("sv_highlight_duration");
+    g_CvarList.PushString("sv_outofammo_indicator");
+    g_CvarList.PushString("sv_staminajumpcost");
+    g_CvarList.PushString("sv_staminalandcost");
+    g_CvarList.PushString("sv_water_movespeed_multiplier");
+    g_CvarList.PushString("sv_water_swim_mode");
+    g_CvarList.PushString("sv_wateraccelerate");
+    g_CvarList.PushString("sv_waterfriction");
+    //sv_enablebunnyhopping
+
+    // MP
+    g_CvarList.PushString("mp_buy_anywhere");
+    g_CvarList.PushString("mp_buytime");
+    g_CvarList.PushString("mp_c4timer");
+    g_CvarList.PushString("mp_damage_headshot_only");
+    g_CvarList.PushString("mp_damage_scale_ct_body");
+    g_CvarList.PushString("mp_damage_scale_ct_head");
+    g_CvarList.PushString("mp_damage_scale_t_body");
+    g_CvarList.PushString("mp_damage_scale_t_head");
+    g_CvarList.PushString("mp_damage_vampiric_amount");
+    g_CvarList.PushString("mp_falldamage");
+    g_CvarList.PushString("mp_free_armor");
+    g_CvarList.PushString("mp_max_armor");
+    g_CvarList.PushString("mp_molotovusedelay");
+    g_CvarList.PushString("mp_plant_c4_anywhere");
+    g_CvarList.PushString("mp_respawn_on_death_ct");
+    g_CvarList.PushString("mp_respawn_on_death_t");
+    g_CvarList.PushString("mp_respawnwavetime");
+    g_CvarList.PushString("mp_respawnwavetime_ct");
+    g_CvarList.PushString("mp_respawnwavetime_t");
+    g_CvarList.PushString("mp_roundtime");
+    g_CvarList.PushString("mp_shield_speed_deployed");
+    g_CvarList.PushString("mp_weapons_allow_map_placed");
+    g_CvarList.PushString("mp_weapons_glow_on_ground");
+    g_CvarList.PushString("healthshot_healthboost_damage_multiplier");
+    g_CvarList.PushString("healthshot_healthboost_speed_multiplier");
+    g_CvarList.PushString("healthshot_healthboost_time");
+    g_CvarList.PushString("molotov_throw_detonate_time");
+    g_CvarList.PushString("mp_anyone_can_pickup_c4");
+    g_CvarList.PushString("mp_defuser_allocation");
+    g_CvarList.PushString("mp_give_player_c4");
+    g_CvarList.PushString("mp_global_damage_per_second");
+    g_CvarList.PushString("mp_tagging_scale");
+    g_CvarList.PushString("mp_taser_recharge_time");
+    g_CvarList.PushString("mp_teammates_are_enemies");
+    g_CvarList.PushString("mp_weapon_self_inflict_amount");
 }
