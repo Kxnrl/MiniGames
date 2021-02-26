@@ -241,7 +241,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("sv_full_alltalk",                   1, true, false);
     ConVar_Easy_SetInt("sv_talk_enemy_living",              1, true, false);
     ConVar_Easy_SetInt("sv_talk_enemy_dead",                1, true, false);
-    ConVar_Easy_SetInt("sv_clamp_unsafe_velocities",        0, true, false);
+    ConVar_Easy_SetInt("sv_clamp_unsafe_velocities",        1, true, false); // github.com/Kxnrl/sm-ext-MovementManager
     ConVar_Easy_SetInt("sv_friction",                       5, true, false);
     ConVar_Easy_SetInt("sv_ignoregrenaderadio",             1, true, false);
     ConVar_Easy_SetInt("sv_infinite_ammo",                  0, true, false);
