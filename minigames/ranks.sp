@@ -247,6 +247,9 @@ void Ranks_OnClientDisconnect(int client)
 
 void Ranks_OnPlayerRunCmd(int client, int buttons)
 {
+    if (!mg_rank_skillgroups.BoolValue)
+        return;
+
     // process competitive ranking
 
     static bool bLast[MAXPLAYERS+1];
