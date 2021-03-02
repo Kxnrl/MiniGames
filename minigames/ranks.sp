@@ -333,7 +333,7 @@ void HookScoreboard(bool hook)
 {
     static int  cs_player_manager = -1;
     static bool bHook = false;
-    cs_player_manager = FindEntityByClassname(MaxClients+1, "cs_player_manager");
+    cs_player_manager = GetPlayerResourceEntity();
     if (hook)
     {
         if (cs_player_manager == -1)
@@ -365,9 +365,12 @@ void HookScoreboard(bool hook)
 
 public void Hook_OnThinkPost(int entity)
 {
+    if (!mg_rank_skillgroups.BoolValue)
+        return;
+
     static int Offset = -1;
     if (Offset == -1)
-        Offset = FindSendPropInfo("CCSPlayerResource", "m_iCompetitiveRanking");
+        Offset  = FindSendPropInfo("CCSPlayerResource", "m_iCompetitiveRanking");
 
     SetEntDataArray(entity, Offset, t_iCompLevel, MAXPLAYERS+1, _, true);
 }
