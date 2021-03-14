@@ -222,7 +222,8 @@ public void OnPluginStart()
         SetFailState("NoBlock offset -> not found.");
 
     // global tick timer
-    CreateTimer(1.0, Timer_Tick, _, TIMER_REPEAT);
+    CreateTimer(0.1, Timer_Tick,     _, TIMER_REPEAT);
+    CreateTimer(1.0, Timer_Interval, _, TIMER_REPEAT);
 
     LoadTranslations("com.kxnrl.minigames.translations");
 }
@@ -864,9 +865,15 @@ public Action Command_MapChange(int client, const char[] command, int args)
 
 public Action Timer_Tick(Handle timer)
 {
+    Hooks_UpdateState();
+
+    return Plugin_Continue;
+}
+
+public Action Timer_Interval(Handle timer)
+{
     Stats_CheckStatus();
     Games_RanderColor();
-    Hooks_UpdateState();
 
     return Plugin_Continue;
 }
@@ -934,23 +941,21 @@ void Hooks_UpdateState()
         return;
     }
 
-    for(int entity = 1; entity <= MaxClients; entity++)
+    for (int client = 1; client <= MaxClients; client++) if (IsClientInGame(client) && !IsFakeClient(client))
     {
-        if (!IsClientInGame(entity) || IsFakeClient(entity))
-            continue;
-
-        for (int client = 1; client <= MaxClients; client++) if (IsClientInGame(client) && !IsFakeClient(client) && entity != client)
+        bool state = true;
+        if (IsPlayerAlive(client))
         {
-            if (!g_kOptions[client][kO_Transmit] || g_iTeam[entity] != g_iTeam[client] || !IsPlayerAlive(client))
-            {
-                // disabled.
-                TransmitManager_SetEntityState(entity, client, true);
-            }
-            else
-            {
-                // can't see teammate
-                TransmitManager_SetEntityState(entity, client, false);
-            }
+            state = g_kOptions[client][kO_Transmit];
+
+            if (GetClientButtons(client) & IN_ATTACK2)
+                state = false;
+        }
+
+        for (int entity = 1; entity <= MaxClients; entity++) if (IsClientInGame(entity) && !IsFakeClient(entity))
+        {
+            // transmit entity
+            TransmitManager_SetEntityState(entity, client, (g_iTeam[entity] != g_iTeam[client] || state));
         }
     }
 }
