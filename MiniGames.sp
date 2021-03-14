@@ -948,8 +948,8 @@ void Hooks_UpdateState()
         {
             state = g_kOptions[client][kO_Transmit];
 
-            if (GetClientButtons(client) & IN_ATTACK2)
-                state = false;
+            if (!state && GetClientButtons(client) & IN_ATTACK2)
+                state = true;
         }
 
         for (int entity = 1; entity <= MaxClients; entity++) if (IsClientInGame(entity) && !IsFakeClient(entity))
