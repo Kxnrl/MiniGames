@@ -123,6 +123,7 @@ void Cvars_OnPluginStart()
     mp_t_default_primary.AddChangeHook(Cvars_OnSettingChanged);
     mp_t_default_secondary.AddChangeHook(Cvars_OnSettingChanged);
     sv_autobunnyhopping.AddChangeHook(Cvars_OnSettingChanged);
+    sv_enablebunnyhopping.AddChangeHook(Cvars_OnSettingChanged);
 
     mp_teammates_are_enemies.AddChangeHook(Cvars_OnFFAChanged);
 
@@ -170,7 +171,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     mp_t_default_secondary.SetString("", true, false);
     sv_tags.SetString("MG,MiniGames,Shop,Store,Skin,WeaponSkin", true, true);
 
-    if (sv_autobunnyhopping.IntValue == 1)
+    if (sv_enablebunnyhopping.BoolValue)
     {
         sv_staminamax.SetInt(0, true, false);
         sv_staminajumpcost.SetInt(0, true, false);
@@ -181,9 +182,9 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     else
     {
         sv_staminamax.SetFloat(100.0, true, false);
-        sv_staminajumpcost.SetFloat(0.10, true, false);
-        sv_staminalandcost.SetFloat(0.05, true, false);
-        sv_staminarecoveryrate.SetFloat(100.0, true, false);
+        sv_staminajumpcost.SetFloat(0.08, true, false);
+        sv_staminalandcost.SetFloat(0.04, true, false);
+        sv_staminarecoveryrate.SetFloat(60.0, true, false);
         sv_timebetweenducks.SetFloat(0.4, true, false);
     }
 }
