@@ -80,10 +80,14 @@ include/mapmusic.inc
 include/geoip2.inc
 include/fys.pupd.inc
 
+mapchat.sp
+mgbet.sp
+mgbutton.sp
 mgcp.sp
+mgnoob.sp
 mgfixes.sp
 ragdolls.sp
-mapchat.sp
+
 .vscode/*
 
 # OSX

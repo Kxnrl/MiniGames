@@ -25,8 +25,8 @@ public Plugin myinfo =
     url         = PI_URL
 };
 
-char g_szDefaultSkin[] = "models/player/custom_player/maoling/haipa/haipa.mdl";
-char g_szDefaultArms[] = "models/player/custom_player/maoling/haipa/haipa_arms.mdl";
+char g_szDefaultSkin[] = "models/player/custom_player/fys/loligh/loligh_v4.mdl";
+char g_szDefaultArms[] = "models/player/custom_player/fys/loligh/loligh_arms_fbi.mdl";
 
 public void Pupd_OnCheckAllPlugins()
 {
@@ -55,7 +55,7 @@ public Action MG_OnRenderModelColor(int client)
     char model[128];
     GetClientModel(client, model, 128);
 
-    if (strcmp(model, "models/player/custom_player/maoling/haipa/haipa.mdl") == 0)
+    if (strcmp(model, g_szDefaultSkin) == 0)
     {
         RefreshRender(client);
         return Plugin_Handled;
