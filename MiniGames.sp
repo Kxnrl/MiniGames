@@ -943,19 +943,19 @@ void Hooks_UpdateState()
 
     for (int client = 1; client <= MaxClients; client++) if (IsClientInGame(client) && !IsFakeClient(client))
     {
-        bool state = true;
+        bool canSee = true;
         if (IsPlayerAlive(client))
         {
-            state = g_kOptions[client][kO_Transmit];
+            canSee = !g_kOptions[client][kO_Transmit];
 
-            if (!state && GetClientButtons(client) & IN_ATTACK2)
-                state = true;
+            if (!canSee && GetClientButtons(client) & IN_ATTACK2)
+                canSee = true;
         }
 
         for (int entity = 1; entity <= MaxClients; entity++) if (IsClientInGame(entity) && !IsFakeClient(entity))
         {
             // transmit entity
-            TransmitManager_SetEntityState(entity, client, (g_iTeam[entity] != g_iTeam[client] || state));
+            TransmitManager_SetEntityState(entity, client, (g_iTeam[entity] != g_iTeam[client] || canSee));
         }
     }
 }

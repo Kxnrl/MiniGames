@@ -528,6 +528,9 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
     SetEntProp(client, Prop_Send, "m_bHasHelmet", mg_spawn_helmet.IntValue);    // apply helmet
 
     SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 0.0);   // disable wallhack
+
+    // warmup god mode
+    SetEntProp(client, Prop_Data, "m_takedamage", IsWarmup() ? 0 : 2);
     
     // remove spec hud
     iLastSpecTarget[client] = 0;
