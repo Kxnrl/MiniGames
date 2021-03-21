@@ -252,9 +252,9 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_equipment_reset_rounds",         1, true, false);
 
     sv_staminamax.SetFloat(         100.0, true, false);
-    sv_staminajumpcost.SetFloat(     0.10, true, false);
-    sv_staminalandcost.SetFloat(     0.05, true, false);
-    sv_staminarecoveryrate.SetFloat( 66.0, true, false);
+    sv_staminajumpcost.SetFloat(     0.08, true, false);
+    sv_staminalandcost.SetFloat(     0.04, true, false);
+    sv_staminarecoveryrate.SetFloat( 60.0, true, false);
 
     sv_teamid_overhead_always_prohibit.SetBool(true,  true, false);
     sv_show_team_equipment_prohibit.SetBool   (true,  true, false);

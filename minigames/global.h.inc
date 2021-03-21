@@ -35,6 +35,11 @@ public Plugin myinfo =
 #define TEAM_TE 2
 #define TEAM_CT 3
 
+#define HUD_CHANNEL_MARKER 0
+#define HUD_CHANNEL_VAC    1
+#define HUD_CHANNEL_SPEED  2
+#define HUD_CHANNEL_SPEC   5
+
 // enum
 enum struct stats_t
 {
@@ -569,4 +574,10 @@ stock void WeaponSwitchFixes(int client)
         SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", INVALID_ENT_REFERENCE);
         SDKCall(g_hWeaponSwitch, client, weapon, 0);
     }
+}
+
+stock void ClearHudByChannel(int client, int channel)
+{
+    SetHudTextParams(0.0, 0.0, 0.01, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0);
+    ShowHudText(client, channel, "");
 }

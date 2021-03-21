@@ -19,7 +19,6 @@ static int  t_iWallHackCD = -1;
 static int  iLastSpecTarget[MAXPLAYERS+1];
 static bool bLastDisplayHud[MAXPLAYERS+1];
 static bool bVACHudPosition[MAXPLAYERS+1];
-static Handle t_hHudSync[4] = null;
 static Handle t_tRoundTimer = null;
 static float t_fRoundStart = -1.0;
 static int t_iRoundNumber = 0;
@@ -187,19 +186,6 @@ static void Games_SetOptions(int client, int option)
 
 void Games_OnMapStart()
 {
-    // init hud synchronizer ...
-    if (t_hHudSync[0] == null)
-        t_hHudSync[0] = CreateHudSynchronizer();
-
-    if (t_hHudSync[1] == null)
-        t_hHudSync[1] = CreateHudSynchronizer();
-
-    if (t_hHudSync[2] == null)
-        t_hHudSync[2] = CreateHudSynchronizer();
-
-    if (t_hHudSync[3] == null)
-        t_hHudSync[3] = CreateHudSynchronizer();
-
     // timer to update hud
     CreateTimer(1.0, Games_TickInterval, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
@@ -266,7 +252,10 @@ static void Games_UpdateGameHUD()
             {
                 iLastSpecTarget[client] = 0;
                 if (bLastDisplayHud[client])
-                    ClearSyncHud(client, t_hHudSync[0]);
+                {
+                    bLastDisplayHud[client] = false;
+                    ClearHudByChannel(client, HUD_CHANNEL_SPEC);
+                }
                 continue;
             }
 
@@ -279,7 +268,10 @@ static void Games_UpdateGameHUD()
             {
                 iLastSpecTarget[client] = 0;
                 if (bLastDisplayHud[client])
-                    ClearSyncHud(client, t_hHudSync[0]);
+                {
+                    bLastDisplayHud[client] = false;
+                    ClearHudByChannel(client, HUD_CHANNEL_SPEC);
+                }
                 continue;
             }
 
@@ -298,7 +290,7 @@ static void Games_UpdateGameHUD()
 
             // setup hud
             SetHudTextParamsEx(0.01, 0.35, 200.0, {175,238,238,255}, {135,206,235,255}, 0, 10.0, 5.0, 5.0);
-            ShowSyncHudText(client, t_hHudSync[0], message);
+            ShowHudText(client, HUD_CHANNEL_SPEC, message);
         }
 
     // countdown wallhack
@@ -309,12 +301,12 @@ static void Games_UpdateGameHUD()
         SetHudTextParams(-1.0, 0.975, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if (!bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
-                ShowSyncHudText(client, t_hHudSync[1], "%T", "vac timer", client, t_iWallHackCD);
+                ShowHudText(client, HUD_CHANNEL_VAC, "%T", "vac timer", client, t_iWallHackCD);
 
         SetHudTextParams(-1.0, 0.000, 2.0, 9, 255, 9, 255, 0, 1.2, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if (bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
-                ShowSyncHudText(client, t_hHudSync[1], "%T", "vac timer", client, t_iWallHackCD);
+                ShowHudText(client, HUD_CHANNEL_VAC, "%T", "vac timer", client, t_iWallHackCD);
     }
     else if (t_iWallHackCD != -1)
     {
@@ -322,45 +314,25 @@ static void Games_UpdateGameHUD()
         SetHudTextParams(-1.0, 0.975, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if (!bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
-                ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
+                ShowHudText(client, HUD_CHANNEL_VAC, "%T", "vac activated", client);
 
         SetHudTextParams(-1.0, 0.000, 2.0, 238, 9, 9, 255, 0, 10.0, 0.0, 0.0);
         for(int client = 1; client <= MaxClients; ++client)
             if (bVACHudPosition[client] && ClientValid(client) && !g_kOptions[client][kO_HudVac])
-                ShowSyncHudText(client, t_hHudSync[1], "%T", "vac activated", client);
+                ShowHudText(client, HUD_CHANNEL_VAC, "%T", "vac activated", client);
     }
     else if (needClear || t_iWallHackCD == -2)
     {
         needClear = false;
         for(int client = 1; client <= MaxClients; ++client)
             if (ClientValid(client))
-                ClearSyncHud(client, t_hHudSync[1]);
+                ClearHudByChannel(client, HUD_CHANNEL_VAC);
     }
 }
 
 void Games_OnMapEnd()
 {
-    //free all
-
-    if (t_hHudSync[0] != null)
-        CloseHandle(t_hHudSync[0]);
-    t_hHudSync[0] = null;
-
-    if (t_hHudSync[1] != null)
-        CloseHandle(t_hHudSync[1]);
-    t_hHudSync[1] = null;
-
-    if (t_hHudSync[2] != null)
-        CloseHandle(t_hHudSync[1]);
-    t_hHudSync[2] = null;
-
-    if (t_hHudSync[3] != null)
-        CloseHandle(t_hHudSync[1]);
-    t_hHudSync[3] = null;
-
-    if (t_tRoundTimer != null)
-        KillTimer(t_tRoundTimer);
-    t_tRoundTimer = null;
+    delete t_tRoundTimer;
 }
 
 // reset ammo and slay.
@@ -437,7 +409,7 @@ void Games_OnClientCookiesCached(int client)
     }
 }
 
-void Games_OnPlayerRunCmd(int client, int& buttons)
+void Games_OnPlayerRunCmd(int client, int& buttons, int tickcount)
 {
     if (!IsPlayerAlive(client))
         return;
@@ -449,7 +421,11 @@ void Games_OnPlayerRunCmd(int client, int& buttons)
     GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
 
     // show speed hud
-    Games_ShowCurrentSpeed(client, SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0)));
+    if (tickcount % 8 == 0)
+    {
+        // if 128tick, 16 calls per second.
+        Games_ShowCurrentSpeed(client, SquareRoot(Pow(CurVelVec[0], 2.0) + Pow(CurVelVec[1], 2.0)));
+    }
 
     // limit pref speed
     Games_LimitPreSpeed(client, view_as<bool>(GetEntityFlags(client) & FL_ONGROUND), CurVelVec);
@@ -484,7 +460,7 @@ static void Games_DuckSpam(int client)
     // fixes crouch spamming
     if (GetEntPropFloat(client, Prop_Data, "m_flDuckSpeed") < 7.0)
     {
-        SetEntPropFloat(client, Prop_Send, "m_flDuckSpeed", 7.0, 0);
+        SetEntPropFloat(client, Prop_Send, "m_flDuckSpeed", 7.0);
     }
 }
 
@@ -534,8 +510,11 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
     
     // remove spec hud
     iLastSpecTarget[client] = 0;
-    bLastDisplayHud[client] = false;
-    ClearSyncHud(client, t_hHudSync[0]);
+    if (bLastDisplayHud[client])
+    {
+        bLastDisplayHud[client] = false;
+        ClearHudByChannel(client, HUD_CHANNEL_SPEC);
+    }
 
     // spawn weapon
     if (mg_spawn_knife.BoolValue  && GetPlayerWeaponSlot(client, 2) == -1)
@@ -680,7 +659,7 @@ static void Games_ShowCurrentSpeed(int client, float speed)
         return;
 
     SetHudTextParams(-1.0, 0.785, 0.1, 0, 191, 255, 200, 0, 0.0, 0.0, 0.0);
-    ShowSyncHudText(client, t_hHudSync[2], "%.3f", speed);
+    ShowHudText(client, HUD_CHANNEL_SPEED, "%.3f", speed);
 }
 
 void Games_PlayerHurts(int client, int hitgroup)
@@ -703,9 +682,7 @@ void Games_PlayerHurts(int client, int hitgroup)
         SetHudTextParams(-1.0, -1.0, 0.25, 250, 128, 114, 128, 0, 0.125, 0.1, 0.125);
     }
 
-    //ShowSyncHudText(client, t_hHudSync[3], "◞　◟\n◝　◜");
-    //ShowSyncHudText(client, t_hHudSync[3], "＼ ／\n／ ＼");
-    ShowSyncHudText(client, t_hHudSync[3], "╳");
+    ShowHudText(client, HUD_CHANNEL_MARKER, "╳");
 }
 
 void Games_OnPlayerBlind(DataPack pack)
