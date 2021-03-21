@@ -28,6 +28,11 @@ public Plugin myinfo =
 char g_szDefaultSkin[] = "models/player/custom_player/fys/loligh/loligh_v4.mdl";
 char g_szDefaultArms[] = "models/player/custom_player/fys/loligh/loligh_arms_fbi.mdl";
 
+public void OnPluginStart()
+{
+    HookEvent("player_death", Event_Death, EventHookMode_Post);
+}
+
 public void Pupd_OnCheckAllPlugins()
 {
     Pupd_CheckPlugin(false, "https://build.kxnrl.com/updater/MiniGames/");
@@ -45,7 +50,7 @@ public bool Store_OnPlayerSkinDefault(int client, int team, char[] skin, int ski
     strcopy(arms, armsLen, g_szDefaultArms);
     strcopy(skin, skinLen, g_szDefaultSkin);
 
-    RefreshRender(client);
+    RefreshRender(client, client);
 
     return true;
 }
@@ -57,18 +62,38 @@ public Action MG_OnRenderModelColor(int client)
 
     if (strcmp(model, g_szDefaultSkin) == 0)
     {
-        RefreshRender(client);
+        RefreshRender(client, client);
         return Plugin_Handled;
     }
     
     return Plugin_Continue;
 }
 
-void RefreshRender(int client)
+void RefreshRender(int client, int entity)
 {
     switch (GetClientTeam(client))
     {
-        case 2: SetEntityRenderColor(client, 255, 0, 0, 255);
-        case 3: SetEntityRenderColor(client, 0, 0, 255, 255);
+        case 2: SetEntityRenderColor(entity, 255, 0, 0, 255);
+        case 3: SetEntityRenderColor(entity, 0, 0, 255, 255);
+    }
+}
+
+public void Event_Death(Event e, const char[] n, bool b)
+{
+    if (GameRules_GetProp("m_bWarmupPeriod") == 1)
+        return;
+
+    int victim = GetClientOfUserId(e.GetInt("userid"));
+    int ragdoll = GetEntPropEnt(victim, Prop_Send, "m_hRagdoll");
+
+    if (ragdoll == -1)
+        return;
+
+    char model[128];
+    GetClientModel(victim, model, 128);
+
+    if (strcmp(model, g_szDefaultSkin) == 0)
+    {
+        RefreshRender(victim, ragdoll);
     }
 }
