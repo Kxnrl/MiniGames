@@ -268,7 +268,14 @@ public void OnLibraryAdded(const char[] name)
     else if (strcmp(name, "GeoIP2") == 0)
         g_extGeoIP2 = true;
     else if (strcmp(name, "TransmitManager") == 0)
+    {
         g_extTransmitManager = true;
+        for (int i = 1; i <= MaxClients; i++) if (IsClientInGame(i))
+        {
+            // late hook
+            TransmitManager_AddEntityHooks(i);
+        }
+    }
     else if (strcmp(name, "store") == 0)
         g_smxStore = true;
     else if (strcmp(name, "MapMusic") == 0)
@@ -519,7 +526,10 @@ public void OnClientPutInServer(int client)
     SDKHook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
 
     // hook this to set transmit
-    TransmitManager_AddEntityHooks(client);
+    if (g_extTransmitManager)
+    {
+        TransmitManager_AddEntityHooks(client);
+    }
 }
 
 public void OnClientPostAdminCheck(int client)

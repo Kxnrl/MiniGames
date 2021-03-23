@@ -41,6 +41,13 @@ public Plugin myinfo =
 
 #define MAX_RESERVE_AMMO_MAX            416
 
+// ENGINE definitions
+#define SF_PLAYEREQUIP_USEONLY          0x0001
+#define SF_PLAYEREQUIP_STRIPFIRST       0x0002
+#define SF_PLAYEREQUIP_ONLYSTRIPSAME    0x0004
+#define MAX_EQUIP                       32
+#define CS_WEAPON_SLOT_KNIFE            2
+
 Handle SDKCall_SetReserveAmmoCount;
 Handle DHook_GetReserveAmmoMax;
 
@@ -128,25 +135,41 @@ public Action Event_OnUse(int entity, int client, int caller, UseType type, floa
         return Plugin_Continue;
 
     // we strip knife if has 'Only Strip Same Weapon Type' flag.
-    if (!(GetEntProp(entity, Prop_Data, "m_spawnflags") & 4))
+    if (!(GetEntProp(entity, Prop_Data, "m_spawnflags") & SF_PLAYEREQUIP_ONLYSTRIPSAME))
         return Plugin_Continue;
 
     char weapon[32];
-    int count = GetEntProp(entity, Prop_Data, "m_weaponCount");
 
-    for(int index; index < count; ++index)
+    int count = 0;
+    bool knife = false;
+
+    for(int index = 0; index < MAX_EQUIP; ++index)
     {
         GetEntPropString(entity, Prop_Data, "m_weaponNames", weapon, 32, index);
 
-        if (strcmp(weapon, "weapon_knife", false) == 0)
-        {
-            // if player has knife and this entity just for giving knife.
-            // we stop that to prevent give twice.
-            if (count == 1 && GetPlayerWeaponSlot(client, 2) != INVALID_ENT_REFERENCE)
-                return Plugin_Handled;
+        //count += GetEntProp(entity, Prop_Data, "m_weaponCount", 4, index);
 
-            HandleKnife(client);
+        // just counting weapon
+        if (strncmp(weapon, "weapon_", 7, false) == 0)
+        {
+            count++;
+
+            if (strcmp(weapon, "weapon_knife", false) == 0)
+            {
+                // mark as knife
+                knife = true;
+            }
         }
+    }
+
+    // if player has knife and this entity just for giving knife.
+    // we stop that to prevent give twice.
+    if (knife)
+    {
+        if (count == 1 && GetPlayerWeaponSlot(client, CS_WEAPON_SLOT_KNIFE) != INVALID_ENT_REFERENCE)
+            return Plugin_Handled;
+
+        HandleKnife(client);
     }
 
     return Plugin_Continue;
@@ -156,7 +179,7 @@ void HandleKnife(int client)
 {
     int knife = INVALID_ENT_REFERENCE;
 
-    while ((knife = GetPlayerWeaponSlot(client, 2)) != INVALID_ENT_REFERENCE)
+    while ((knife = GetPlayerWeaponSlot(client, CS_WEAPON_SLOT_KNIFE)) != INVALID_ENT_REFERENCE)
     {
         RemovePlayerItem(client, knife);
 
