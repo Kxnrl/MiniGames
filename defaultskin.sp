@@ -89,6 +89,11 @@ public void Event_Death(Event e, const char[] n, bool b)
     if (ragdoll == -1)
         return;
 
+    char classname[32];
+    GetEntityClassname(ragdoll, classname, 32);
+    if (strcmp(classname, "cs_ragdoll") == 0)
+        return;
+
     char model[128];
     GetClientModel(victim, model, 128);
 
