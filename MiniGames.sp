@@ -588,11 +588,6 @@ public void OnClientDisconnect(int client)
     Stats_OnClientDisconnect(client);
 }
 
-public void  OnClientDisconnect_Post(int client)
-{
-    Stats_OnClientDisconnectPost();
-}
-
 public void OnEntityCreated(int entity, const char[] classname)
 {
     Games_OnEntityCreated(entity);
@@ -883,7 +878,6 @@ public Action Timer_Tick(Handle timer)
 
 public Action Timer_Interval(Handle timer)
 {
-    Stats_CheckStatus();
     Games_RanderColor();
 
     return Plugin_Continue;

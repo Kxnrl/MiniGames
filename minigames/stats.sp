@@ -87,12 +87,6 @@ void Stats_OnMapStart()
     t_bEnabled = false;
 }
 
-void Stats_CheckStatus()
-{
-    // check tracking
-    t_bEnabled = (GetClientCount(true) >= 6 && !IsWarmup());
-}
-
 void Stats_OnClientConnected(int client)
 {
     // init client
@@ -108,9 +102,6 @@ void Stats_OnClientConnected(int client)
 
 void Stats_OnClientPostAdminCheck(int client)
 {
-    // check tracking
-    Stats_CheckStatus();
-
     // ignore bot and gotv
     if (IsFakeClient(client) || IsClientSourceTV(client))
         return;
@@ -131,11 +122,6 @@ void Stats_OnClientDisconnect(int client)
     }
     
     Stats_SaveClient(client);
-}
-
-void Stats_OnClientDisconnectPost()
-{
-    Stats_CheckStatus();
 }
 
 /*******************************************************/
@@ -453,6 +439,9 @@ public Action Stats_PrivateMessage(Handle timer, int userid)
 /*******************************************************/
 void Stats_OnRoundStart()
 {
+    // once check players
+    t_bEnabled = (GetClientCount(true) >= 6 && !IsWarmup());
+
     for (int i = 1; i <= MaxClients; i++)
     {
         // mark client as not spawn...
