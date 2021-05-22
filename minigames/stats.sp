@@ -18,6 +18,7 @@
 static stats_t t_Session[MAXPLAYERS+1];
 static stats_t t_StatsDB[MAXPLAYERS+1];
 
+static bool t_Spawned[MAXPLAYERS+1];
 static bool t_bLoaded[MAXPLAYERS+1];
 static bool t_bEnabled = false;
 static  int t_iRoundCredits[MAXPLAYERS+1];
@@ -100,6 +101,7 @@ void Stats_OnClientConnected(int client)
     t_StatsDB[client].Reset();
 
     t_bLoaded[client] = false;
+    t_Spawned[client] = false;
 
     t_Session[client].m_iTotalOnline = GetTime();
 }
@@ -449,10 +451,26 @@ public Action Stats_PrivateMessage(Handle timer, int userid)
 /*******************************************************/
 /******************** Event to Track *******************/
 /*******************************************************/
+void Stats_OnRoundStart()
+{
+    for (int i = 1; i <= MaxClients; i++)
+    {
+        // mark client as not spawn...
+        // for some maps, auto-respawn is enabled...
+        t_Spawned[i] = false;
+    }
+}
+
 void Stats_OnClientSpawn(int client)
 {
     if (!t_bEnabled)
         return;
+
+    // already spawn in this round...
+    if (t_Spawned[client])
+        return;
+
+    t_Spawned[client] = true;
 
     t_Session[client].m_iPlayRounds++;
     t_iRoundCredits[client] = 0;

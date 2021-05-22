@@ -507,7 +507,7 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
 
     // warmup god mode
     SetEntProp(client, Prop_Data, "m_takedamage", IsWarmup() ? 0 : 2);
-    
+
     // remove spec hud
     iLastSpecTarget[client] = 0;
     if (bLastDisplayHud[client])
@@ -522,11 +522,11 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
 
     if (mg_spawn_pistol.BoolValue && GetPlayerWeaponSlot(client, 1) == -1)
     {
-        if (g_iTeam[client] == 2)
-            GivePlayerItem(client, "weapon_glock");
-
-        if (g_iTeam[client] == 3)
-            GivePlayerItem(client, "weapon_hkp2000");
+        switch (g_iTeam[client])
+        {
+            case TEAM_CT: GivePlayerItem(client, "weapon_hkp2000");
+            case TEAM_TE: GivePlayerItem(client, "weapon_glock");
+        }
     }
 
     return Plugin_Stop;

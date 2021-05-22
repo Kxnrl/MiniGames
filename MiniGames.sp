@@ -806,6 +806,7 @@ public void Event_PlayerConnected(Event event, const char[] name, bool dontBroad
 
 public void Event_RoundStart(Event event, const char[] name, bool dontBroadcast)
 {
+    Stats_OnRoundStart();
     Cvars_OnRoundStart();
     Teams_OnRoundStart();
 }

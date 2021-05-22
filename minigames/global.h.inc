@@ -450,9 +450,9 @@ stock void GetAlives(int &tt, int &te, int &ct)
         if (ClientValid(client) && IsPlayerAlive(client))
         {
             tt++;
-            if (g_iTeam[client] == 3)
+            if (g_iTeam[client] == TEAM_CT)
                 ct++;
-            else if (g_iTeam[client] == 2)
+            else if (g_iTeam[client] == TEAM_TE)
                 te++;
         }
 }
