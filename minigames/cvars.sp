@@ -32,6 +32,7 @@ static ConVar phys_pushscale;
 static ConVar cs_enable_player_physics_box;
 static ConVar sv_standable_normal;
 static ConVar sv_turbophysics;
+static ConVar sv_disable_radar;
 static ConVar mp_taser_recharge_time;
 
 static ConVar sv_teamid_overhead_always_prohibit;
@@ -101,6 +102,7 @@ void Cvars_OnPluginStart()
     sv_staminalandcost      = FindConVar("sv_staminalandcost");
     sv_staminarecoveryrate  = FindConVar("sv_staminarecoveryrate");
     sv_standable_normal     = FindConVar("sv_standable_normal");
+    sv_disable_radar        = FindConVar("sv_disable_radar");
     mp_join_grace_time      = FindConVar("mp_join_grace_time");
     mp_freezetime           = FindConVar("mp_freezetime");
     mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
@@ -311,6 +313,7 @@ void Cvars_OnConfigsExecuted()
     Cvars_SetCvarDefault();
     Cvars_EnforceOptions();
     Cvars_LoadMapConfigs();
+    Cvars_CheckMapRadars();
 }
 
 static void CreateAllMapConfigs()
@@ -662,4 +665,72 @@ public Action MuteConVarChanged(Event event, const char[] name, bool dontBroadca
 bool Cvars_AllowDropTaser()
 {
     return mp_taser_recharge_time.IntValue < 0;
+}
+
+static void Cvars_CheckMapRadars()
+{
+    char map[128];
+    GetCurrentMap(map, 128);
+    sv_disable_radar.BoolValue = !Cvars_FindMapRadar(map);
+}
+
+static bool Cvars_FindMapRadar(const char[] map)
+{
+    char txt[128];
+    FormatEx(txt, 128, "resource/overviews/%s.txt", map);
+
+    if (!FileExists(txt, true))
+    {
+        LogError("Failed to find [%s].", txt);
+        return false;
+    }
+    
+    KeyValues kv = new KeyValues(map);
+    if (!kv.ImportFromFile(txt))
+    {
+        LogError("Failed to import [%s].", txt);
+        delete kv;
+        return false;
+    }
+
+    char material[128];
+    kv.GetString("material", material, 128, map);
+
+    char dds[128];
+    FormatEx(dds, 128, "resource/%s.dds", material);
+
+    if (FileExists(dds, true))
+    {
+        delete kv;
+        return true;
+    }
+
+    FormatEx(dds, 128, "resource/overviews/%s_radar.dds", map);
+    if (FileExists(dds, true))
+    {
+        delete kv;
+        return true;
+    }
+
+    if (kv.JumpToKey("verticalsections", false))
+    {
+        if (kv.GotoFirstSubKey(true))
+        {
+            do
+            {
+                char name[32];
+                kv.GetSectionName(name, 32);
+                FormatEx(dds, 128, "resource/%s_%s_radar.dds", material, name);
+                if (FileExists(dds, true))
+                {
+                    delete kv;
+                    return true;
+                }
+            }
+            while (kv.GotoNextKey(true));
+        }
+    }
+
+    delete kv;
+    return false;
 }

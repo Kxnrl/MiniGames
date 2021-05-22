@@ -498,7 +498,6 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
     if (!ClientValid(client))
         return Plugin_Stop;
 
-    SetEntProp(client, Prop_Send, "m_iHideHUD",   1<<12);                       // hide radar
     SetEntProp(client, Prop_Send, "m_iAccount",   23333);                       // unlimit cash
     SetEntProp(client, Prop_Send, "m_ArmorValue", mg_spawn_kevlar.IntValue);    // apply kevlar
     SetEntProp(client, Prop_Send, "m_bHasHelmet", mg_spawn_helmet.IntValue);    // apply helmet

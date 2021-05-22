@@ -450,17 +450,6 @@ public void OnConfigsExecuted()
     // fire to module
     Cvars_OnConfigsExecuted();
 
-    // check message for A2SFirewall
-    if (!g_extA2SFirewall)
-    {
-        static bool print_a2s = false;
-        if (!print_a2s)
-        {
-            print_a2s = true;
-            LogMessage("A2SFirewall not install! -> For A2S attack protection, please install A2SFirewall.ext! please contact 'https://steamcommunity.com/profiles/76561198048432253' or Download from 'https://build.kxnrl.com/_Raw/A2SFirewall'.");
-        }
-    }
-
     // check message for TransmitManager
     if (!g_extTransmitManager)
     {
@@ -468,7 +457,7 @@ public void OnConfigsExecuted()
         if (!print_tm)
         {
             print_tm = true;
-            LogMessage("TransmitManager not install! -> For hide teammate feature, please install TransmitManager.ext! please contact 'https://steamcommunity.com/profiles/76561198048432253' or Download from 'https://github.com/Kxnrl/sm-ext-TransmitManager'.");
+            LogMessage("TransmitManager not install! -> For hide teammate feature, please install TransmitManager.ext. -> 'https://github.com/Kxnrl/sm-ext-TransmitManager'");
         }
     }
 
