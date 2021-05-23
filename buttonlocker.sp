@@ -14,7 +14,7 @@
 #define PI_NAME     "MiniGames - Button locker"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
 #define PI_DESC     "DARLING in the FRANXX"
-#define PI_VERSION  "2.1." ... MYBUILD
+#define PI_VERSION  "2.2." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
 public Plugin myinfo = 
