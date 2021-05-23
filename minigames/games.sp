@@ -515,10 +515,21 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
         ClearHudByChannel(client, HUD_CHANNEL_SPEC);
     }
 
-    // spawn weapon
-    if (mg_spawn_knife.BoolValue  && GetPlayerWeaponSlot(client, 2) == -1)
-        GivePlayerItem(client, "weapon_knife");
+    // spawn knife
+    if (GetPlayerWeaponSlot(client, 2) == -1)
+    {
+        if (mg_spawn_knife.BoolValue)
+        {
+            GivePlayerItem(client, "weapon_knife");
+        }
+        else
+        {
+            int fists = GivePlayerItem(client, "weapon_fists");
+            EquipPlayerWeapon(client, fists);
+        }
+    }
 
+    // spawn pistol
     if (mg_spawn_pistol.BoolValue && GetPlayerWeaponSlot(client, 1) == -1)
     {
         switch (g_iTeam[client])

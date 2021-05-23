@@ -166,8 +166,27 @@ public Action Event_OnUse(int entity, int client, int caller, UseType type, floa
     // we stop that to prevent give twice.
     if (knife)
     {
-        if (count == 1 && GetPlayerWeaponSlot(client, CS_WEAPON_SLOT_KNIFE) != INVALID_ENT_REFERENCE)
+        // only give knife
+        if (count == 1)
+        {
+            int melee = GetPlayerWeaponSlot(client, CS_WEAPON_SLOT_KNIFE);
+            if (melee == -1)
+            {
+                // we have not knife
+                return Plugin_Continue;
+            }
+
+            // hold the fists
+            if (GetEdictClassname(melee, weapon, 32) && strcmp(weapon, "weapon_fists") == 0)
+            {
+                RemovePlayerItem(client, melee);
+                AcceptEntityInput(melee, "KillHierarchy");
+                return Plugin_Continue;
+            }
+
+            // we have knife
             return Plugin_Handled;
+        }
 
         HandleKnife(client);
     }

@@ -33,6 +33,8 @@ static ConVar cs_enable_player_physics_box;
 static ConVar sv_standable_normal;
 static ConVar sv_turbophysics;
 static ConVar sv_disable_radar;
+static ConVar sv_gameinstructor_disable;
+static ConVar sv_fistpunch_damage_to_player_multiplier;
 static ConVar mp_taser_recharge_time;
 
 static ConVar sv_teamid_overhead_always_prohibit;
@@ -108,6 +110,9 @@ void Cvars_OnPluginStart()
     mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
     mp_taser_recharge_time  = FindConVar("mp_taser_recharge_time");
     mp_teammates_are_enemies= FindConVar("mp_teammates_are_enemies");
+
+    sv_gameinstructor_disable                = FindConVar("sv_gameinstructor_disable");
+    sv_fistpunch_damage_to_player_multiplier = FindConVar("sv_fistpunch_damage_to_player_multiplier");
 
     sv_teamid_overhead_always_prohibit = FindConVar("sv_teamid_overhead_always_prohibit");
     sv_show_team_equipment_prohibit    = FindConVar("sv_show_team_equipment_prohibit");
@@ -252,6 +257,9 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("sv_teamid_overhead_maxdist",     1500, true, false);
     ConVar_Easy_SetInt("weapon_reticle_knife_show",         1, true, false);
     ConVar_Easy_SetInt("mp_equipment_reset_rounds",         1, true, false);
+
+    sv_gameinstructor_disable.BoolValue = true;
+    sv_fistpunch_damage_to_player_multiplier.FloatValue = 0.0;
 
     sv_staminamax.SetFloat(         100.0, true, false);
     sv_staminajumpcost.SetFloat(     0.08, true, false);
