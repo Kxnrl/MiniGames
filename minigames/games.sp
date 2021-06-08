@@ -23,6 +23,7 @@ static Handle t_tRoundTimer = null;
 static float t_fRoundStart = -1.0;
 static int t_iRoundNumber = 0;
 static bool t_bPressed[2048];
+static bool t_VacSlay = false;
 
 static Handle t_kOCookies[kO_MaxOptions];
 
@@ -609,11 +610,12 @@ public Action Games_RoundTimer(Handle timer)
     // Slap player after vac timer elapsed
     else if (t_iWallHackCD == 0 && mg_slap_after_vac.BoolValue)
     {
+        t_VacSlay = true;
         for(int client = 1; client <= MaxClients; ++client)
             if (ClientValid(client) && IsPlayerAlive(client))
             {
                 int health = GetClientHealth(client) - 1;
-                if (health < 0)
+                if (health < 1)
                 {
                     // kill player
                     ForcePlayerSuicide(client);
@@ -624,6 +626,7 @@ public Action Games_RoundTimer(Handle timer)
                     SetEntityHealth(client, health);
                 }
             }
+        t_VacSlay = false;
     }
 
     return Plugin_Continue;
@@ -800,4 +803,9 @@ int Games_GetRoundNumber()
 void Games_AddVacTimer(int seconds)
 {
     t_iWallHackCD += seconds;
+}
+
+bool Games_VacSlay()
+{
+    return t_VacSlay;
 }

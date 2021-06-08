@@ -571,7 +571,7 @@ void Stats_OnWeaponFire(int attacker, const char[] weapon)
 
 void Stats_OnRoundEnd()
 {
-    if (!t_bEnabled)
+    if (!t_bEnabled || Games_VacSlay())
         return;
 
     for(int client = 1; client <= MaxClients; ++client)
