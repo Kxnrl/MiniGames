@@ -236,6 +236,7 @@ public void OnAllPluginsLoaded()
     g_smxStore = LibraryExists("store");
     g_smxMapMuisc = LibraryExists("MapMusic");
     g_extTransmitManager = LibraryExists("TransmitManager");
+    g_extMovementManager = LibraryExists("MovementManager");
 
     if (LibraryExists("updater"))
     {
@@ -276,6 +277,8 @@ public void OnLibraryAdded(const char[] name)
             TransmitManager_AddEntityHooks(i);
         }
     }
+    else if (strcmp(name, "MovementManager") == 0)
+        g_extMovementManager = true;
     else if (strcmp(name, "store") == 0)
         g_smxStore = true;
     else if (strcmp(name, "MapMusic") == 0)
@@ -295,6 +298,8 @@ public void OnLibraryRemoved(const char[] name)
         g_extGeoIP2 = false;
     else if (strcmp(name, "TransmitManager") == 0)
         g_extTransmitManager = false;
+    else if (strcmp(name, "MovementManager") == 0)
+        g_extMovementManager = false;
     else if (strcmp(name, "store") == 0)
         g_smxStore = false;
     else if (strcmp(name, "MapMusic") == 0)

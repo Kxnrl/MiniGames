@@ -194,6 +194,12 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
         sv_staminarecoveryrate.SetFloat(60.0, true, false);
         sv_timebetweenducks.SetFloat(0.4, true, false);
     }
+
+    if (g_extMovementManager)
+    {
+        ConVar_Easy_SetInt("sm_movement_unlocker_ct", sv_enablebunnyhopping.BoolValue ? 2 : 0, true, false);
+        ConVar_Easy_SetInt("sm_movement_unlocker_te", sv_enablebunnyhopping.BoolValue ? 2 : 0, true, false);
+    }
 }
 
 public void Cvars_OnLateSpawnChanged(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -533,6 +539,12 @@ static Action Command_SetBhopAllow(int args)
         LogError("Error trigger command mg_setbhop_allow! arg[1]: %s", buffer);
     }
 
+    if (g_extMovementManager)
+    {
+        ConVar_Easy_SetInt("sm_movement_unlocker_ct", sv_enablebunnyhopping.BoolValue ? 2 : 0, true, false);
+        ConVar_Easy_SetInt("sm_movement_unlocker_te", sv_enablebunnyhopping.BoolValue ? 2 : 0, true, false);
+    }
+
     return Plugin_Handled;
 }
 
@@ -643,6 +655,13 @@ void Cvars_OnRoundStart()
     
     // fix skate invoke
     sv_standable_normal.FloatValue = 0.7;
+
+    // movement
+    if (g_extMovementManager)
+    {
+        ConVar_Easy_SetInt("sm_movement_unlocker_ct", sv_enablebunnyhopping.BoolValue ? 2 : 0, true, false);
+        ConVar_Easy_SetInt("sm_movement_unlocker_te", sv_enablebunnyhopping.BoolValue ? 2 : 0, true, false);
+    }
 }
 
 public Action Command_SetCvar(int args)

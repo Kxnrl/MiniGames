@@ -116,6 +116,7 @@ bool g_smxMapMuisc;
 bool g_extGeoIP2;
 bool g_extA2SFirewall;
 bool g_extTransmitManager;
+bool g_extMovementManager;
 
 // forwards
 GlobalForward g_fwdOnRandomTeam;
