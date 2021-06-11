@@ -445,7 +445,7 @@ static void Games_BlockKeybindCJ(int client, int& buttons)
     if (!m_bJumping[client] && !m_bWasDucking[client] && newJumping && newOnGround && newDuck)
     {
         buttons &= ~IN_DUCK;
-        Text(client, "Keybind Crouch Jump is not allow.");
+        Text(client, "%T", "block bind cj", client);
     }
 
     m_bWasDucking[client] = view_as<bool>((buttons & IN_DUCK));
