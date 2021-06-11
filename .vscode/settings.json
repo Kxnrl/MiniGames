@@ -75,5 +75,8 @@
         "include/vector.inc": true,
         "include/version.inc": true,
         "include/version_auto.inc": true
-    }
+    },
+    "sourcepawn.AuthorName": "Kyle",
+    "sourcepawn.GithubName": "Kxnrl",
+    "sourcepawn.SourcemodHome": "E:\\WorkSpace\\Github\\MiniGames\\include"
 }

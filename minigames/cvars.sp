@@ -59,23 +59,24 @@ void Cvars_OnPluginStart()
     // Version convar
     AutoExecConfig_CreateConVar("minigames_version", PI_VERSION, "Current MiniGames version", FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY|FCVAR_DONTRECORD);
 
-    mg_restrictawp      = AutoExecConfig_CreateConVar("mg_restrictawp",      "0",        "Restrict use AWP",                                                 _, true, 0.0,   true, 1.0);
-    mg_slaygaygun       = AutoExecConfig_CreateConVar("mg_slaygaygun",       "1",        "Slay player who uses gaygun",                                      _, true, 0.0,   true, 1.0);
-    mg_spawn_knife      = AutoExecConfig_CreateConVar("mg_spawn_knife",      "0",        "Give knife On player spawn",                                       _, true, 0.0,   true, 1.0);
-    mg_spawn_pistol     = AutoExecConfig_CreateConVar("mg_spawn_pistol",     "0",        "Give pistol On player spawn",                                      _, true, 0.0,   true, 1.0);
-    mg_spawn_kevlar     = AutoExecConfig_CreateConVar("mg_spawn_kevlar",     "0",        "Give kevlar On player spawn",                                      _, true, 0.0,   true, 100.0);
-    mg_spawn_helmet     = AutoExecConfig_CreateConVar("mg_spawn_helmet",     "0",        "Give helmet On player spawn",                                      _, true, 0.0,   true, 1.0);
-    mg_bhopspeed        = AutoExecConfig_CreateConVar("mg_bhopspeed",        "250.0",    "Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)",  _, true, 200.0, true, 3500.0);
-    mg_randomteam       = AutoExecConfig_CreateConVar("mg_randomteam",       "1",        "Scramble Team after Round End",                                    _, true, 0.0,   true, 1.0);
-    mg_wallhack_delay   = AutoExecConfig_CreateConVar("mg_wallhack_delay",   "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 180.0);
-    mg_transmitblock    = AutoExecConfig_CreateConVar("mg_transmitblock",    "1",        "Allow client hide teammate.",                                      _, true, 0.0,   true, 1.0);
-    mg_geoiplanguage    = AutoExecConfig_CreateConVar("mg_geoiplanguage",    "en",       "Language of GeoIP2-City. \nList of language: \nBrazilian Portuguese (pt-BR), English (en), French (fr), German (de), Japanese (ja), Russian (ru), Simplified Chinese (zh-CN), and Spanish (es)");
-    mg_render_player    = AutoExecConfig_CreateConVar("mg_render_player",    "0",        "Allow render player model color.",                                 _, true, 0.0,   true, 1.0);
-    mg_block_keybind_cj = AutoExecConfig_CreateConVar("mg_block_keybind_cj", "1",        "Block keybind crouch jump.",                                       _, true, 0.0,   true, 1.0);
-    mg_button_watcher   = AutoExecConfig_CreateConVar("mg_button_watcher",   "1",        "Print button usage info.",                                         _, true, 0.0,   true, 1.0);
-    mg_broadcast_leave  = AutoExecConfig_CreateConVar("mg_broadcast_leave",  "0",        "Broadcast on client disconnect.",                                  _, true, 0.0,   true, 1.0);
-    mg_slap_after_vac   = AutoExecConfig_CreateConVar("mg_slap_after_vac",   "1",        "Slap player after vac timer elapsed.",                             _, true, 0.0,   true, 1.0);
-    mg_rank_skillgroups = AutoExecConfig_CreateConVar("mg_rank_skillgroups", "1",        "Display skill groups on scoreboard.",                              _, true, 0.0,   true, 1.0);
+    mg_restrict_awp         = AutoExecConfig_CreateConVar("mg_restrict_awp",        "0",        "Restrict use AWP",                                                 _, true, 0.0,   true, 1.0);
+    mg_restrict_machinegun  = AutoExecConfig_CreateConVar("mg_restrict_machinegun", "0",        "Restrict use machine gun",                                         _, true, 0.0,   true, 1.0);
+    mg_slaygaygun           = AutoExecConfig_CreateConVar("mg_slaygaygun",          "1",        "Slay player who uses gaygun",                                      _, true, 0.0,   true, 1.0);
+    mg_spawn_knife          = AutoExecConfig_CreateConVar("mg_spawn_knife",         "0",        "Give knife On player spawn",                                       _, true, 0.0,   true, 1.0);
+    mg_spawn_pistol         = AutoExecConfig_CreateConVar("mg_spawn_pistol",        "0",        "Give pistol On player spawn",                                      _, true, 0.0,   true, 1.0);
+    mg_spawn_kevlar         = AutoExecConfig_CreateConVar("mg_spawn_kevlar",        "0",        "Give kevlar On player spawn",                                      _, true, 0.0,   true, 100.0);
+    mg_spawn_helmet         = AutoExecConfig_CreateConVar("mg_spawn_helmet",        "0",        "Give helmet On player spawn",                                      _, true, 0.0,   true, 1.0);
+    mg_bhopspeed            = AutoExecConfig_CreateConVar("mg_bhopspeed",           "250.0",    "Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)",  _, true, 200.0, true, 3500.0);
+    mg_randomteam           = AutoExecConfig_CreateConVar("mg_randomteam",          "1",        "Scramble Team after Round End",                                    _, true, 0.0,   true, 1.0);
+    mg_wallhack_delay       = AutoExecConfig_CreateConVar("mg_wallhack_delay",      "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 180.0);
+    mg_transmitblock        = AutoExecConfig_CreateConVar("mg_transmitblock",       "1",        "Allow client hide teammate.",                                      _, true, 0.0,   true, 1.0);
+    mg_geoiplanguage        = AutoExecConfig_CreateConVar("mg_geoiplanguage",       "en",       "Language of GeoIP2-City. \nList of language: \nBrazilian Portuguese (pt-BR), English (en), French (fr), German (de), Japanese (ja), Russian (ru), Simplified Chinese (zh-CN), and Spanish (es)");
+    mg_render_player        = AutoExecConfig_CreateConVar("mg_render_player",       "0",        "Allow render player model color.",                                 _, true, 0.0,   true, 1.0);
+    mg_block_keybind_cj     = AutoExecConfig_CreateConVar("mg_block_keybind_cj",    "1",        "Block keybind crouch jump.",                                       _, true, 0.0,   true, 1.0);
+    mg_button_watcher       = AutoExecConfig_CreateConVar("mg_button_watcher",      "1",        "Print button usage info.",                                         _, true, 0.0,   true, 1.0);
+    mg_broadcast_leave      = AutoExecConfig_CreateConVar("mg_broadcast_leave",     "0",        "Broadcast on client disconnect.",                                  _, true, 0.0,   true, 1.0);
+    mg_slap_after_vac       = AutoExecConfig_CreateConVar("mg_slap_after_vac",      "1",        "Slap player after vac timer elapsed.",                             _, true, 0.0,   true, 1.0);
+    mg_rank_skillgroups     = AutoExecConfig_CreateConVar("mg_rank_skillgroups",    "1",        "Display skill groups on scoreboard.",                              _, true, 0.0,   true, 1.0);
 
     mg_bonus_kill_via_gun     = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun",       "3", "How many credits to earn when player kill enemy with gun",                _, true, 0.0, true, 1000.0);
     mg_bonus_kill_via_gun_hs  = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun_hs",    "4", "How many credits to earn when player kill enemy with gun and headshot",   _, true, 0.0, true, 1000.0);
@@ -184,7 +185,6 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
         sv_staminajumpcost.SetInt(0, true, false);
         sv_staminalandcost.SetInt(0, true, false);
         sv_staminarecoveryrate.SetInt(0, true, false);
-        sv_timebetweenducks.SetFloat(0.2, true, false);
     }
     else
     {
@@ -192,7 +192,6 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
         sv_staminajumpcost.SetFloat(0.08, true, false);
         sv_staminalandcost.SetFloat(0.04, true, false);
         sv_staminarecoveryrate.SetFloat(60.0, true, false);
-        sv_timebetweenducks.SetFloat(0.4, true, false);
     }
 
     if (g_extMovementManager)
@@ -263,6 +262,8 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("sv_teamid_overhead_maxdist",     1500, true, false);
     ConVar_Easy_SetInt("weapon_reticle_knife_show",         1, true, false);
     ConVar_Easy_SetInt("mp_equipment_reset_rounds",         1, true, false);
+
+    sv_timebetweenducks.SetFloat(0.4, true, false);
 
     sv_gameinstructor_disable.BoolValue = true;
     sv_fistpunch_damage_to_player_multiplier.FloatValue = 0.0;
@@ -489,7 +490,13 @@ static void GenerateMapConfigs(const char[] map, const char[] path)
     //Restrict AWP
     file.WriteLine("// 禁止使用AWP(1为启用)");
     file.WriteLine("// Restrict use AWP");
-    file.WriteLine("mg_restrictawp \"0\"");
+    file.WriteLine("mg_restrict_awp \"0\"");
+    file.WriteLine("");
+
+    //Restrict Mahine gun
+    file.WriteLine("// 禁止使用机枪(1为启用)");
+    file.WriteLine("// Restrict use Machine gun");
+    file.WriteLine("mg_restrict_machinegun \"0\"");
     file.WriteLine("");
 
     //Slay player who uses gaygun

@@ -230,6 +230,12 @@
         "chi"       "{red}当前地图限制Awp的使用..."
     }
 
+    "restrict machine gun"
+    {
+        "en"        "{red}Machine gun is restricted in current map."
+        "chi"       "{red}当前地图限制M249/Negev的使用..."
+    }
+
     "slay gaygun"
     {
         "#format"   "{1:N},{2:s}"

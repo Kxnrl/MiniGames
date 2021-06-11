@@ -170,7 +170,8 @@ ConVar mp_damage_headshot_only      = null;
 ConVar mp_teammates_are_enemies     = null;
 
 ConVar mg_bhopspeed                 = null;
-ConVar mg_restrictawp               = null;
+ConVar mg_restrict_awp              = null;
+ConVar mg_restrict_machinegun       = null;
 ConVar mg_slaygaygun                = null;
 ConVar mg_spawn_knife               = null;
 ConVar mg_spawn_pistol              = null;
@@ -572,9 +573,28 @@ stock void WeaponSwitchFixes(int client)
     int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
     if (weapon != INVALID_ENT_REFERENCE)
     {
-        SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", INVALID_ENT_REFERENCE);
-        SDKCall(g_hWeaponSwitch, client, weapon, 0);
+        SwitchWeapon(client, weapon);
     }
+}
+
+stock void SwitchWeapon(int client, int weapon)
+{
+    SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", INVALID_ENT_REFERENCE);
+    SDKCall(g_hWeaponSwitch, client, weapon, 0);
+}
+
+stock void RemoveAndSwitch(int client, int weapon)
+{
+    if (GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == weapon)
+    {
+        AcceptEntityInput(weapon, "KillHierarchy");
+
+        int knife = GetPlayerWeaponSlot(client, 2);
+        if (knife != -1)
+            SwitchWeapon(client, knife);
+    }
+    else
+        AcceptEntityInput(weapon, "KillHierarchy");
 }
 
 stock void ClearHudByChannel(int client, int channel)

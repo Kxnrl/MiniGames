@@ -361,20 +361,18 @@ void Games_OnEquipPost(DataPack pack)
         return;
 
     // restrict AWP
-    if (mg_restrictawp.BoolValue && strcmp(classname, "weapon_awp") == 0)
+    if (mg_restrict_awp.BoolValue && strcmp(classname, "weapon_awp") == 0)
     {
         Chat(client, "%T", "restrict awp", client);
+        RemoveAndSwitch(client, weapon);
+        return;
+    }
 
-        if (GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == weapon)
-        {
-            int knife = GetPlayerWeaponSlot(client, 2);
-            if (knife != -1)
-                SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", knife);
-        }
-
-        RemovePlayerItem(client, weapon);
-        AcceptEntityInput(weapon, "KillHierarchy");
-
+    // restrict Mahine gun
+    if (mg_restrict_machinegun.BoolValue && (strcmp(classname, "weapon_m249") == 0 || strcmp(classname, "weapon_negev") == 0))
+    {
+        Chat(client, "%T", "restrict machine gun", client);
+        RemoveAndSwitch(client, weapon);
         return;
     }
 
@@ -383,7 +381,6 @@ void Games_OnEquipPost(DataPack pack)
     {
         ChatAll("%t", "slay gaygun", client, classname[7]);
 
-        RemovePlayerItem(client, weapon);
         AcceptEntityInput(weapon, "KillHierarchy");
         ForcePlayerSuicide(client);
 
