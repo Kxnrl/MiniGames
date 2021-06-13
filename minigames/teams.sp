@@ -33,7 +33,7 @@ void Teams_OnPlayerConnected(int userid)
 public Action Timer_FullConnected(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
-    if (!ClientValid(client) || g_iTeam[client] > TEAM_OB)
+    if (!ClientValid(client) || g_iTeam[client] >= TEAM_OB)
         return Plugin_Stop;
 
     int newteam = Teams_GetAllowTeam(client);
@@ -109,6 +109,11 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
     GetCmdArg(1, arg, 4);
     int newteam = StringToInt(arg);
     int oldteam = GetClientTeam(client);
+
+    if (newteam == TEAM_OB)
+    {
+        return CheckCommandAccess(client, "check_admin", ADMFLAG_BAN, true) ? Plugin_Continue : Plugin_Handled;
+    }
 
     // if client join game at the moment.
     if (oldteam <= TEAM_OB)
