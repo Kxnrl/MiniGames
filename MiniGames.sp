@@ -947,7 +947,8 @@ void Hooks_UpdateState()
         {
             canSee = !g_kOptions[client][kO_Transmit];
 
-            if (!canSee && GetClientButtons(client) & IN_ATTACK2)
+            // prevent lag
+            if (!canSee && PressedButton(client, IN_ATTACK2) && !IsClientUsingSniper(client))
                 canSee = true;
         }
 

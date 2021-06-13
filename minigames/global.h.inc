@@ -602,3 +602,29 @@ stock void ClearHudByChannel(int client, int channel)
     SetHudTextParams(0.0, 0.0, 0.01, 0, 0, 0, 0, 0, 0.0, 0.0, 0.0);
     ShowHudText(client, channel, "");
 }
+
+stock bool IsClientUsingSniper(int client)
+{
+    int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+
+    char classname[32];
+    if (weapon == -1 || !GetEdictClassname(weapon, classname, 32))
+        return false;
+
+    static char weapons[] = "weapon_awp|weapon_scar20|weapon_g3sg1|weapon_aug|weapon_sg553";
+
+    return StrContains(weapons, classname) >= 0;
+}
+
+stock bool PressedButton(int client, int button)
+{
+    // not hold
+    if (!(GetClientButtons(client) & button))
+        return false;
+
+    // last hold
+    //if (GetEntProp(client, Prop_Data, "m_nOldButtons") & button)
+    //    return false;
+
+    return true;
+}
