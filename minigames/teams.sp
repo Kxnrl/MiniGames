@@ -139,8 +139,15 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
         return Plugin_Handled;
     }
 
-    // force change
-    ChangeClientTeam(client, newteam);
+    
+    if (CheckCommandAccess(client, "check_sponsor", ADMFLAG_CUSTOM1, true))
+    {
+        // force change if has sponsor flag
+        ChangeClientTeam(client, newteam);
+        return Plugin_Handled;
+    }
+
+    // you can not change.
     return Plugin_Handled;
 }
 
