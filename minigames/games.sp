@@ -22,6 +22,7 @@ static bool bVACHudPosition[MAXPLAYERS+1];
 static Handle t_tRoundTimer = null;
 static float t_fRoundStart = -1.0;
 static int t_iRoundNumber = 0;
+static int t_bRoundEnding = false;
 static bool t_bPressed[2048];
 
 static Handle t_kOCookies[kO_MaxOptions];
@@ -541,6 +542,9 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
 
 void Games_OnRoundStarted()
 {
+    // mark
+    t_bRoundEnding = false;
+
     // check warmup
     if (IsWarmup())
         return;
@@ -633,6 +637,8 @@ void Games_OnRoundEnd()
     t_tRoundTimer = null;
 
     t_iWallHackCD = -1;
+
+    t_bRoundEnding = true;
 }
 
 void Games_OnEntityCreated(int entity)
@@ -797,4 +803,9 @@ int Games_GetRoundNumber()
 void Games_AddVacTimer(int seconds)
 {
     t_iWallHackCD += seconds;
+}
+
+bool Games_IsRoundEnding()
+{
+    return t_bRoundEnding;
 }

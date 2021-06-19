@@ -925,12 +925,12 @@ void Hooks_UpdateState()
     if (!g_extTransmitManager)
         return;
 
-    if (!mg_transmitblock.BoolValue || mp_teammates_are_enemies.BoolValue)
+    if (!mg_transmitblock.BoolValue || mp_teammates_are_enemies.BoolValue || Games_IsRoundEnding())
     {
         // force all transmit state
         for(int i = 1; i <= MaxClients; i++)
         {
-            if (!IsClientInGame(i) || IsFakeClient(i))
+            if (!IsClientInGame(i) || IsFakeClient(i) || !TransmitManager_IsEntityHooked(i))
                 continue;
 
             for (int j = 1; j <= MaxClients; j++) if (IsClientInGame(j) && !IsFakeClient(j))
@@ -953,7 +953,7 @@ void Hooks_UpdateState()
                 canSee = true;
         }
 
-        for (int entity = 1; entity <= MaxClients; entity++) if (IsClientInGame(entity) && !IsFakeClient(entity))
+        for (int entity = 1; entity <= MaxClients; entity++) if (IsClientInGame(entity) && !IsFakeClient(entity) && TransmitManager_IsEntityHooked(entity))
         {
             // transmit entity
             TransmitManager_SetEntityState(entity, client, (g_iTeam[entity] != g_iTeam[client] || canSee));

@@ -6,6 +6,8 @@
 native void TransmitManager_AddEntityHooks(int entity);
 native bool TransmitManager_SetEntityOwner(int entity, int target);
 native bool TransmitManager_SetEntityState(int entity, int client, bool can);
+native bool TransmitManager_GetEntityState(int entity, int client);
+native bool TransmitManager_IsEntityHooked(int entity);
 
 /**
  * _________________Do not edit below this line!_______________________
