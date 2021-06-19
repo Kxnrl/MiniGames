@@ -27,7 +27,7 @@ void Teams_OnMapStart()
 
 void Teams_OnPlayerConnected(int userid)
 {
-    CreateTimer(10.0, Timer_FullConnected, userid, TIMER_FLAG_NO_MAPCHANGE);
+    CreateTimer(0.1, Timer_FullConnected, userid, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Timer_FullConnected(Handle timer, int userid)
@@ -139,7 +139,6 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
         return Plugin_Handled;
     }
 
-    
     if (CheckCommandAccess(client, "check_sponsor", ADMFLAG_CUSTOM1, true))
     {
         // force change if has sponsor flag
