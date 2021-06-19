@@ -965,7 +965,7 @@ void Hooks_UpdateState()
 // by Kyle
 void Hooks_OnEntityCreated(int entity, const char[] classname)
 {
-    if (StrContains(classname, "_projectile") > 0 && classname[0] != 'h')
+    if (StrContains(classname, "_projectile") > 0 && (classname[0] == 'd' || classname[0] == 's'))
         SDKHook(entity, SDKHook_SpawnPost, Hooks_OnEntitySpawnedPost);
 }
 
