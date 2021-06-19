@@ -858,7 +858,8 @@ public Action Command_MapChange(int client, const char[] command, int args)
         if (!IsClientConnected(i) || IsFakeClient(i))
             continue;
 
-        ClientCommand(i , "retry");
+        LogMessage("Retry client %N", i);
+        ClientCommand(i , "retry;");
     }
     return Plugin_Continue;
 }
