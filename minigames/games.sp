@@ -22,7 +22,7 @@ static bool bVACHudPosition[MAXPLAYERS+1];
 static Handle t_tRoundTimer = null;
 static float t_fRoundStart = -1.0;
 static int t_iRoundNumber = 0;
-static int t_bRoundEnding = false;
+static bool t_bRoundEnding = false;
 static bool t_bPressed[2048];
 
 static Handle t_kOCookies[kO_MaxOptions];
