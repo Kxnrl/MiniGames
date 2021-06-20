@@ -31,7 +31,7 @@ int g_HookId[MAXPLAYERS+1] = {-1, ...};
 
 public void OnPluginStart()
 {
-    GameData conf = new GameData("sdktools.games\\engine.csgo");
+    GameData conf = new GameData("sdktools.games");
     if (conf == null)
         SetFailState("Failed to load gamedata.");
 

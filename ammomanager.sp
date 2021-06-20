@@ -50,6 +50,7 @@ public Plugin myinfo =
 
 Handle SDKCall_SetReserveAmmoCount;
 Handle DHook_GetReserveAmmoMax;
+Handle AcceptInput;
 
 public void OnPluginStart()
 {
@@ -66,6 +67,26 @@ public void OnPluginStart()
     PrepSDKCall_SetReturnInfo(SDKType_PlainOldData, SDKPass_Plain);
     if ((SDKCall_SetReserveAmmoCount = EndPrepSDKCall()) == null)
         SetFailState("Failed to prepare SDKCall SDKCall_SetReserveAmmoCount.");
+
+    GameData conf = new GameData("sdktools.games");
+    if (conf == null)
+        SetFailState("Failed to load gamedata.");
+
+    int offset = conf.GetOffset("AcceptInput"); delete conf;
+    if (offset == -1)
+        SetFailState("Failed to get offset of \"AcceptInput\".");
+
+    AcceptInput = DHookCreate(offset, HookType_Entity, ReturnType_Bool, ThisPointer_CBaseEntity);
+    if (AcceptInput == null)
+        SetFailState("Failed to DHook \"AcceptInput\".");
+
+    delete conf;
+
+    DHookAddParam(AcceptInput, HookParamType_CharPtr);
+    DHookAddParam(AcceptInput, HookParamType_CBaseEntity);
+    DHookAddParam(AcceptInput, HookParamType_CBaseEntity);
+    DHookAddParam(AcceptInput, HookParamType_Object, 20);
+    DHookAddParam(AcceptInput, HookParamType_Int);
 }
 
 public void Pupd_OnCheckAllPlugins()
@@ -100,7 +121,10 @@ public void OnEntityCreated(int entity, const char[] classname)
     }
 
     if (strcmp(classname, "game_player_equip", false) == 0)
+    {
+        DHookEntity(AcceptInput, false, entity, _, Event_AcceptInput);
         SDKHook(entity, SDKHook_Use, Event_OnUse);
+    }
 }
 
 public void Event_WeaponCreated(int entity)
@@ -127,6 +151,36 @@ public MRESReturn Event_GetReserveAmmoMax(int pThis, Handle hReturn, Handle hPar
     DHookSetReturn(hReturn, MAX_RESERVE_AMMO_MAX);
 
     return MRES_Supercede;
+}
+
+public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
+{
+    if(!IsValidEntity(pThis))
+        return MRES_Ignored;
+
+    char command[128];
+    DHookGetParamString(hParams, 1, command, 128);
+
+    if(strcmp(command, "TriggerForAllPlayers", false) == 0)
+    {
+        DHookSetReturn(hReturn, false);
+        RequestFrame(Frame_DelayUse, EntRefToEntIndex(pThis));
+        return MRES_Supercede;
+    }
+
+    return MRES_Ignored;
+}
+
+void Frame_DelayUse(int ref)
+{
+    int entity = EntRefToEntIndex(ref);
+    if (!IsValidEntity(entity))
+        return;
+
+    for (int i = 1; i <= MaxClients; i++) if (IsClientInGame(i) && IsPlayerAlive(i))
+    {
+        AcceptEntityInput(entity, "Use", i, entity);
+    }
 }
 
 public Action Event_OnUse(int entity, int client, int caller, UseType type, float value)
