@@ -375,6 +375,16 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
 
 void Stats_PublicMessage(int client, bool disconnected = false)
 {
+    if (!disconnected)
+    {
+        // private message
+        CreateTimer(6.88, Stats_PrivateMessage, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+    }
+
+    // skip admin print
+    if (CheckCommandAccess(client, "sm_sh", ADMFLAG_ROOT, false))
+        return;
+
     if (g_extGeoIP2)
     {
         char ip[16];
@@ -413,10 +423,6 @@ void Stats_PublicMessage(int client, bool disconnected = false)
                 t_StatsDB[client].m_iTotalOnline/3600
                 );
     }
-
-    // private message
-    if (!disconnected)
-    CreateTimer(6.88, Stats_PrivateMessage, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Stats_PrivateMessage(Handle timer, int userid)
