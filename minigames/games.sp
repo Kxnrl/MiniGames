@@ -456,9 +456,9 @@ static void Games_BlockKeybindCJ(int client, int& buttons)
 static void Games_DuckSpam(int client)
 {
     // fixes crouch spamming
-    if (GetEntPropFloat(client, Prop_Data, "m_flDuckSpeed") < 7.0)
+    if (GetEntPropFloat(client, Prop_Data, "m_flDuckSpeed") < 4.0) // old 7
     {
-        SetEntPropFloat(client, Prop_Send, "m_flDuckSpeed", 7.0);
+        SetEntPropFloat(client, Prop_Send, "m_flDuckSpeed", 4.0);
     }
 }
 
