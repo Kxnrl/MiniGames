@@ -202,10 +202,10 @@ public Action Games_TickInterval(Handle timer)
 static void Games_CleanupWeapon()
 {
     bool cleanMapWeapon = false;
+    int edicts = 0;
 
     if (!IsWarmup())
     {
-        int edicts = 0;
         for (int i = 1; i < 2048; i++) if (IsValidEdict(i))
         {
             // counting
@@ -224,13 +224,15 @@ static void Games_CleanupWeapon()
         cleanMapWeapon = true;
     }
 
+    LogMessage("Clean Weapons -> cleanMapWeapon = %s | edicts = %d", cleanMapWeapon ? "true" : "false", edicts);
+
     int entity = INVALID_ENT_REFERENCE;
     while ((entity = FindEntityByClassname(entity, "weapon_*")) != INVALID_ENT_REFERENCE)
     {
         int client = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
 
         // if have owner client
-        if (client != -1)
+        if (client > 0)
             continue;
 
         // ignore map weapons/grenades?
@@ -382,6 +384,7 @@ void Games_OnEquipPost(DataPack pack)
     {
         ChatAll("%t", "slay gaygun", client, classname[7]);
 
+        RemovePlayerItem(client, weapon);
         AcceptEntityInput(weapon, "KillHierarchy");
         ForcePlayerSuicide(client);
 

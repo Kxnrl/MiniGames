@@ -587,6 +587,7 @@ stock void RemoveAndSwitch(int client, int weapon)
 {
     if (GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon") == weapon)
     {
+        RemovePlayerItem(client, weapon);
         AcceptEntityInput(weapon, "KillHierarchy");
 
         int knife = GetPlayerWeaponSlot(client, 2);
@@ -594,7 +595,10 @@ stock void RemoveAndSwitch(int client, int weapon)
             SwitchWeapon(client, knife);
     }
     else
+    {
+        RemovePlayerItem(client, weapon);
         AcceptEntityInput(weapon, "KillHierarchy");
+    }
 }
 
 stock void ClearHudByChannel(int client, int channel)
