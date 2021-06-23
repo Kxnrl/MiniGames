@@ -83,6 +83,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     MarkNativeAsOptional("TransmitManager_AddEntityHooks");
     MarkNativeAsOptional("TransmitManager_SetEntityOwner");
     MarkNativeAsOptional("TransmitManager_SetEntityState");
+    MarkNativeAsOptional("TransmitManager_IsEntityHooked");
     
     // GeoIP2
     MarkNativeAsOptional("GeoIP2_Country");
