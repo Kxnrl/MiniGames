@@ -202,7 +202,7 @@ public Action Games_TickInterval(Handle timer)
 static void Games_CleanupWeapon()
 {
     bool cleanMapWeapon = false;
-    int edicts = 0;
+    int edicts = -1;
 
     if (!IsWarmup())
     {
@@ -217,6 +217,8 @@ static void Games_CleanupWeapon()
             // we have enough entity
             return;
         }
+
+        cleanMapWeapon = edicts >= 1988;
     }
     else
     {
@@ -224,6 +226,7 @@ static void Games_CleanupWeapon()
         cleanMapWeapon = true;
     }
 
+    if (edicts > -1)
     LogMessage("Clean Weapons -> cleanMapWeapon = %s | edicts = %d", cleanMapWeapon ? "true" : "false", edicts);
 
     int entity = INVALID_ENT_REFERENCE;
