@@ -258,27 +258,51 @@ public Action Event_OnUse(int entity, int client, int caller, UseType type, floa
 void HandleKnife(int client)
 {
     int knife = INVALID_ENT_REFERENCE;
+    char classname[32];
 
     while ((knife = GetPlayerWeaponSlot(client, CS_WEAPON_SLOT_KNIFE)) != INVALID_ENT_REFERENCE)
     {
-        RemovePlayerItem(client, knife);
+        // if this is fists, just killed...
+        if (GetEdictClassname(knife, classname, 32) && strcmp(classname, "weapon_fists") == 0)
+        {
+            SaveRemove(client, knife);
+            continue;
+        }
+
+        // not the map item
+        if (GetEntProp(knife, Prop_Data, "m_iHammerID") <= 0)
+        {
+            SaveRemove(client, knife);
+            continue;
+        }
 
         // map item?
-        if (GetEntProp(knife, Prop_Data, "m_iHammerID") > 0)
+        // we need to fix this
+        // CLagCompensationManager::StartLagCompensation with NULL CUserCmd!!!
+
+        // no child
+        if (GetEntPropEnt(knife, Prop_Data, "m_hMoveChild") == -1)
         {
-            // we need give back again.
-            DataPack context = new DataPack();
-            context.WriteCell(GetClientUserId(client));
-            context.WriteCell(EntIndexToEntRef(knife));
-            context.Reset();
-            CreateTimer(1.0, Timer_GiveBack, context);
+            SaveRemove(client, knife);
+            continue;
         }
-        else
-        {
-            // kill
-            AcceptEntityInput(knife, "KillHierarchy");
-        }
+
+        // NEED MORE TEST
+        // we need give back again.
+        DataPack context = new DataPack();
+        context.WriteCell(GetClientUserId(client));
+        context.WriteCell(EntIndexToEntRef(knife));
+        context.Reset();
+        CreateTimer(0.1, Timer_GiveBack, context);
+
+        RemovePlayerItem(client, knife);
     }
+}
+
+void SaveRemove(int client, int knife)
+{
+    RemovePlayerItem(client, knife);
+    AcceptEntityInput(knife, "KillHierarchy");
 }
 
 public Action Timer_GiveBack(Handle timer, DataPack context)
