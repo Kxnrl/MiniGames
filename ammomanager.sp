@@ -296,6 +296,8 @@ void HandleKnife(int client)
         CreateTimer(0.1, Timer_GiveBack, context);
 
         RemovePlayerItem(client, knife);
+
+        LogMessage("[DEBUG]  Delayed Knife %L -> %d.<%s>", client, knife, classname);
     }
 }
 
