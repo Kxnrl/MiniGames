@@ -110,6 +110,13 @@ public void OnConfigsExecuted()
     FindConVar("ammo_762mm_max").SetInt(0);
     FindConVar("ammo_9mm_max").SetInt(0);
     FindConVar("ammo_buckshot_max").SetInt(0);
+
+    // healthshot
+    FindConVar("sv_health_approach_enabled").SetBool(true);
+    FindConVar("healthshot_health").SetInt(60);
+    FindConVar("healthshot_healthboost_time").SetFloat(5.0);
+    FindConVar("healthshot_healthboost_damage_multiplier").SetFloat(1.5);
+    FindConVar("healthshot_healthboost_speed_multiplier").SetFloat(0.75);
 }
 
 public void OnEntityCreated(int entity, const char[] classname)

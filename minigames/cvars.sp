@@ -177,7 +177,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     mp_t_default_melee.SetString("", true, false);
     mp_t_default_primary.SetString("", true, false);
     mp_t_default_secondary.SetString("", true, false);
-    sv_tags.SetString("MG,MiniGames,Shop,Store,Skin,WeaponSkin", true, true);
+    sv_tags.SetString("MG,MiniGames,Shop,Store,Skin", true, true);
 
     if (sv_enablebunnyhopping.BoolValue)
     {
@@ -303,7 +303,7 @@ static void Cvars_EnforceOptions()
     ConVar_Easy_SetInt("sv_parallel_packentities",  1, true, false);
     ConVar_Easy_SetInt("sv_parallel_sendsnapshot",  1, true, false); 
     ConVar_Easy_SetInt("sv_enable_delta_packing",   1, true, false); 
-    ConVar_Easy_SetFlo("sv_maxunlag", 0.1, true, false);
+    ConVar_Easy_SetFlo("sv_maxunlag", 0.07, true, false);
 
     // phys
     ConVar_Easy_SetInt("phys_enable_experimental_optimizations", 1, true, false);
