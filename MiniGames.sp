@@ -554,6 +554,7 @@ public void OnClientPostAdminCheck(int client)
     }
 
     // fire to module
+    Cvars_FakeClientConVar(client);
     Stats_OnClientPostAdminCheck(client);
 }
 

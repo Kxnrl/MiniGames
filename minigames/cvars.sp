@@ -36,6 +36,7 @@ static ConVar sv_disable_radar;
 static ConVar sv_gameinstructor_disable;
 static ConVar sv_fistpunch_damage_to_player_multiplier;
 static ConVar mp_taser_recharge_time;
+static ConVar sv_competitive_official_5v5;
 
 static ConVar sv_teamid_overhead_always_prohibit;
 static ConVar sv_show_team_equipment_prohibit;
@@ -90,27 +91,28 @@ void Cvars_OnPluginStart()
     mg_bonus_requires_players = AutoExecConfig_CreateConVar("mg_bonus_requires_players",   "8", "How many player requires to enable bouns",                                _, true, 1.0, true,   64.0);
     mg_bonus_max_round_credits= AutoExecConfig_CreateConVar("mg_bonus_max_round_credits",  "5", "Max credtis can be earned per round",                                     _, true, 0.0, true, 1000.0);
 
-    mp_ct_default_melee     = FindConVar("mp_ct_default_melee");
-    mp_ct_default_primary   = FindConVar("mp_ct_default_primary");
-    mp_ct_default_secondary = FindConVar("mp_ct_default_secondary");
-    mp_t_default_melee      = FindConVar("mp_t_default_melee");
-    mp_t_default_primary    = FindConVar("mp_t_default_primary");
-    mp_t_default_secondary  = FindConVar("mp_t_default_secondary");
-    sv_tags                 = FindConVar("sv_tags");
-    sv_enablebunnyhopping   = FindConVar("sv_enablebunnyhopping");
-    sv_autobunnyhopping     = FindConVar("sv_autobunnyhopping");
-    sv_timebetweenducks     = FindConVar("sv_timebetweenducks");
-    sv_staminamax           = FindConVar("sv_staminamax");
-    sv_staminajumpcost      = FindConVar("sv_staminajumpcost");
-    sv_staminalandcost      = FindConVar("sv_staminalandcost");
-    sv_staminarecoveryrate  = FindConVar("sv_staminarecoveryrate");
-    sv_standable_normal     = FindConVar("sv_standable_normal");
-    sv_disable_radar        = FindConVar("sv_disable_radar");
-    mp_join_grace_time      = FindConVar("mp_join_grace_time");
-    mp_freezetime           = FindConVar("mp_freezetime");
-    mp_damage_headshot_only = FindConVar("mp_damage_headshot_only");
-    mp_taser_recharge_time  = FindConVar("mp_taser_recharge_time");
-    mp_teammates_are_enemies= FindConVar("mp_teammates_are_enemies");
+    mp_ct_default_melee         = FindConVar("mp_ct_default_melee");
+    mp_ct_default_primary       = FindConVar("mp_ct_default_primary");
+    mp_ct_default_secondary     = FindConVar("mp_ct_default_secondary");
+    mp_t_default_melee          = FindConVar("mp_t_default_melee");
+    mp_t_default_primary        = FindConVar("mp_t_default_primary");
+    mp_t_default_secondary      = FindConVar("mp_t_default_secondary");
+    sv_tags                     = FindConVar("sv_tags");
+    sv_enablebunnyhopping       = FindConVar("sv_enablebunnyhopping");
+    sv_autobunnyhopping         = FindConVar("sv_autobunnyhopping");
+    sv_timebetweenducks         = FindConVar("sv_timebetweenducks");
+    sv_staminamax               = FindConVar("sv_staminamax");
+    sv_staminajumpcost          = FindConVar("sv_staminajumpcost");
+    sv_staminalandcost          = FindConVar("sv_staminalandcost");
+    sv_staminarecoveryrate      = FindConVar("sv_staminarecoveryrate");
+    sv_standable_normal         = FindConVar("sv_standable_normal");
+    sv_disable_radar            = FindConVar("sv_disable_radar");
+    mp_join_grace_time          = FindConVar("mp_join_grace_time");
+    mp_freezetime               = FindConVar("mp_freezetime");
+    mp_damage_headshot_only     = FindConVar("mp_damage_headshot_only");
+    mp_taser_recharge_time      = FindConVar("mp_taser_recharge_time");
+    mp_teammates_are_enemies    = FindConVar("mp_teammates_are_enemies");
+    sv_competitive_official_5v5 = FindConVar("sv_competitive_official_5v5");
 
     sv_gameinstructor_disable                = FindConVar("sv_gameinstructor_disable");
     sv_fistpunch_damage_to_player_multiplier = FindConVar("sv_fistpunch_damage_to_player_multiplier");
@@ -300,6 +302,7 @@ static void Cvars_EnforceOptions()
 
     // optimized
     ConVar_Easy_SetInt("net_splitrate",             2, true, false);
+    ConVar_Easy_SetInt("sv_parallel_send",          1, true, false);
     ConVar_Easy_SetInt("sv_parallel_packentities",  1, true, false);
     ConVar_Easy_SetInt("sv_parallel_sendsnapshot",  1, true, false); 
     ConVar_Easy_SetInt("sv_enable_delta_packing",   1, true, false); 
@@ -767,4 +770,13 @@ static bool Cvars_FindMapRadar(const char[] map)
 
     delete kv;
     return false;
+}
+
+void Cvars_FakeClientConVar(int client)
+{
+    if (!CheckCommandAccess(client, "sm_ban", ADMFLAG_BAN, false))
+        return;
+
+    // Enables Observer X-Ray...
+    sv_competitive_official_5v5.ReplicateToClient(client, "1");
 }
