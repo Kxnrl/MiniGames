@@ -302,7 +302,6 @@ static void Cvars_EnforceOptions()
 
     // optimized
     ConVar_Easy_SetInt("net_splitrate",             2, true, false);
-    ConVar_Easy_SetInt("sv_parallel_send",          1, true, false);
     ConVar_Easy_SetInt("sv_parallel_packentities",  1, true, false);
     ConVar_Easy_SetInt("sv_parallel_sendsnapshot",  1, true, false); 
     ConVar_Easy_SetInt("sv_enable_delta_packing",   1, true, false); 
