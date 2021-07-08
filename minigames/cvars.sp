@@ -37,6 +37,7 @@ static ConVar sv_gameinstructor_disable;
 static ConVar sv_fistpunch_damage_to_player_multiplier;
 static ConVar mp_taser_recharge_time;
 static ConVar sv_competitive_official_5v5;
+static ConVar sv_airaccelerate;
 
 static ConVar sv_teamid_overhead_always_prohibit;
 static ConVar sv_show_team_equipment_prohibit;
@@ -113,6 +114,7 @@ void Cvars_OnPluginStart()
     mp_taser_recharge_time      = FindConVar("mp_taser_recharge_time");
     mp_teammates_are_enemies    = FindConVar("mp_teammates_are_enemies");
     sv_competitive_official_5v5 = FindConVar("sv_competitive_official_5v5");
+    sv_airaccelerate            = FindConVar("sv_airaccelerate");
 
     sv_gameinstructor_disable                = FindConVar("sv_gameinstructor_disable");
     sv_fistpunch_damage_to_player_multiplier = FindConVar("sv_fistpunch_damage_to_player_multiplier");
@@ -187,6 +189,8 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
         sv_staminajumpcost.SetInt(0, true, false);
         sv_staminalandcost.SetInt(0, true, false);
         sv_staminarecoveryrate.SetInt(0, true, false);
+
+        sv_airaccelerate.SetInt(9999, true, false);
     }
     else
     {
@@ -194,6 +198,8 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
         sv_staminajumpcost.SetFloat(0.08, true, false);
         sv_staminalandcost.SetFloat(0.04, true, false);
         sv_staminarecoveryrate.SetFloat(60.0, true, false);
+
+        sv_airaccelerate.SetInt(12, true, false);
     }
 
     if (g_extMovementManager)
@@ -250,7 +256,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_match_can_clinch",               0, true, false);
     ConVar_Easy_SetInt("phys_timescale",                    1, true, false);
     ConVar_Easy_SetInt("sv_damage_print_enable",            0, true, false);
-    ConVar_Easy_SetInt("sv_airaccelerate",               9999, true, false);
+    ConVar_Easy_SetInt("sv_airaccelerate",                 12, true, false);
     ConVar_Easy_SetInt("sv_accelerate_use_weapon_speed",    0, true, false);
     ConVar_Easy_SetInt("sv_maxvelocity",                 3500, true, false);
     ConVar_Easy_SetInt("sv_allow_votes",                    0, true, false);
