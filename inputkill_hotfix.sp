@@ -98,7 +98,7 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
     char command[128];
     DHookGetParamString(hParams, 1, command, 128);
 
-    if (strncmp(command, "kill", false, 4) == 0)
+    if (strncmp(command, "kill", 4, false) == 0)
     {
         DHookSetReturn(hReturn, false);
         return MRES_Supercede;
