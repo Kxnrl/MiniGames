@@ -1,3 +1,19 @@
+/******************************************************************/
+/*                                                                */
+/*                     MiniGames - Ammo manager                   */
+/*                                                                */
+/*                                                                */
+/*  File:          ammomanager.sp                                 */
+/*  Description:   MiniGames Game Mod.                            */
+/*                                                                */
+/*                                                                */
+/*  Copyright (C) 2021  Kyle                                      */
+/*  2018/03/02 04:19:06                                           */
+/*                                                                */
+/*  This code is licensed under the GPLv3 License.                */
+/*                                                                */
+/******************************************************************/
+
 #pragma semicolon 1
 #pragma newdecls required
 
@@ -13,7 +29,7 @@
 
 #define PI_NAME     "Ammo Manager - Lite for MiniGames"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss + PerfectLaugh"
-#define PI_DESC     "DARLING in the FRANXX"
+#define PI_DESC     "MiniGames Game Mod"
 #define PI_VERSION  "2.2." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 

@@ -7,7 +7,7 @@
 /*  Description:   MiniGames Game Mod.                            */
 /*                                                                */
 /*                                                                */
-/*  Copyright (C) 2020  Kyle                                      */
+/*  Copyright (C) 2021  Kyle                                      */
 /*  2018/03/02 04:19:06                                           */
 /*                                                                */
 /*  This code is licensed under the GPLv3 License.                */
@@ -745,7 +745,7 @@ public void Event_PlayerHurts(Event event, const char[] name, bool dontBroadcast
     event.GetString("weapon", weapon, 32, "");
 
     Stats_PlayerHurts(client, attacker, damage, weapon);
-    Games_PlayerHurts(attacker, hitgroup);
+    Games_PlayerHurts(attacker, client, hitgroup);
 }
 
 public Action Event_PlayerTeams(Event event, const char[] name, bool dontBroadcast)

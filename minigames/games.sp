@@ -681,13 +681,17 @@ static void Games_ShowCurrentSpeed(int client, float speed)
     ShowHudText(client, HUD_CHANNEL_SPEED, "%.3f", speed);
 }
 
-void Games_PlayerHurts(int client, int hitgroup)
+void Games_PlayerHurts(int client, int victim, int hitgroup)
 {
     if (!client || g_kOptions[client][kO_HudHurt])
         return;
 
     static float lastDisplay[MAXPLAYERS+1];
+    static   int lastTickNum[MAXPLAYERS+1];
 
+    int currentTick = GetGameTickCount();
+
+    // if headshot, always override
     if (hitgroup == 1)
     {
         lastDisplay[client] = GetGameTime() + 0.66;
@@ -695,13 +699,25 @@ void Games_PlayerHurts(int client, int hitgroup)
     }
     else
     {
+        // last headshot...
         if (GetGameTime() < lastDisplay[client])
+            return;
+
+        // same tick meaning bullet penetration, display the first only
+        if (lastTickNum[client] == currentTick)
             return;
 
         SetHudTextParams(-1.0, -1.0, 0.25, 250, 128, 114, 128, 0, 0.125, 0.1, 0.125);
     }
 
-    ShowHudText(client, HUD_CHANNEL_MARKER, "╳");
+    ShowHudText(client, HUD_CHANNEL_MARKER, "\n\n\n\n\n\n╳\n\n\n\n\n\n%N", victim);
+
+    for (int target = 1; target <= MaxClients; ++target)
+        if (client != target && ClientValid(target) && IsClientObserver(target) && !g_kOptions[target][kO_HudHurt])
+            if (GetEntPropEnt(target, Prop_Send, "m_hObserverTarget") == client)
+                ShowHudText(target, HUD_CHANNEL_MARKER, "\n\n\n\n\n\n╳\n\n\n\n\n\n%N", victim);
+
+    lastTickNum[client] = currentTick;
 }
 
 void Games_OnPlayerBlind(DataPack pack)

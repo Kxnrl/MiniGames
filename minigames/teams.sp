@@ -7,7 +7,7 @@
 /*  Description:   MiniGames Game Mod.                            */
 /*                                                                */
 /*                                                                */
-/*  Copyright (C) 2020  Kyle                                      */
+/*  Copyright (C) 2021  Kyle                                      */
 /*  2018/03/05 16:51:01                                           */
 /*                                                                */
 /*  This code is licensed under the GPLv3 License.                */
@@ -112,7 +112,13 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
 
     if (newteam == TEAM_OB)
     {
-        return CheckCommandAccess(client, "check_admin", ADMFLAG_BAN, true) ? Plugin_Continue : Plugin_Handled;
+        if (CheckCommandAccess(client, "check_admin", ADMFLAG_BAN, true))
+        {
+            // fix mp_spectators_max
+            ChangeClientTeam(client, TEAM_OB);
+        }
+
+        return Plugin_Handled;
     }
 
     // if client join game at the moment.

@@ -7,7 +7,7 @@
 /*  Description:   MiniGames Game Mod.                            */
 /*                                                                */
 /*                                                                */
-/*  Copyright (C) 2020  Kyle                                      */
+/*  Copyright (C) 2021  Kyle                                      */
 /*  2018/03/05 16:51:01                                           */
 /*                                                                */
 /*  This code is licensed under the GPLv3 License.                */
@@ -17,7 +17,7 @@
 
 #define PI_NAME     "MiniGames - Core"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
-#define PI_DESC     "DARLING in the FRANXX"
+#define PI_DESC     "MiniGames Game Mod"
 #define PI_VERSION  "2.2." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 

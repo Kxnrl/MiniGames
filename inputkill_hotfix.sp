@@ -1,3 +1,19 @@
+/******************************************************************/
+/*                                                                */
+/*                 MiniGames - Input 'Kill' hotfix                */
+/*                                                                */
+/*                                                                */
+/*  File:          inputkill_hotfix.sp                            */
+/*  Description:   MiniGames Game Mod.                            */
+/*                                                                */
+/*                                                                */
+/*  Copyright (C) 2021  Kyle                                      */
+/*  2018/03/02 04:19:06                                           */
+/*                                                                */
+/*  This code is licensed under the GPLv3 License.                */
+/*                                                                */
+/******************************************************************/
+
 #pragma semicolon 1
 #pragma newdecls required
 
@@ -12,7 +28,7 @@
 
 #define PI_NAME     "MiniGames - Input 'Kill' hotfix"
 #define PI_AUTHOR   "Kyle 'Kxnrl' Frankiss"
-#define PI_DESC     "DARLING in the FRANXX"
+#define PI_DESC     "MiniGames Game Mod"
 #define PI_VERSION  "2.2." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
@@ -59,7 +75,7 @@ public void Pupd_OnCheckAllPlugins()
 
 public void OnClientPutInServer(int client)
 {
-    if(IsFakeClient(client))
+    if (IsFakeClient(client))
         return;
 
     g_HookId[client] = DHookEntity(AcceptInput, false, client, _, Event_AcceptInput);
@@ -67,7 +83,7 @@ public void OnClientPutInServer(int client)
 
 public void OnClientDisconnect(int client)
 {
-    if(g_HookId[client] != -1)
+    if (g_HookId[client] != -1)
     {
         DHookRemoveHookID(g_HookId[client]);
         g_HookId[client] = -1;
@@ -76,13 +92,13 @@ public void OnClientDisconnect(int client)
 
 public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
 {
-    if(!IsValidEntity(pThis))
+    if (!IsValidEntity(pThis))
         return MRES_Ignored;
 
     char command[128];
     DHookGetParamString(hParams, 1, command, 128);
 
-    if(strcmp(command, "Kill", false) == 0 || strcmp(command, "KillHierarchy", false) == 0)
+    if (strncmp(command, "kill", false, 4) == 0)
     {
         DHookSetReturn(hReturn, false);
         return MRES_Supercede;
