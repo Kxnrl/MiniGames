@@ -24,9 +24,14 @@ static bool t_bEnabled = false;
 static  int t_iRoundCredits[MAXPLAYERS+1];
 
 
+static GlobalForward t_OnScoreIncreased;
+
+
 void Stats_OnPluginStart()
 {
     RegConsoleCmd("sm_stats", Command_Stats);
+
+    t_OnScoreIncreased = new GlobalForward("MG_OnScoreIncreased", ET_Ignore, Param_Cell, Param_Cell);
 }
 
 public Action Command_Stats(int client, int args)
@@ -483,8 +488,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
     if (assister != 0)
     {
         t_Session[assister].m_iAssists++;
-        t_Session[assister].m_iTotalScores++;
-
+        AddScore(assister, 1);
         GiveCredits(assister, mg_bonus_assist.IntValue, "[MiniGames] - Assist kill", "%T", "store bonus assist", assister, victim, mg_bonus_assist.IntValue);
     }
 
@@ -492,7 +496,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
         return;
 
     t_Session[attacker].m_iKills++;
-    t_Session[attacker].m_iTotalScores+=3;
+    AddScore(attacker, 3);
 
     if (mp_damage_headshot_only.BoolValue)
     {
@@ -512,7 +516,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
     if (headshot)
     {
         t_Session[attacker].m_iHeadshots++;
-        t_Session[attacker].m_iTotalScores+=2;
+        AddScore(attacker, 2);
         GiveCredits(attacker, mg_bonus_kill_via_gun_hs.IntValue, "[MiniGames] - Headshot kill", "%T", "store bonus headshot", attacker, victim, mg_bonus_kill_via_gun_hs.IntValue);
         return;
     }
@@ -636,6 +640,16 @@ static void GiveCredits(int client, int credits, const char[] reason, const char
     char message[256];
     VFormat(message, 256, chat, 5);
     Chat(client, message);
+}
+
+static void AddScore(int client, int score)
+{
+    t_Session[client].m_iTotalScores += score;
+
+    Call_StartForward(t_OnScoreIncreased);
+    Call_PushCell(client);
+    Call_PushCell(score);
+    Call_Finish();
 }
 
 /*******************************************************/
