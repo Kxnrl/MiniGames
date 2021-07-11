@@ -305,15 +305,15 @@ void HandleKnife(int client)
 
         // NEED MORE TEST
         // we need give back again.
-        DataPack context = new DataPack();
-        context.WriteCell(GetClientUserId(client));
-        context.WriteCell(EntIndexToEntRef(knife));
-        context.Reset();
-        CreateTimer(0.1, Timer_GiveBack, context);
+        //DataPack context = new DataPack();
+        //context.WriteCell(GetClientUserId(client));
+        //context.WriteCell(EntIndexToEntRef(knife));
+        //context.Reset();
+        //CreateTimer(0.1, Timer_GiveBack, context);
 
-        RemovePlayerItem(client, knife);
+        //RemovePlayerItem(client, knife);
 
-        LogMessage("[DEBUG]  Delayed Knife %L -> %d.<%s>", client, knife, classname);
+        //LogMessage("[DEBUG]  Delayed Knife %L -> %d.<%s>", client, knife, classname);
     }
 }
 

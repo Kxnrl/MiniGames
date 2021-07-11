@@ -212,13 +212,13 @@ static void Games_CleanupWeapon()
             edicts++;
         }
 
-        if (edicts < 1500)
+        if (edicts < 1800)
         {
-            // we have enough entity
+            // we have enough free edict slot
             return;
         }
 
-        cleanMapWeapon = edicts >= 1988;
+        cleanMapWeapon = edicts >= 1900;
     }
     else
     {
@@ -520,7 +520,7 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
     }
 
     // spawn knife
-    if (GetPlayerWeaponSlot(client, 2) == -1)
+    if (GetPlayerWeaponSlot(client, CS_SLOT_KNIFE) == -1)
     {
         if (mg_spawn_knife.BoolValue)
         {
@@ -534,7 +534,7 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
     }
 
     // spawn pistol
-    if (mg_spawn_pistol.BoolValue && GetPlayerWeaponSlot(client, 1) == -1)
+    if (mg_spawn_pistol.BoolValue && GetPlayerWeaponSlot(client, CS_SLOT_SECONDARY) == -1)
     {
         switch (g_iTeam[client])
         {

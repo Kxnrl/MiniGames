@@ -590,7 +590,7 @@ stock void RemoveAndSwitch(int client, int weapon)
         RemovePlayerItem(client, weapon);
         AcceptEntityInput(weapon, "KillHierarchy");
 
-        int knife = GetPlayerWeaponSlot(client, 2);
+        int knife = GetPlayerWeaponSlot(client, CS_SLOT_KNIFE);
         if (knife != -1)
             SwitchWeapon(client, knife);
     }
