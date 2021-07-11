@@ -337,6 +337,7 @@ void Cvars_OnConfigsExecuted()
     Cvars_EnforceOptions();
     Cvars_LoadMapConfigs();
     Cvars_CheckMapRadars();
+    Cvars_LoadLastConfig();
 }
 
 static void CreateAllMapConfigs()
@@ -723,14 +724,14 @@ static bool Cvars_FindMapRadar(const char[] map)
 
     if (!FileExists(txt, true))
     {
-        LogError("Failed to find [%s].", txt);
+        //LogError("Failed to find [%s].", txt);
         return false;
     }
     
     KeyValues kv = new KeyValues(map);
     if (!kv.ImportFromFile(txt))
     {
-        LogError("Failed to import [%s].", txt);
+        //LogError("Failed to import [%s].", txt);
         delete kv;
         return false;
     }
@@ -784,4 +785,11 @@ void Cvars_FakeClientConVar(int client)
 
     // Enables Observer X-Ray...
     sv_competitive_official_5v5.ReplicateToClient(client, "1");
+}
+
+static void Cvars_LoadLastConfig()
+{
+    t_LastEBhop = sv_enablebunnyhopping.BoolValue;
+    t_LastABhop = sv_autobunnyhopping.BoolValue;
+    t_LastSpeed = -1.0;
 }
