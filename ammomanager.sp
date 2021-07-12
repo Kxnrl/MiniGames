@@ -46,10 +46,12 @@ public Plugin myinfo =
 //#define _LINUX
 
 #if defined _WIN32
+#define OFFSET_GETSLOT                  361
 #define OFFSET_GetReserveAmmoMax        356
 #define SIGOFFSET_SetReserveAmmoCount   9
 #define SIGNATURE_SetReserveAmmoCount   "\x55\x8B\xEC\x51\x8B\x45\x14\x53\x56"
 #else
+#define OFFSET_GETSLOT                  368
 #define OFFSET_GetReserveAmmoMax        362
 #define SIGOFFSET_SetReserveAmmoCount   12
 #define SIGNATURE_SetReserveAmmoCount   "\x55\x89\xE5\x57\x56\x53\x83\xEC\x2C\x8B\x4D\x18"
@@ -64,6 +66,7 @@ public Plugin myinfo =
 #define MAX_EQUIP                       32
 #define CS_WEAPON_SLOT_KNIFE            2
 
+Handle SDKCall_GetSlot;
 Handle SDKCall_SetReserveAmmoCount;
 Handle DHook_GetReserveAmmoMax;
 Handle AcceptInput;
@@ -83,6 +86,16 @@ public void OnPluginStart()
     PrepSDKCall_SetReturnInfo(SDKType_PlainOldData, SDKPass_Plain);
     if ((SDKCall_SetReserveAmmoCount = EndPrepSDKCall()) == null)
         SetFailState("Failed to prepare SDKCall SDKCall_SetReserveAmmoCount.");
+
+    StartPrepSDKCall(SDKCall_Entity);
+    if (!PrepSDKCall_SetVirtual(OFFSET_GETSLOT))
+    {
+        SetFailState("PrepSDKCall_SetVirtual(\"GetSlot\" failed!");
+        return;
+    }
+    PrepSDKCall_SetReturnInfo(SDKType_PlainOldData, SDKPass_Plain);
+    if ((SDKCall_GetSlot = EndPrepSDKCall()) == null)
+        SetFailState("Failed to prepare SDKCall SDKCall_GetSlot.");
 
     GameData conf = new GameData("sdktools.games");
     if (conf == null)
@@ -273,6 +286,46 @@ public Action Event_OnUse(int entity, int client, int caller, UseType type, floa
 
 void HandleKnife(int client)
 {
+    int weapon = -1;
+    char classname[32];
+    int m_hMyWeapons = GetEntPropArraySize(client, Prop_Send, "m_hMyWeapons");
+    for(int offset = 0; offset < m_hMyWeapons; offset++)
+    {
+        weapon = GetEntPropEnt(client, Prop_Send, "m_hMyWeapons", offset);
+        if(weapon > MaxClients)
+        {
+            if (SDKCall(SDKCall_GetSlot, weapon) == CS_WEAPON_SLOT_KNIFE)
+            {
+                // if this is fists, just killed...
+                if (GetEdictClassname(weapon, classname, 32) && strcmp(classname, "weapon_fists") == 0)
+                {
+                    SaveRemove(client, weapon);
+                    continue;
+                }
+
+                // not the map item
+                if (GetEntProp(weapon, Prop_Data, "m_iHammerID") <= 0)
+                {
+                    SaveRemove(client, weapon);
+                    continue;
+                }
+
+                // no child
+                if (GetEntPropEnt(weapon, Prop_Data, "m_hMoveChild") == -1)
+                {
+                    SaveRemove(client, weapon);
+                    continue;
+                }
+
+                LogMessage("[DEBUG]  Has Knife %L -> %d.<%s>", client, weapon, classname);
+            }
+        }
+    }
+}
+
+/*
+void HandleKnife(int client)
+{
     int knife = INVALID_ENT_REFERENCE;
     char classname[32];
 
@@ -314,8 +367,10 @@ void HandleKnife(int client)
         //RemovePlayerItem(client, knife);
 
         //LogMessage("[DEBUG]  Delayed Knife %L -> %d.<%s>", client, knife, classname);
+        break;
     }
 }
+*/
 
 void SaveRemove(int client, int knife)
 {

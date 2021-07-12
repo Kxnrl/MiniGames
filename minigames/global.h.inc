@@ -151,7 +151,6 @@ Handle g_hWeaponSwitch;
 Database g_hMySQL  = null;
 
 int g_iTeam[MAXPLAYERS+1];
-int g_iNext[MAXPLAYERS+1];
 int g_iUId[MAXPLAYERS+1];
 
 int g_offsetNoBlock = -1;

@@ -982,9 +982,6 @@ void Hooks_OnEntitySpawnedPost(int entity)
     if (client == -1)
         return;
 
-    // mark last used grenade to prevent weaon stack;
-    g_iNext[client] = GetTime() + 1;
-
     char model[128];
     GetEntPropString(entity, Prop_Data, "m_ModelName", model, 128);
 
