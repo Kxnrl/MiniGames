@@ -303,8 +303,8 @@ static void Cvars_EnforceOptions()
     // network
     ConVar_Easy_SetInt("sv_maxrate",             0, true, false); 
     ConVar_Easy_SetInt("sv_minrate",        128000, true, false); 
-    ConVar_Easy_SetInt("sv_minupdaterate",     128, true, false);
-    ConVar_Easy_SetInt("sv_mincmdrate",        128, true, false);
+    //ConVar_Easy_SetInt("sv_minupdaterate",     128, true, false);
+    //ConVar_Easy_SetInt("sv_mincmdrate",        128, true, false);
 
     // optimized
     ConVar_Easy_SetInt("net_splitrate",             2, true, false);
