@@ -181,7 +181,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     mp_t_default_melee.SetString("", true, false);
     mp_t_default_primary.SetString("", true, false);
     mp_t_default_secondary.SetString("", true, false);
-    sv_tags.SetString("MG,MiniGames,Shop,Store,Skin", true, true);
+    sv_tags.SetString("MG,MiniGames,FUN,Skin", true, true);
 
     if (sv_enablebunnyhopping.BoolValue)
     {
@@ -303,8 +303,6 @@ static void Cvars_EnforceOptions()
     // network
     ConVar_Easy_SetInt("sv_maxrate",             0, true, false); 
     ConVar_Easy_SetInt("sv_minrate",        128000, true, false); 
-    //ConVar_Easy_SetInt("sv_minupdaterate",     128, true, false);
-    //ConVar_Easy_SetInt("sv_mincmdrate",        128, true, false);
 
     // optimized
     ConVar_Easy_SetInt("net_splitrate",             2, true, false);

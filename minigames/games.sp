@@ -677,8 +677,19 @@ static void Games_ShowCurrentSpeed(int client, float speed)
     if (g_kOptions[client][kO_HudSpeed])
         return;
 
-    SetHudTextParams(-1.0, 0.785, 0.1, 0, 191, 255, 200, 0, 0.0, 0.0, 0.0);
-    ShowHudText(client, HUD_CHANNEL_SPEED, "%.3f", speed);
+    // if 64tick, we need 0.16s
+    SetHudTextParams(-1.0, 0.785, 0.2, 0, 191, 255, 200, 0, 0.0, 0.0, 0.0);
+
+    if (!sv_enablebunnyhopping.BoolValue)
+    {
+        // just current speed
+        ShowHudText(client, HUD_CHANNEL_SPEED, "%.3f", speed);
+    }
+    else
+    {
+        // display max speed
+        ShowHudText(client, HUD_CHANNEL_SPEED, "%d / %d", RoundToNearest(speed), mg_bhopspeed.IntValue);
+    }
 }
 
 void Games_PlayerHurts(int client, int victim, int hitgroup)
