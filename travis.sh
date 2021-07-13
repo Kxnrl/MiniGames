@@ -85,6 +85,7 @@ mv buttonlocker.sp      build/scripting
 mv defaultskin.sp       build/scripting
 mv inputkill_hotfix.sp  build/scripting
 mv translations         build
+mv gamedata             build
 
 cd build
 7z a $FILE -t7z -mx9 LICENSE.md README.md plugins scripting translations >nul

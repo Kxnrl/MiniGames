@@ -42,21 +42,6 @@ public Plugin myinfo =
     url         = PI_URL
 };
 
-#define _WIN32
-//#define _LINUX
-
-#if defined _WIN32
-#define OFFSET_GETSLOT                  361
-#define OFFSET_GetReserveAmmoMax        356
-#define SIGOFFSET_SetReserveAmmoCount   9
-#define SIGNATURE_SetReserveAmmoCount   "\x55\x8B\xEC\x51\x8B\x45\x14\x53\x56"
-#else
-#define OFFSET_GETSLOT                  368
-#define OFFSET_GetReserveAmmoMax        362
-#define SIGOFFSET_SetReserveAmmoCount   12
-#define SIGNATURE_SetReserveAmmoCount   "\x55\x89\xE5\x57\x56\x53\x83\xEC\x2C\x8B\x4D\x18"
-#endif
-
 #define MAX_RESERVE_AMMO_MAX            416
 
 // ENGINE definitions
@@ -73,12 +58,20 @@ Handle AcceptInput;
 
 public void OnPluginStart()
 {
+    GameData config = new GameData("minigames.games");
+    if (config == null)
+        SetFailState("Gamedata minigames.games not found.");
+
+    int OFFSET_GetReserveAmmoMax = config.GetOffset("CBaseCombatWeapon::GetReserveAmmoMax");
+    if (OFFSET_GetReserveAmmoMax == -1)
+        SetFailState("Failed to get CBaseCombatWeapon::GetReserveAmmoMax offset");
+
     DHook_GetReserveAmmoMax = DHookCreate(OFFSET_GetReserveAmmoMax, HookType_Entity, ReturnType_Int, ThisPointer_CBaseEntity);
     DHookAddParam(DHook_GetReserveAmmoMax, HookParamType_Int);
 
     StartPrepSDKCall(SDKCall_Entity);
-    if (!PrepSDKCall_SetSignature(SDKLibrary_Server, SIGNATURE_SetReserveAmmoCount, SIGOFFSET_SetReserveAmmoCount))
-        SetFailState("PrepSDKCall_SetSignature(SDKLibrary_Server, SIGNATURE, len) failed!");
+    if (!PrepSDKCall_SetFromConf(config, SDKConf_Signature, "CBaseCombatWeapon::SetReserveAmmoCount"))
+        SetFailState("PrepSDKCall_SetSignature(CBaseCombatWeapon::SetReserveAmmoCount) failed!");
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
     PrepSDKCall_AddParameter(SDKType_PlainOldData, SDKPass_Plain);
     PrepSDKCall_AddParameter(SDKType_Bool, SDKPass_Plain);
@@ -86,6 +79,10 @@ public void OnPluginStart()
     PrepSDKCall_SetReturnInfo(SDKType_PlainOldData, SDKPass_Plain);
     if ((SDKCall_SetReserveAmmoCount = EndPrepSDKCall()) == null)
         SetFailState("Failed to prepare SDKCall SDKCall_SetReserveAmmoCount.");
+
+    int OFFSET_GETSLOT = config.GetOffset("CBaseCombatWeapon::GetSlot");
+    if (OFFSET_GETSLOT == -1)
+        SetFailState("Failed to get CBaseCombatWeapon::GetSlot offset");
 
     StartPrepSDKCall(SDKCall_Entity);
     if (!PrepSDKCall_SetVirtual(OFFSET_GETSLOT))

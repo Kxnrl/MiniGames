@@ -1,0 +1,29 @@
+"Games"
+{
+    "csgo"
+    {
+        "Offsets"
+        {
+            "CBaseCombatWeapon::GetReserveAmmoMax"
+            {
+                "windows"    "356"
+                "linux"      "362"
+            }
+
+            "CBaseCombatWeapon::GetSlot"
+            {
+                "windows"    "361"
+                "linux"      "367"
+            }
+        }
+        "Signatures"
+        {
+            "CBaseCombatWeapon::SetReserveAmmoCount"
+            {
+                "library"    "server"
+                "windows"    "\x55\x8B\xEC\x51\x8B\x45\x14\x53\x56"
+                "linux"      "\x55\x89\xE5\x57\x56\x53\x83\xEC\x2C\x8B\x4D\x18"
+            }
+        }
+    }
+}

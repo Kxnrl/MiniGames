@@ -234,6 +234,7 @@ public void Cvars_OnLateSpawnChanged(ConVar convar, const char[] oldValue, const
 
 static void Cvars_SetCvarDefault()
 {
+    ConVar_Easy_SetInt("mp_free_armor",                     0, true, false);
     ConVar_Easy_SetInt("mp_autokick",                       0, true, false);
     ConVar_Easy_SetInt("mp_buytime",                       60, true, false);
     ConVar_Easy_SetInt("mp_roundtime_hostage",              0, true, false);
