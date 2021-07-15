@@ -15,5 +15,8 @@ public SharedPlugin __pl_store =
 #endif
 };
 
-native int Store_GetClientCredits(int client);
-native int Store_SetClientCredits(int client, int credits, const char[] log = "未知");
+native int  Store_GetClientCredits(int client);
+native int  Store_SetClientCredits(int client, int credits, const char[] log = "未知");
+native bool Store_HasClientItem(int client, int itemId);
+native int  Store_GetEquippedItem(int client, const char[] type, int slot);
+native int  Store_GetItemId(const char[] unique);

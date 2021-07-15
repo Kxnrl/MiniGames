@@ -41,6 +41,7 @@ void Games_OnPluginStart()
     RegConsoleCmd("sm_mg",      Command_Main);
     RegConsoleCmd("sm_menu",    Command_Main);
     RegConsoleCmd("buyammo2",   Command_Main);
+    RegConsoleCmd("sm_hide",    Command_Hide);
     RegConsoleCmd("sm_options", Command_Options);
 }
 
@@ -183,6 +184,12 @@ static void Games_SetOptions(int client, int option)
         // immed refresh state
         Hooks_UpdateState();
     }
+}
+
+public Action Command_Hide(int client, int args)
+{
+    Games_SetOptions(client, kO_Transmit);
+    return Plugin_Handled;
 }
 
 void Games_OnMapStart()
