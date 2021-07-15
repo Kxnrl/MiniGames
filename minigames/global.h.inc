@@ -614,7 +614,7 @@ stock bool IsClientUsingSniper(int client)
     if (weapon == -1 || !GetEdictClassname(weapon, classname, 32))
         return false;
 
-    static char weapons[] = "weapon_awp|weapon_scar20|weapon_g3sg1|weapon_aug|weapon_sg553";
+    static char weapons[] = "weapon_awp|weapon_scar20|weapon_g3sg1|weapon_aug|weapon_sg556|weapon_ssg08";
 
     return StrContains(weapons, classname) >= 0;
 }
