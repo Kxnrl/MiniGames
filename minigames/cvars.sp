@@ -63,7 +63,7 @@ void Cvars_OnPluginStart()
 
     mg_restrict_awp         = AutoExecConfig_CreateConVar("mg_restrict_awp",        "0",        "Restrict use AWP",                                                 _, true, 0.0,   true, 1.0);
     mg_restrict_machinegun  = AutoExecConfig_CreateConVar("mg_restrict_machinegun", "0",        "Restrict use machine gun",                                         _, true, 0.0,   true, 1.0);
-    mg_slaygaygun           = AutoExecConfig_CreateConVar("mg_slaygaygun",          "1",        "Slay player who uses gaygun",                                      _, true, 0.0,   true, 1.0);
+    mg_restrict_autosniper  = AutoExecConfig_CreateConVar("mg_restrict_autosniper", "1",        "Restrict use auto sniper",                                         _, true, 0.0,   true, 1.0);
     mg_spawn_knife          = AutoExecConfig_CreateConVar("mg_spawn_knife",         "0",        "Give knife On player spawn",                                       _, true, 0.0,   true, 1.0);
     mg_spawn_pistol         = AutoExecConfig_CreateConVar("mg_spawn_pistol",        "0",        "Give pistol On player spawn",                                      _, true, 0.0,   true, 1.0);
     mg_spawn_kevlar         = AutoExecConfig_CreateConVar("mg_spawn_kevlar",        "0",        "Give kevlar On player spawn",                                      _, true, 0.0,   true, 100.0);
@@ -508,9 +508,9 @@ static void GenerateMapConfigs(const char[] map, const char[] path)
     file.WriteLine("");
 
     //Slay player who uses gaygun
-    file.WriteLine("// 处死使用连狙玩家(默认1,1为启用)");
+    file.WriteLine("// 禁止使用连狙(默认1,1为启用)");
     file.WriteLine("// Slay player who uses gaygun");
-    file.WriteLine("mg_slaygaygun \"1\"");
+    file.WriteLine("mg_restrict_autosniper \"1\"");
     file.WriteLine("");
 
     //VAC timer

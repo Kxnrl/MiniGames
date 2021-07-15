@@ -390,16 +390,14 @@ void Games_OnEquipPost(DataPack pack)
     }
 
     // force slay player who uses gaygun
-    if (mg_slaygaygun.BoolValue && (strcmp(classname, "weapon_scar20") == 0 || strcmp(classname, "weapon_g3sg1") == 0))
+    if (mg_restrict_autosniper.BoolValue && (strcmp(classname, "weapon_scar20") == 0 || strcmp(classname, "weapon_g3sg1") == 0))
     {
-        ChatAll("%t", "slay gaygun", client, classname[7]);
-
-        RemovePlayerItem(client, weapon);
-        AcceptEntityInput(weapon, "KillHierarchy");
-        ForcePlayerSuicide(client);
-
+        Chat(client, "%T", "restrict autosniper", client);
+        RemoveAndSwitch(client, weapon);
         return;
     }
+
+    // Do.?
 }
 
 void Games_OnClientConnected(int client)

@@ -236,11 +236,10 @@
         "chi"       "{red}当前地图限制M249/Negev的使用..."
     }
 
-    "slay gaygun"
+    "restrict autosniper"
     {
-        "#format"   "{1:N},{2:s}"
-        "en"        "{lightblue}{1} {normal}has been slain by using [{red}{2}{normal}]"
-        "chi"       "{lightblue}{1} {normal}使用[{red}{2}{normal}]时遭遇天谴"
+        "en"        "{red}Auto Sniper is restricted in current map."
+        "chi"       "{red}当前地图限制连狙的使用..."
     }
 
     "flashing self"
