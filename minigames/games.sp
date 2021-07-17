@@ -741,6 +741,7 @@ void Games_OnPlayerBlind(DataPack pack)
     int victim = GetClientOfUserId(pack.ReadCell());
     int client = GetClientOfUserId(pack.ReadCell());
     float time = pack.ReadFloat();
+    delete pack;
     
     if (!ClientValid(victim) || !IsPlayerAlive(victim) || !ClientValid(client))
         return;
@@ -759,7 +760,7 @@ void Games_OnPlayerBlind(DataPack pack)
     if (g_iTeam[victim] == g_iTeam[client])
     {
         int damage = RoundToCeil(time * 6);
-        ChatAll("%t", "flashing target", client, victim, damage);
+        //ChatAll("%t", "flashing target", client, victim, damage);
         
         SetEntPropFloat(client, Prop_Send, "m_flFlashMaxAlpha", 0.5);
 

@@ -323,59 +323,20 @@ void HandleKnife(int client)
                 }
 
                 LogMessage("[DEBUG]  Has Knife %L -> %d.<%s>", client, weapon, classname);
+
+                // CLagCompensationManager::StartLagCompensation with NULL CUserCmd!!!
+                // we need give back again.
+                DataPack context = new DataPack();
+                context.WriteCell(GetClientUserId(client));
+                context.WriteCell(EntIndexToEntRef(weapon));
+                context.Reset();
+                CreateTimer(0.1, Timer_GiveBack, context);
+
+                RemovePlayerItem(client, weapon);
             }
         }
     }
 }
-
-/*
-void HandleKnife(int client)
-{
-    int knife = INVALID_ENT_REFERENCE;
-    char classname[32];
-
-    while ((knife = GetPlayerWeaponSlot(client, CS_WEAPON_SLOT_KNIFE)) != INVALID_ENT_REFERENCE)
-    {
-        // if this is fists, just killed...
-        if (GetEdictClassname(knife, classname, 32) && strcmp(classname, "weapon_fists") == 0)
-        {
-            SaveRemove(client, knife);
-            continue;
-        }
-
-        // not the map item
-        if (GetEntProp(knife, Prop_Data, "m_iHammerID") <= 0)
-        {
-            SaveRemove(client, knife);
-            continue;
-        }
-
-        // map item?
-        // we need to fix this
-        // CLagCompensationManager::StartLagCompensation with NULL CUserCmd!!!
-
-        // no child
-        if (GetEntPropEnt(knife, Prop_Data, "m_hMoveChild") == -1)
-        {
-            SaveRemove(client, knife);
-            continue;
-        }
-
-        // NEED MORE TEST
-        // we need give back again.
-        //DataPack context = new DataPack();
-        //context.WriteCell(GetClientUserId(client));
-        //context.WriteCell(EntIndexToEntRef(knife));
-        //context.Reset();
-        //CreateTimer(0.1, Timer_GiveBack, context);
-
-        //RemovePlayerItem(client, knife);
-
-        //LogMessage("[DEBUG]  Delayed Knife %L -> %d.<%s>", client, knife, classname);
-        break;
-    }
-}
-*/
 
 void SaveRemove(int client, int knife, const char[] classname)
 {
@@ -385,7 +346,6 @@ void SaveRemove(int client, int knife, const char[] classname)
     LogMessage("[DEBUG] SaveRemove %d.%s from %L", knife, classname, client);
 }
 
-/*
 public Action Timer_GiveBack(Handle timer, DataPack context)
 {
     int userid = context.ReadCell();
@@ -405,4 +365,3 @@ public Action Timer_GiveBack(Handle timer, DataPack context)
 
     return Plugin_Stop;
 }
-*/

@@ -608,7 +608,7 @@ static void MySQL_VoidQuery(const char[] m_szQuery)
     pack.WriteString(m_szQuery);
     pack.Reset();
 
-    g_hMySQL.Query(MySQL_VoidQueryCallback, m_szQuery, _, DBPrio_Low);
+    g_hMySQL.Query(MySQL_VoidQueryCallback, m_szQuery, pack, DBPrio_Low);
 }
 
 public void MySQL_VoidQueryCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
