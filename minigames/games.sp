@@ -24,6 +24,7 @@ static float t_fRoundStart = -1.0;
 static int t_iRoundNumber = 0;
 static bool t_bRoundEnding = false;
 static bool t_bPressed[2048];
+static bool bHasBombTarget;
 
 static Handle t_kOCookies[kO_MaxOptions];
 
@@ -194,6 +195,9 @@ public Action Command_Hide(int client, int args)
 
 void Games_OnMapStart()
 {
+    // check bomb target
+    bHasBombTarget = FindEntityByClassname(-1, "func_bomb_target") != -1;
+
     // timer to update hud
     CreateTimer(1.0, Games_TickInterval, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
@@ -400,6 +404,21 @@ void Games_OnEquipPost(DataPack pack)
     // Do.?
 }
 
+// reset addons
+void Games_OnPostThinkPost(int client)
+{
+    if (!bHasBombTarget)
+        return;
+
+    int m_iAddonBits = GetEntProp(client, Prop_Send, "m_iAddonBits");
+
+    if (m_iAddonBits & ADDON_DEFUSER)
+    {
+        // remove that
+        SetEntProp(client, Prop_Send, "m_iAddonBits", m_iAddonBits & ~ADDON_DEFUSER);
+    }
+}
+
 void Games_OnClientConnected(int client)
 {
     t_szSpecHudContent[client][0] = '\0';
@@ -545,6 +564,16 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
         {
             case TEAM_CT: GivePlayerItem(client, "weapon_hkp2000");
             case TEAM_TE: GivePlayerItem(client, "weapon_glock");
+        }
+    }
+
+    // we has bomb target
+    if (bHasBombTarget)
+    {
+        if (GetClientTeam(client) == TEAM_CT)
+        {
+            // give defuser
+            GivePlayerItem(client, "item_defuser");
         }
     }
 

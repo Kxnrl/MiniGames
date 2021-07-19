@@ -520,6 +520,9 @@ public void OnClientPutInServer(int client)
     // hook this to check weapon
     SDKHook(client, SDKHook_WeaponEquipPost, Hook_OnPostWeaponEquip);
 
+    // hook this to check addons
+    SDKHook(client, SDKHook_PostThinkPost,   Hook_OnPostThinkPost);
+
     // hook this to set transmit
     if (g_extTransmitManager)
     {
@@ -600,6 +603,11 @@ public void Hook_OnPostWeaponEquip(int client, int weapon)
     pack.WriteCell(client);
     pack.WriteCell(EntIndexToEntRef(weapon));
     RequestFrame(Games_OnEquipPost, pack);
+}
+
+public void Hook_OnPostThinkPost(int client)
+{
+    Games_OnPostThinkPost(client);
 }
 
 public void Store_OnHatsCreated(int client, int entity, int slot)

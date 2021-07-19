@@ -40,6 +40,8 @@ public Plugin myinfo =
 #define HUD_CHANNEL_SPEED  2
 #define HUD_CHANNEL_SPEC   5
 
+#define ADDON_DEFUSER (1<<5)
+
 // enum
 enum struct stats_t
 {
