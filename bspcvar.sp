@@ -289,4 +289,8 @@ void InitCvars()
     g_CvarList.PushString("mp_taser_recharge_time");
     g_CvarList.PushString("mp_teammates_are_enemies");
     g_CvarList.PushString("mp_weapon_self_inflict_amount");
+
+    // MV
+    g_CvarList.PushString("sm_movement_unlocker_ct");
+    g_CvarList.PushString("sm_movement_unlocker_te");
 }
