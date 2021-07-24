@@ -229,7 +229,7 @@ static void Games_CleanupWeapon()
             return;
         }
 
-        cleanMapWeapon = edicts >= 1900;
+        cleanMapWeapon = edicts >= 2000;
     }
     else
     {
