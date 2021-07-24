@@ -1011,9 +1011,9 @@ void Hooks_OnEntitySpawnedPost(int entity)
     DispatchKeyValue(trigger_multiple, "model", model);
     DispatchKeyValue(trigger_multiple, "spawnflags", "1");
 
-    DispatchSpawn(trigger_multiple);
-
     TeleportEntity(trigger_multiple, fPos, fAgl, NULL_VECTOR);
+
+    DispatchSpawn(trigger_multiple);
 
     SetVariantString("!activator");
     AcceptEntityInput(trigger_multiple, "SetParent", entity, trigger_multiple, 0);

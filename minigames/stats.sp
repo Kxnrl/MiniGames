@@ -620,7 +620,7 @@ public void MySQL_VoidQueryCallback(Database db, DBResultSet results, const char
         pack.ReadString(m_szQuery, maxLen);
 
         char path[256];
-        BuildPath(Path_SM, path, 256, "log/MySQL_VoidQueryError.log");
+        BuildPath(Path_SM, path, 256, "logs/MySQL_VoidQueryError.log");
 
         LogToFileEx(path, "----------------------------------------------------------------");
         LogToFileEx(path, "Query: %s", m_szQuery);
