@@ -304,21 +304,21 @@ void HandleKnife(int client)
                 // if this is fists, just killed...
                 if (strcmp(classname, "weapon_fists") == 0)
                 {
-                    SaveRemove(client, weapon, classname);
+                    SaveRemove(client, weapon);
                     continue;
                 }
 
                 // not the map item
                 if (GetEntProp(weapon, Prop_Data, "m_iHammerID") <= 0)
                 {
-                    SaveRemove(client, weapon, classname);
+                    SaveRemove(client, weapon);
                     continue;
                 }
 
                 // no child
                 if (GetEntPropEnt(weapon, Prop_Data, "m_hMoveChild") == -1)
                 {
-                    SaveRemove(client, weapon, classname);
+                    SaveRemove(client, weapon);
                     continue;
                 }
 
@@ -336,7 +336,7 @@ void HandleKnife(int client)
     }
 }
 
-void SaveRemove(int client, int knife, const char[] classname)
+void SaveRemove(int client, int knife)
 {
     RemovePlayerItem(client, knife);
     AcceptEntityInput(knife, "KillHierarchy");
