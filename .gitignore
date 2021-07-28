@@ -80,7 +80,9 @@ include/mapmusic.inc
 include/geoip2.inc
 include/fys.pupd.inc
 
+alwaysweaponskins.sp
 buttonrec.sp
+lobby.sp
 mapchat.sp
 mgbet.sp
 mgbutton.sp

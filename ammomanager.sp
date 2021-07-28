@@ -322,8 +322,6 @@ void HandleKnife(int client)
                     continue;
                 }
 
-                LogMessage("[DEBUG]  Has Knife %L -> %d.<%s>", client, weapon, classname);
-
                 // CLagCompensationManager::StartLagCompensation with NULL CUserCmd!!!
                 // we need give back again.
                 DataPack context = new DataPack();
@@ -340,10 +338,8 @@ void HandleKnife(int client)
 
 void SaveRemove(int client, int knife, const char[] classname)
 {
-    LogMessage("[DEBUG] Attempt to SaveRemove %d.%s", knife, classname);
     RemovePlayerItem(client, knife);
     AcceptEntityInput(knife, "KillHierarchy");
-    LogMessage("[DEBUG] SaveRemove %d.%s from %L", knife, classname, client);
 }
 
 public Action Timer_GiveBack(Handle timer, DataPack context)
