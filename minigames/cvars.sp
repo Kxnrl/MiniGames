@@ -250,7 +250,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("mp_friendlyfire",                   0, true, false);
     ConVar_Easy_SetInt("mp_autoteambalance",                0, true, false);
     ConVar_Easy_SetInt("mp_limitteams",                     0, true, false);
-    ConVar_Easy_SetInt("mp_force_pick_time",               15, true, false);
+    ConVar_Easy_SetInt("mp_force_pick_time",                3, true, false);
     ConVar_Easy_SetInt("mp_display_kill_assists",           1, true, false);
     ConVar_Easy_SetInt("mp_maxrounds",                      0, true, false);
     ConVar_Easy_SetInt("mp_halftime",                       0, true, false);
