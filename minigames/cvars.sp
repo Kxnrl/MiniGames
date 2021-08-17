@@ -39,6 +39,11 @@ static ConVar mp_taser_recharge_time;
 static ConVar sv_competitive_official_5v5;
 static ConVar sv_airaccelerate;
 
+static ConVar sv_minupdaterate;
+static ConVar sv_maxupdaterate;
+static ConVar sv_mincmdrate;
+static ConVar sv_maxcmdrate;
+
 static ConVar sv_teamid_overhead_always_prohibit;
 static ConVar sv_show_team_equipment_prohibit;
 static ConVar sv_teamid_overhead;
@@ -115,6 +120,11 @@ void Cvars_OnPluginStart()
     mp_teammates_are_enemies    = FindConVar("mp_teammates_are_enemies");
     sv_competitive_official_5v5 = FindConVar("sv_competitive_official_5v5");
     sv_airaccelerate            = FindConVar("sv_airaccelerate");
+
+    sv_minupdaterate    = FindConVar("sv_minupdaterate");
+    sv_maxupdaterate    = FindConVar("sv_maxupdaterate");
+    sv_mincmdrate       = FindConVar("sv_mincmdrate");
+    sv_maxcmdrate       = FindConVar("sv_maxcmdrate");
 
     sv_gameinstructor_disable                = FindConVar("sv_gameinstructor_disable");
     sv_fistpunch_damage_to_player_multiplier = FindConVar("sv_fistpunch_damage_to_player_multiplier");
@@ -297,6 +307,13 @@ static void Cvars_SetCvarDefault()
     mp_freezetime.SetInt(       3, true, false);
 
     sv_tags.SetString("MG,MiniGames,FUN,Skin", false, false);
+    
+    int tickrate = GetCommandLineParamInt("-tickrate", 64);
+
+    sv_minupdaterate.IntValue = tickrate;
+    sv_maxupdaterate.IntValue = tickrate;
+    sv_mincmdrate.IntValue = tickrate;
+    sv_maxcmdrate.IntValue = tickrate;
 }
 
 static void Cvars_EnforceOptions()
