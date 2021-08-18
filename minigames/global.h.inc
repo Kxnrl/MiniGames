@@ -204,6 +204,7 @@ stock bool IsWarmup()
 {
     return GameRules_GetProp("m_bWarmupPeriod") == 1;
 }
+
 stock void Chat(int client, const char[] buffer, any ...)
 {
     if (g_kOptions[client][kO_HudChat])
@@ -220,9 +221,12 @@ stock void Chat(int client, const char[] buffer, any ...)
         return;
     }
 
+    char message[256] = "\x0A[\x04MG\x0A]    ";
+    StrCat(message, 256, msg);
+
     SayText2.SetInt("ent_idx", 0);
     SayText2.SetBool("chat", true); // force trigger sound and console log
-    SayText2.SetString("msg_name", msg);
+    SayText2.SetString("msg_name", message);
     SayText2.AddString("params", "");
     SayText2.AddString("params", "");
     SayText2.AddString("params", "");
@@ -247,9 +251,12 @@ stock void ChatAll(const char[] buffer, any ...)
                 continue;
             }
 
+            char message[256] = "\x0A[\x04MG\x0A]    ";
+            StrCat(message, 256, msg);
+
             SayText2.SetInt("ent_idx", 0);
             SayText2.SetBool("chat", true);
-            SayText2.SetString("msg_name", msg);
+            SayText2.SetString("msg_name", message);
             SayText2.AddString("params", "");
             SayText2.AddString("params", "");
             SayText2.AddString("params", "");
