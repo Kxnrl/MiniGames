@@ -221,7 +221,7 @@ stock void Chat(int client, const char[] buffer, any ...)
         return;
     }
 
-    char message[256] = "\x0A[\x04MG\x0A]    ";
+    char message[256] = "\x01[\x04MG\x01]    ";
     StrCat(message, 256, msg);
 
     SayText2.SetInt("ent_idx", 0);
@@ -251,7 +251,7 @@ stock void ChatAll(const char[] buffer, any ...)
                 continue;
             }
 
-            char message[256] = "\x0A[\x04MG\x0A]    ";
+            char message[256] = "\x01[\x04MG\x01]    ";
             StrCat(message, 256, msg);
 
             SayText2.SetInt("ent_idx", 0);
