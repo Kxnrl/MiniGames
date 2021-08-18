@@ -260,30 +260,27 @@ stock void ChatAll(const char[] buffer, any ...)
     SetGlobalTransTarget(LANG_SERVER);
 }
 
-stock int ProcessColorString(char[] message, int maxLen)
+stock void ProcessColorString(char[] message, int maxLen)
 {
     ReplaceString(message, maxLen, "{normal}",      "\x01", false);
     ReplaceString(message, maxLen, "{default}",     "\x01", false);
     ReplaceString(message, maxLen, "{white}",       "\x01", false);
+    ReplaceString(message, maxLen, "{team}",        "\x03", false);
+
     ReplaceString(message, maxLen, "{darkred}",     "\x02", false);
     ReplaceString(message, maxLen, "{pink}",        "\x03", false);
     ReplaceString(message, maxLen, "{green}",       "\x04", false);
-    ReplaceString(message, maxLen, "{lime}",        "\x05", false);
-    ReplaceString(message, maxLen, "{yellow}",      "\x05", false);
-    ReplaceString(message, maxLen, "{lightgreen}",  "\x06", false);
-    ReplaceString(message, maxLen, "{lightred}",    "\x07", false);
+    ReplaceString(message, maxLen, "{lightgreen}",  "\x05", false);
+    ReplaceString(message, maxLen, "{lime}",        "\x06", false);
     ReplaceString(message, maxLen, "{red}",         "\x07", false);
-    ReplaceString(message, maxLen, "{gray}",        "\x08", false);
     ReplaceString(message, maxLen, "{grey}",        "\x08", false);
-    ReplaceString(message, maxLen, "{olive}",       "\x09", false);
-    ReplaceString(message, maxLen, "{orange}",      "\x10", false);
+    ReplaceString(message, maxLen, "{yellow}",      "\x09", false);
+    ReplaceString(message, maxLen, "{gold}",        "\x10", false);
     ReplaceString(message, maxLen, "{silver}",      "\x0A", false);
-    ReplaceString(message, maxLen, "{lightblue}",   "\x0B", false);
-    ReplaceString(message, maxLen, "{blue}",        "\x0C", false);
+    ReplaceString(message, maxLen, "{blue}",        "\x0B", false);
+    ReplaceString(message, maxLen, "{darkblue}",    "\x0C", false);
     ReplaceString(message, maxLen, "{purple}",      "\x0E", false);
-    ReplaceString(message, maxLen, "{darkorange}",  "\x0F", false);
-
-    return Format(message, maxLen, "[\x04MG\x01]   %s", message);
+    ReplaceString(message, maxLen, "{lightred}",    "\x0F", false);
 }
 
 stock int GetWeaponClassname(int weapon, int index, char[] classname, int maxLen)
