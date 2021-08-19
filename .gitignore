@@ -10,25 +10,6 @@ include/mapmusic.inc
 include/geoip2.inc
 include/fys.pupd.inc
 
-alwaysweaponskins.sp
-buttonrec.sp
-lobby.sp
-mapchat.sp
-mgbet.sp
-mgbutton.sp
-mgchicken.sp
-mgcp.sp
-mgdemo.sp
-mghelp.sp
-mgmonitor.sp
-mgnoob.sp
-mgfixes.sp
-mgplayermanager.sp
-mgskin.sp
-mgtest.sp
-ragdolls.sp
-soundhook.sp
-svpure.sp
 
 .vscode/*
 

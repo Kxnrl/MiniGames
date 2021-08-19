@@ -210,9 +210,9 @@ stock void Chat(int client, const char[] buffer, any ...)
     if (g_kOptions[client][kO_HudChat])
         return;
 
-    char msg[256];
-    VFormat(msg, 256, buffer, 3);
-    ProcessColorString(msg, 256);
+    char msg[384];
+    VFormat(msg, 384, buffer, 3);
+    ProcessColorString(msg, 384);
 
     Protobuf SayText2 = view_as<Protobuf>(StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
     if (SayText2 == null)
@@ -221,8 +221,8 @@ stock void Chat(int client, const char[] buffer, any ...)
         return;
     }
 
-    char message[256] = "\x01[\x04MG\x01]    ";
-    StrCat(message, 256, msg);
+    char message[384] = "\x01[\x04MG\x01]    ";
+    StrCat(message, 384, msg);
 
     SayText2.SetInt("ent_idx", 0);
     SayText2.SetBool("chat", true); // force trigger sound and console log
@@ -236,13 +236,13 @@ stock void Chat(int client, const char[] buffer, any ...)
 
 stock void ChatAll(const char[] buffer, any ...)
 {
-    char msg[256];
+    char msg[384];
     for(int client = 1; client <= MaxClients; ++client)
         if (ClientValid(client) && !g_kOptions[client][kO_HudChat])
         {
             SetGlobalTransTarget(client);
-            VFormat(msg, 256, buffer, 2);
-            ProcessColorString(msg, 256);
+            VFormat(msg, 384, buffer, 2);
+            ProcessColorString(msg, 384);
 
             Protobuf SayText2 = view_as<Protobuf>(StartMessageOne("SayText2", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
             if (SayText2 == null)
@@ -251,8 +251,8 @@ stock void ChatAll(const char[] buffer, any ...)
                 continue;
             }
 
-            char message[256] = "\x01[\x04MG\x01]    ";
-            StrCat(message, 256, msg);
+            char message[384] = "\x01[\x04MG\x01]    ";
+            StrCat(message, 384, msg);
 
             SayText2.SetInt("ent_idx", 0);
             SayText2.SetBool("chat", true);
@@ -330,8 +330,8 @@ stock void Text(int client, const char[] buffer, any ...)
     if (g_kOptions[client][kO_HudText])
         return;
 
-    char msg[256];
-    VFormat(msg, 256, buffer, 3);
+    char msg[384];
+    VFormat(msg, 384, buffer, 3);
 
     Protobuf TextMsg = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
     if (TextMsg == null)
@@ -355,12 +355,12 @@ stock void Text(int client, const char[] buffer, any ...)
 
 stock void TextAll(const char[] buffer, any ...)
 {
-    char msg[256];
+    char msg[384];
     for(int client = 1; client <= MaxClients; ++client)
         if (ClientValid(client) && !g_kOptions[client][kO_HudText])
         {
             SetGlobalTransTarget(client);
-            VFormat(msg, 256, buffer, 2);
+            VFormat(msg, 384, buffer, 2);
 
             Protobuf TextMsg = view_as<Protobuf>(StartMessageOne("TextMsg", client, USERMSG_RELIABLE|USERMSG_BLOCKHOOKS));
             if (TextMsg == null)
