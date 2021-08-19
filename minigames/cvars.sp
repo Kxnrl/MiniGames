@@ -333,7 +333,7 @@ static void Cvars_EnforceOptions()
     ConVar_Easy_SetInt("phys_enable_experimental_optimizations", 1, true, false);
 
     // 
-    ConVar_Easy_SetInt("sv_server_verify_blood_on_player", 0, true, false);
+    ConVar_Easy_SetInt("sv_server_verify_blood_on_player", 1, true, false);
 
     // sv var
     ConVar_Easy_SetInt("sv_alternateticks",         1, true, false);
