@@ -24,7 +24,7 @@ static float t_fRoundStart = -1.0;
 static int t_iRoundNumber = 0;
 static bool t_bRoundEnding = false;
 static bool t_bPressed[2048];
-static bool bHasBombTarget;
+static bool bBombPlanted;
 
 static Handle t_kOCookies[kO_MaxOptions];
 
@@ -195,9 +195,6 @@ public Action Command_Hide(int client, int args)
 
 void Games_OnMapStart()
 {
-    // check bomb target
-    bHasBombTarget = FindEntityByClassname(-1, "func_bomb_target") != -1;
-
     // timer to update hud
     CreateTimer(1.0, Games_TickInterval, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
@@ -407,7 +404,7 @@ void Games_OnEquipPost(DataPack pack)
 // reset addons
 void Games_OnPostThinkPost(int client)
 {
-    if (!bHasBombTarget)
+    if (!bBombPlanted)
         return;
 
     int m_iAddonBits = GetEntProp(client, Prop_Send, "m_iAddonBits");
@@ -567,16 +564,6 @@ public Action Games_OnClientSpawn(Handle timer, int userid)
         }
     }
 
-    // we has bomb target
-    if (bHasBombTarget)
-    {
-        if (GetClientTeam(client) == TEAM_CT)
-        {
-            // give defuser
-            GivePlayerItem(client, "item_defuser");
-        }
-    }
-
     return Plugin_Stop;
 }
 
@@ -584,6 +571,7 @@ void Games_OnRoundStarted()
 {
     // mark
     t_bRoundEnding = false;
+    bBombPlanted = false;
 
     // check warmup
     if (IsWarmup())
@@ -679,6 +667,25 @@ void Games_OnRoundEnd()
     t_iWallHackCD = -1;
 
     t_bRoundEnding = true;
+    bBombPlanted = false;
+}
+
+void Games_OnBombPlanted()
+{
+    bBombPlanted = true;
+
+    if (!mg_auto_defuser.BoolValue)
+        return;
+
+    for(int client = 1; client <= MaxClients; ++client)
+    if (ClientValid(client) && IsPlayerAlive(client))
+    {
+        if (GetClientTeam(client) == TEAM_CT)
+        {
+            // give defuser
+            GivePlayerItem(client, "item_defuser");
+        }
+    }
 }
 
 void Games_OnEntityCreated(int entity)

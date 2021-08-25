@@ -202,20 +202,21 @@ public void OnPluginStart()
     PrepareSDKCalls();
 
     // game events
-    HookEventEx("round_prestart",       Event_RoundStart,       EventHookMode_Post);
-    HookEventEx("round_freeze_end",     Event_RoundStarted,     EventHookMode_Post);
-    HookEventEx("round_end",            Event_RoundEnd,         EventHookMode_Post);
-    HookEventEx("player_spawn",         Event_PlayerSpawn,      EventHookMode_Post);
-    HookEventEx("player_death",         Event_PlayerDeath,      EventHookMode_Post);
-    HookEventEx("player_hurt",          Event_PlayerHurts,      EventHookMode_Post);
-    HookEventEx("player_team",          Event_PlayerTeams,      EventHookMode_Pre);
-    HookEventEx("player_blind",         Event_PlayerBlind,      EventHookMode_Post);
-    HookEventEx("player_disconnect",    Event_PlayerDisconnect, EventHookMode_Pre);
-    HookEventEx("player_connect_full",  Event_PlayerConnected,  EventHookMode_Post);
-    HookEventEx("weapon_fire",          Event_WeaponFire,       EventHookMode_Post);
-    HookEventEx("cs_win_panel_match",   Event_WinPanel,         EventHookMode_Post);
-    HookEventEx("announce_phase_end",   Event_AnnouncePhaseEnd, EventHookMode_Post);
-    HookEventEx("grenade_thrown",       EventHook_Grenaded,     EventHookMode_Post);
+    HookEvent("round_prestart",       Event_RoundStart,       EventHookMode_Post);
+    HookEvent("round_freeze_end",     Event_RoundStarted,     EventHookMode_Post);
+    HookEvent("round_end",            Event_RoundEnd,         EventHookMode_Post);
+    HookEvent("player_spawn",         Event_PlayerSpawn,      EventHookMode_Post);
+    HookEvent("player_death",         Event_PlayerDeath,      EventHookMode_Post);
+    HookEvent("player_hurt",          Event_PlayerHurts,      EventHookMode_Post);
+    HookEvent("player_team",          Event_PlayerTeams,      EventHookMode_Pre);
+    HookEvent("player_blind",         Event_PlayerBlind,      EventHookMode_Post);
+    HookEvent("player_disconnect",    Event_PlayerDisconnect, EventHookMode_Pre);
+    HookEvent("player_connect_full",  Event_PlayerConnected,  EventHookMode_Post);
+    HookEvent("weapon_fire",          Event_WeaponFire,       EventHookMode_Post);
+    HookEvent("cs_win_panel_match",   Event_WinPanel,         EventHookMode_Post);
+    HookEvent("announce_phase_end",   Event_AnnouncePhaseEnd, EventHookMode_Post);
+    HookEvent("grenade_thrown",       Event_GrenadeThrown,    EventHookMode_Post);
+    HookEvent("bomb_planted",         Event_BombPlanted,      EventHookMode_Post);
 
     // for noblock
     g_offsetNoBlock = FindSendPropInfo("CBaseEntity", "m_CollisionGroup");
@@ -846,9 +847,14 @@ public void Event_AnnouncePhaseEnd(Event event, const char[] name, bool dontBroa
         EndMessage();
 }
 
-public void EventHook_Grenaded(Event event, const char[] name, bool dontBroadcast)
+public void Event_GrenadeThrown(Event event, const char[] name, bool dontBroadcast)
 {
     CreateTimer(0.3, Timer_FixWeapon, event.GetInt("userid"), TIMER_FLAG_NO_MAPCHANGE);
+}
+
+public void Event_BombPlanted(Event event, const char[] name, bool dontBroadcast)
+{
+    Games_OnBombPlanted();
 }
 
 public Action CS_OnCSWeaponDrop(int client, int weapon)
