@@ -720,6 +720,12 @@ public void Event_OnPressed(const char[] output, int entity, int client, float d
 
 public void Event_PlayerSpawn(Event event, const char[] name, bool dontBroadcast)
 {
+    // I don't know why engine call this
+    // when player connected server,
+    // but after this die immediately
+    if (event.GetInt("teamnum") == 0)
+        return;
+
     int userid = event.GetInt("userid");
     int client = GetClientOfUserId(userid);
 
