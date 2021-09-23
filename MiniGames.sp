@@ -881,6 +881,7 @@ public Action Command_MapChange(int client, const char[] command, int args)
             continue;
 
         ClientCommand(i , "retry;");
+        LogMessage("Force %L reconnect...", i);
     }
     return Plugin_Continue;
 }
