@@ -85,6 +85,7 @@ void Cvars_OnPluginStart()
     mg_slap_after_vac       = AutoExecConfig_CreateConVar("mg_slap_after_vac",      "1",        "Slap player after vac timer elapsed.",                             _, true, 0.0,   true, 1.0);
     mg_rank_skillgroups     = AutoExecConfig_CreateConVar("mg_rank_skillgroups",    "1",        "Display skill groups on scoreboard.",                              _, true, 0.0,   true, 1.0);
     mg_auto_defuser         = AutoExecConfig_CreateConVar("mg_auto_defuser",        "1",        "Give all CTs defuser when the bomb has been planted.",             _, true, 0.0,   true, 1.0);
+    mg_display_rating       = AutoExecConfig_CreateConVar("mg_display_rating",      "1",        "Display player rating instead of analytics.",                      _, true, 0.0,   true, 1.0);
 
     mg_bonus_kill_via_gun     = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun",       "3", "How many credits to earn when player kill enemy with gun",                _, true, 0.0, true, 1000.0);
     mg_bonus_kill_via_gun_hs  = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun_hs",    "4", "How many credits to earn when player kill enemy with gun and headshot",   _, true, 0.0, true, 1000.0);

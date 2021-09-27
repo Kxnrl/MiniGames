@@ -402,31 +402,58 @@ void Stats_PublicMessage(int client, bool disconnected = false)
         GeoIP2_City   (ip, geo[1], 32, lang);
         GeoIP2_Country(ip, geo[0], 32, lang);
 
-        // public message with geoip
-        ChatAll("%t", "public message with geoip",
-                client, 
-                disconnected ? "disconnect" : "join",
-                Ranks_GetRank(client), 
-                Stats_GetKDA(client),
-                Stats_GetHSP(client),
-                t_StatsDB[client].m_iTotalScores,
-                t_StatsDB[client].m_iTotalOnline/3600,
-                geo[0],
-                geo[1]
-                );
+        if (mg_display_rating.BoolValue)
+        {
+            // public message rating with geoip
+            ChatAll("%t", "public message rating with geoip",
+                    client, 
+                    disconnected ? "disconnect" : "join",
+                    Ranks_GetRank(client), 
+                    Stats_GetRating(client),
+                    t_StatsDB[client].m_iTotalOnline/3600,
+                    geo[0],
+                    geo[1]);
+        }
+        else
+        {
+            // public message with geoip
+            ChatAll("%t", "public message with geoip",
+                    client, 
+                    disconnected ? "disconnect" : "join",
+                    Ranks_GetRank(client), 
+                    Stats_GetKDA(client),
+                    Stats_GetHSP(client),
+                    t_StatsDB[client].m_iTotalScores,
+                    t_StatsDB[client].m_iTotalOnline/3600,
+                    geo[0],
+                    geo[1]);
+        }
     }
     else
     {
-        // public message
-        ChatAll("%t", "public message",
-                client, 
-                disconnected ? "disconnect" : "join",
-                Ranks_GetRank(client), 
-                Stats_GetKDA(client),
-                Stats_GetHSP(client),
-                t_StatsDB[client].m_iTotalScores,
-                t_StatsDB[client].m_iTotalOnline/3600
-                );
+        if (mg_display_rating.BoolValue)
+        {
+            // public message rating
+            ChatAll("%t", "public message rating",
+                    client, 
+                    disconnected ? "disconnect" : "join",
+                    Ranks_GetRank(client), 
+                    Stats_GetRating(client),
+                    t_StatsDB[client].m_iTotalOnline/3600);
+        }
+        else
+        {
+            // public message
+            ChatAll("%t", "public message",
+                    client, 
+                    disconnected ? "disconnect" : "join",
+                    Ranks_GetRank(client), 
+                    Stats_GetKDA(client),
+                    Stats_GetHSP(client),
+                    t_StatsDB[client].m_iTotalScores,
+                    t_StatsDB[client].m_iTotalOnline/3600);
+        }
+        
     }
 }
 
@@ -699,4 +726,28 @@ float Stats_GetHSP(int client)
 {
     int totalKill = Stats_GetKills(client) - Stats_GetKnifeKills(client) - Stats_GetTaserKills(client);
     return (Stats_GetHeadShots(client) > 0 && totalKill > 0) ? float(Stats_GetHeadShots(client) * 100) / float(totalKill) : 0.0;
+}
+
+float Stats_GetRating(int client)
+{
+    return Stats_GetRatingEx(t_StatsDB[client].m_iKills, t_StatsDB[client].m_iDeaths, t_StatsDB[client].m_iAssists, t_StatsDB[client].m_iShots, t_StatsDB[client].m_iHits, t_StatsDB[client].m_iSurvivals, t_StatsDB[client].m_iPlayRounds);
+}
+
+float Stats_GetRatingEx(int k, int d, int a, int s, int h, int v, int r)
+{
+    // fys edition
+    // algorithm by https://github.com/YuricaKirisame
+    // =0.1*hit ratio+0.368*survive ratio+0.1*k/d ratio+0.214*Assist Per Round+0.08*kpr+0.618
+
+    return 0.618
+    // 命中率HRP
+    + 0.124 * (float(s) / float(h + 1))
+    // 存活率ASR
+    + 0.368 * (float(v) / float(r + 1))
+    // 杀亡比KDR
+    + 0.098 * (float(k) / float(d + 1))
+    // 助攻比APR
+    + 0.214 * (float(a) / float(r + 1))
+    // 局击杀KRP
+    + 0.088 * (float(k) / float(r + 1));
 }

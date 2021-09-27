@@ -166,22 +166,19 @@ void DisplayRankDetails(int client, const char[] username, stats_t data)
     // using panel instead of menu
     Panel panel = new Panel();
 
-    FormatEx(buffer, 128, "▽ %T ▽", "ranking title", client);
-    panel.SetTitle(buffer);
+    FormatEx(buffer, 128, "▽ %s ▽", "ranking title", username);
+    panel.DrawText(buffer);
 
-    panel.DrawText("    ");
-    panel.DrawText(username);
+    FormatEx(buffer, 128, "Rating: %.2f", Stats_GetRatingEx(data.m_iKills, data.m_iDeaths, data.m_iAssists, data.m_iShots, data.m_iHits, data.m_iSurvivals, data.m_iPlayRounds)); panel.DrawText(buffer);
     panel.DrawText("    ");
 
     FormatEx(buffer, 128, "%T", "ranking line 1", client, data.m_iKills, data.m_iDeaths, data.m_iAssists);                                                                                                                                             panel.DrawText(buffer);
-    FormatEx(buffer, 128, "%T", "ranking line 2", client, data.m_iShots, data.m_iHits, data.m_iHeadshots, data.m_iTotalDamage);                                                                                                                         panel.DrawText(buffer);
-    FormatEx(buffer, 128, "%T", "ranking line 3", client, float(data.m_iKills)/float(data.m_iDeaths+1), float(data.m_iHeadshots * 100)/float(data.m_iKills - data.m_iKnifeKills - data.m_iTaserKills +1), float(data.m_iHits)/float(data.m_iShots+1));      panel.DrawText(buffer);
-    FormatEx(buffer, 128, "%T", "ranking line 4", client, data.m_iKnifeKills, data.m_iTaserKills, data.m_iGrenadeKills, data.m_iMolotovKills);                                                                                                          panel.DrawText(buffer);
-    FormatEx(buffer, 128, "%T", "ranking line 5", client, data.m_iPlayRounds, data.m_iSurvivals);                                                                                                                                                     panel.DrawText(buffer);
-    FormatEx(buffer, 128, "%T", "ranking line 6", client, data.m_iTotalScores, data.m_iTotalOnline / 3600);                                                                                                                                           panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 2", client, data.m_iShots, data.m_iHits, data.m_iHeadshots, data.m_iTotalDamage);                                                                                                                        panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 3", client, float(data.m_iKills)/float(data.m_iDeaths+1), float(data.m_iHeadshots * 100)/float(data.m_iKills - data.m_iKnifeKills - data.m_iTaserKills +1), float(data.m_iHits)/float(data.m_iShots+1)); panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 4", client, data.m_iKnifeKills, data.m_iTaserKills, data.m_iGrenadeKills, data.m_iMolotovKills);                                                                                                         panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 5", client, data.m_iPlayRounds, data.m_iSurvivals);                                                                                                                                                      panel.DrawText(buffer);
+    FormatEx(buffer, 128, "%T", "ranking line 6", client, data.m_iTotalScores, data.m_iTotalOnline / 3600);                                                                                                                                            panel.DrawText(buffer);
 
-    panel.DrawText("    ");
-    panel.DrawText("    ");
     panel.DrawText("    ");
 
     FormatEx(buffer, 128, "%T", "back", client); panel.DrawItem(buffer);
