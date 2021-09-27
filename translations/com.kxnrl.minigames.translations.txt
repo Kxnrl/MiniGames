@@ -229,7 +229,7 @@
     {
         "#format"   "{1:d},{2:d},{3:.2f},{4:.2f},{5:d}"
         "en"        "Rank:\t\t\t{1}\nKills:\t\t\t{2}\nHSR:\t\t\t{3}%\nRating:\t\t{4}\nScores:\t\t{5}"
-        "chi"       "总排名:\t{1}\n杀敌数:\t{2}\n爆头率:\t{3}%\n技巧分\t:{4}\n总得分:\t{5}"
+        "chi"       "总排名:\t{1}\n杀敌数:\t{2}\n爆头率:\t{3}%\n技巧分:\t{4}\n总得分:\t{5}"
     }
 
     "vac timer"
