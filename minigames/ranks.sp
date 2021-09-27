@@ -73,9 +73,11 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
         t_RankMenu.ExitButton = false;
         t_RankMenu.ExitBackButton = true;
 
+        bool showRating = mg_display_rating.BoolValue;
+
         // process data
         char name[64], pidstr[16], buffer[128];
-        int index, iKill, iDeath, iScore;
+        int index, k, d, a, s, h, v, r, p;
         while(results.FetchRow())
         {
             index++;
@@ -87,13 +89,26 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
             if (index > 100)
                 continue;
 
-            iKill = results.FetchInt(2);
-            iDeath = results.FetchInt(3);
-            iScore = results.FetchInt(4);
-            float KD = (float(iKill) / float(iDeath+1));
+            k = results.FetchInt(2);
+            d = results.FetchInt(3);
+            a = results.FetchInt(4);
+            s = results.FetchInt(5);
+            h = results.FetchInt(6);
+            v = results.FetchInt(7);
+            r = results.FetchInt(8);
+            p = results.FetchInt(9);
+
+            if (showRating)
+            {
+                FormatEx(buffer, 128, " #%02d  %s  (Rating: %.2f)", index, name, Stats_GetRatingEx(k, d, a, s, h, v, r));
+            }
+            else
+            {
+                float kd = (float(k) / float(d+1));
+                FormatEx(buffer, 128, " #%02d  %s  [K/D: %.2f (%dp)]", index, name, kd, p);
+            }
 
             IntToString(pid, pidstr, 16);
-            FormatEx(buffer, 128, " #%02d  %s  [K/D: %.2f (%dp)]", index, name, KD, iScore);
             t_RankMenu.AddItem(pidstr, buffer);
         }
     }
