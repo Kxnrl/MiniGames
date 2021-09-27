@@ -86,7 +86,7 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
             Ranks_FilterName(name, 64);
             t_aRankCache.Push(pid);
 
-            if (index > 100)
+            if (index >= 100)
                 continue;
 
             k = results.FetchInt(2);
@@ -207,9 +207,9 @@ public int MenuHandler_RankDetails(Menu menu, MenuAction action, int param1, int
 {
     if (action == MenuAction_End)
         delete menu;
-    else if (action == MenuAction_Select && param2 == 0)
+    else if (action == MenuAction_Select && param2 == 1)
     {
-        t_RankMenu.SetTitle("%T\n ", "top 100 title", param1);
+        t_RankMenu.SetTitle("%T\n ", "top 99 title", param1);
         t_RankMenu.Display(param1, 60);
     }
 }
@@ -227,7 +227,7 @@ public Action Command_Rank(int client, int args)
         return Plugin_Handled;
     }
 
-    t_RankMenu.SetTitle("%T\n ", "top 100 title", client);
+    t_RankMenu.SetTitle("%T\n ", "top 99 title", client);
     t_RankMenu.Display(client, 60);
 
     return Plugin_Handled;

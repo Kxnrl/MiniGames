@@ -741,7 +741,7 @@ float Stats_GetRatingEx(int k, int d, int a, int s, int h, int v, int r)
 
     return 0.618
     // 命中率HRP
-    + 0.124 * (float(s) / float(h + 1))
+    + 0.124 * (float(h) / float(s + 1))
     // 存活率ASR
     + 0.368 * (float(v) / float(r + 1))
     // 杀亡比KDR
@@ -749,5 +749,5 @@ float Stats_GetRatingEx(int k, int d, int a, int s, int h, int v, int r)
     // 助攻比APR
     + 0.214 * (float(a) / float(r + 1))
     // 局击杀KRP
-    + 0.088 * (float(k) / float(r + 1));
+    + 0.086 * (float(k) / float(r + 1));
 }

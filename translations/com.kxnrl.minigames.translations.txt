@@ -12,10 +12,10 @@
         "chi"   "排行榜当前不可用"
     }
 
-    "top 100 title"
+    "top 99 title"
     {
-        "en"    "[Ranking] Top 100"
-        "chi"   "[排行榜]  Top 100"
+        "en"    "[Ranking] Top 99"
+        "chi"   "[排行榜]  Top 99"
     }
 
     "ranking title"
