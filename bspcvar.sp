@@ -33,9 +33,13 @@
 #define PI_VERSION  "2.2." ... MYBUILD
 #define PI_URL      "https://github.com/Kxnrl/MiniGames"
 
+#define PHYSICS_COMMAND_STRING "toggle_player_physics_box"
+#define PHYSICS_COMMAND_LENGTH 25
+
 Handle g_AcceptInput;
 ArrayList g_CvarList;
 ConVar cs_enable_player_physics_box;
+Handle g_InitVCollision;
 
 public Plugin myinfo = 
 {
@@ -69,12 +73,37 @@ public void OnPluginStart()
     g_CvarList = new ArrayList(ByteCountToCells(128));
     InitCvars();
 
+    RegServerCmd("toggle_player_physics_box", Command_Physics);
+
     cs_enable_player_physics_box = FindConVar("cs_enable_player_physics_box");
+
+    HookEvent("round_prestart", Event_RoundStart, EventHookMode_Post);
+
+    GameData minigames = new GameData("minigames.games");
+    if (minigames == null)
+        SetFailState("Could not load minigames.games gamedata");
+
+    StartPrepSDKCall(SDKCall_Player);
+    if (!PrepSDKCall_SetFromConf(minigames, SDKConf_Signature, "CCSPlayer::InitVCollision"))
+    {
+        SetFailState("PrepSDKCall_SetFromConf(\"CCSPlayer::InitVCollision\" failed!");
+        return;
+    }
+    PrepSDKCall_AddParameter(SDKType_Vector, SDKPass_ByRef);
+    PrepSDKCall_AddParameter(SDKType_Vector, SDKPass_ByRef);
+    g_InitVCollision = EndPrepSDKCall();
+    if (g_InitVCollision == null)
+        SetFailState("g_InitVCollision failed!");
 }
 
 public void Pupd_OnCheckAllPlugins()
 {
     Pupd_CheckPlugin(false, "https://build.kxnrl.com/updater/MiniGames/");
+}
+
+public void Event_RoundStart(Event e, const char[] n, bool b)
+{
+    cs_enable_player_physics_box.BoolValue = false;
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
@@ -147,8 +176,13 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
     // cs_enable_player_physics_box
     if (StrContains(command, "cs_enable_player_physics_box", false) > -1)
     {
-        cs_enable_player_physics_box.BoolValue = true;
-        PrintToConsoleAll("[BspConVar]  cs_enable_player_physics_box enabled");
+        DHookSetReturn(hReturn, false);
+        return MRES_Supercede;
+    }
+
+    if (strncmp(command, PHYSICS_COMMAND_STRING, PHYSICS_COMMAND_LENGTH, false) == 0)
+    {
+        CheckPhysics();
         DHookSetReturn(hReturn, false);
         return MRES_Supercede;
     }
@@ -178,26 +212,6 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
     int split = ExplodeString(command, " ", values, 2, 32);
     if (split == 2)
     {
-        /*
-        char whitelist[128]; bool isWhiteList = false;
-        for(int index = 0; index < g_CvarList.Length; index++)
-        {
-            g_CvarList.GetString(index, whitelist, 128);
-            if (strcmp(values[0], whitelist, false) == 0)
-            {
-                isWhiteList = true;
-                break;
-            }
-        }
-
-        if (!isWhiteList)
-        {
-            LogMessage("[BspConVar]  Blocked non-whitelist convar [%s]", command);
-            DHookSetReturn(hReturn, false);
-            return MRES_Supercede;
-        }
-        */
-
         if (g_CvarList.FindString(values[0]) == -1)
         {
             LogMessage("[BspConVar]  Blocked non-whitelist convar [%s]", command);
@@ -207,12 +221,37 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
 
         PrintToConsoleAll("[BspConVar]  [%s] -> [%s]", values[0], values[1]);
         ServerCommand("mg_setcvar %s %s", values[0], values[1]);
-
+    }
+    else
+    {
+        PrintToServer("[BspConVar]  Blocked unknow command [%s]", command);
     }
 
-    PrintToServer("[BspConVar]  Blocked unknow command [%s]", command);
     DHookSetReturn(hReturn, false);
     return MRES_Supercede;
+}
+
+public Action Command_Physics(int args)
+{
+    CheckPhysics();
+    return Plugin_Handled;
+}
+
+void CheckPhysics()
+{
+    if (g_Locked != null)
+        return;
+
+    cs_enable_player_physics_box.BoolValue = true;
+    PrintToConsoleAll("[BspConVar]  cs_enable_player_physics_box enabled");
+
+    float vPos[3], vVel[3] = {0.0, 0.0, 0.0};
+    for (int i = 1; i <= MaxClients; i++) if (IsClientInGame(i) && IsPlayerAlive(i))
+    {
+        GetClientAbsOrigin(i, vPos);
+        TeleportEntity(i, vPos, NULL_VECTOR, vVel);
+        SDKCall(g_InitVCollision, i, vPos, vVel);
+    }
 }
 
 void InitCvars()
@@ -293,4 +332,7 @@ void InitCvars()
     // MV
     g_CvarList.PushString("sm_movement_unlocker_ct");
     g_CvarList.PushString("sm_movement_unlocker_te");
+
+    // SELF
+    g_CvarList.PushString("toogle_player_physics_box");
 }
