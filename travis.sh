@@ -13,6 +13,7 @@ wget "https://github.com/Kxnrl/MapMusic-API/raw/master/include/mapmusic.inc" -q 
 wget "https://github.com/Impact123/AutoExecConfig/raw/development/autoexecconfig.inc" -q -O include/autoexecconfig.inc
 wget "https://github.com/Kxnrl/GeoIP2/raw/master/geoip2.inc" -q -O include/geoip2.inc
 wget "https://github.com/fys-csgo/public-include/raw/master/fys.pupd.inc" -q -O include/fys.pupd.inc
+wget "https://github.com/fys-csgo/public-include/raw/master/fys.opts.inc" -q -O include/fys.opts.inc
 wget "https://www.sourcemod.net/latest.php?version=$1&os=linux" -q -O sourcemod.tar.gz
 tar -xzf sourcemod.tar.gz
 

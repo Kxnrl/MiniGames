@@ -115,6 +115,8 @@ char g_szBlockRadio[][] = {"resetteam", "spectate", "kill", "explode", "coverme"
 // library 
 bool g_smxStore;
 bool g_smxMapMuisc;
+bool g_smxCookies;
+bool g_extCookies;
 bool g_extGeoIP2;
 bool g_extA2SFirewall;
 bool g_extTransmitManager;

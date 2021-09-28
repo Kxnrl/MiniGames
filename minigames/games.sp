@@ -27,23 +27,34 @@ static bool t_bPressed[2048];
 static bool bBombPlanted;
 
 static Handle t_kOCookies[kO_MaxOptions];
+static char   t_szCookies[kO_MaxOptions][] = {
+    "MG.HudSpec.Disabled",
+    "MG.HudVac.Disabled",
+    "MG.HudSpeed.Disabled",
+    "MG.HudHurt.Disabled",
+    "MG.HudChat.Disabled",
+    "MG.HudText.Disabled",
+    // !!! transmit disabled by default
+    "MG.Transmit.Enabled"
+};
 
 static char t_szSpecHudContent[MAXPLAYERS+1][256];
 
 void Games_OnPluginStart()
 {
-    for(int i = 0; i < kO_MaxOptions; ++i)
-    {
-        char cookieName[16];
-        FormatEx(cookieName, 16, "MG_Options_%d", i);
-        t_kOCookies[i] = RegClientCookie(cookieName, cookieName, CookieAccess_Private);
-    }
-
     RegConsoleCmd("sm_mg",      Command_Main);
     RegConsoleCmd("sm_menu",    Command_Main);
     RegConsoleCmd("buyammo2",   Command_Main);
     RegConsoleCmd("sm_hide",    Command_Hide);
     RegConsoleCmd("sm_options", Command_Options);
+}
+
+void Games_RegisterCookies()
+{
+    for(int i = 0; i < kO_MaxOptions; ++i)
+    {
+        t_kOCookies[i] = RegClientCookie(t_szCookies[i], t_szCookies[i], CookieAccess_Private);
+    }
 }
 
 public Action Command_Main(int client, int args)
@@ -178,7 +189,15 @@ public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int
 static void Games_SetOptions(int client, int option)
 {
     g_kOptions[client][option] = !g_kOptions[client][option];
-    SetClientCookie(client, t_kOCookies[option], g_kOptions[client][option] ? "1" : "0");
+
+    if (g_smxCookies)
+    {
+        Opts_SetOptBool(client, t_szCookies[option], g_kOptions[client][option]);
+    }
+    else if (g_smxCookies)
+    {
+        SetClientCookie(client, t_kOCookies[option], g_kOptions[client][option] ? "1" : "0");
+    }
 
     if (option == kO_Transmit)
     {
@@ -432,8 +451,20 @@ void Games_OnClientConnected(int client)
         g_kOptions[client][i] = false;
 }
 
+void Games_OnClientCookiesLoaded(int client)
+{
+    for(int i = 0; i < kO_MaxOptions; ++i)
+    {
+        g_kOptions[client][i] = Opts_GetOptBool(client, t_szCookies[i], false);
+    }
+}
+
 void Games_OnClientCookiesCached(int client)
 {
+    // don't override
+    if (g_smxCookies)
+        return;
+
     char buffer[4];
     for(int i = 0; i < kO_MaxOptions; ++i)
     {

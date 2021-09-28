@@ -24,7 +24,6 @@
 #include <sdktools>
 #include <sdkhooks>
 #include <cstrike>
-#include <clientprefs>
 #include <autoexecconfig>
 
 // myself
@@ -36,6 +35,7 @@
 #include <mapmusic>          //https://github.com/Kxnrl/MapMusic-API
 #include <updater>           //https://forums.alliedmods.net/showthread.php?t=169095
 #include <fys.pupd>          //https://git.kxnrl.com/fys-update-service
+#include <fys.opts>
 #define REQUIRE_PLUGIN
 
 // extensions
@@ -43,6 +43,7 @@
 #include <geoip2>            //https://github.com/Kxnrl/GeoIP2
 #include <TransmitManager>   //https://github.com/Kxnrl/sm-ext-TransmitManager
 #include <MovementManager>   //https://github.com/Kxnrl/sm-ext-Movement
+#include <clientprefs>
 #define REQUIRE_EXTENSIONS
 
 // header
@@ -239,11 +240,18 @@ public void OnAllPluginsLoaded()
     g_smxMapMuisc = LibraryExists("MapMusic");
     g_extTransmitManager = LibraryExists("TransmitManager");
     g_extMovementManager = LibraryExists("MovementManager");
+    g_smxCookies = LibraryExists("fys-Opts");
+    g_extCookies = LibraryExists("clientprefs");
 
     if (LibraryExists("updater"))
     {
         ConVar_Easy_SetInt("sm_updater", 2);
         Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
+    }
+
+    if (g_extCookies)
+    {
+        Games_RegisterCookies();
     }
 }
 
@@ -290,6 +298,25 @@ public void OnLibraryAdded(const char[] name)
         ConVar_Easy_SetInt("sm_updater", 2);
         Updater_AddPlugin("https://build.kxnrl.com/MiniGames/updater/release.txt");
     }
+    else if (strcmp(name, "fys-Opts") == 0)
+    {
+        g_smxCookies = true;
+        for (int i = 1; i <= MaxClients; i++) if (IsClientInGame(i) && !IsFakeClient(i) && Opts_IsClientLoaded(i))
+        {
+            // late load
+            Opts_OnClientLoad(i);
+        }
+    }
+    else if (strcmp(name, "clientprefs") == 0)
+    {
+        g_extCookies = true;
+        Games_RegisterCookies();
+        for (int i = 1; i <= MaxClients; i++) if (IsClientInGame(i) && !IsFakeClient(i) && AreClientCookiesCached(i))
+        {
+            // late load
+            OnClientCookiesCached(i);
+        }
+    }
 }
 
 public void OnLibraryRemoved(const char[] name)
@@ -306,6 +333,10 @@ public void OnLibraryRemoved(const char[] name)
         g_smxStore = false;
     else if (strcmp(name, "MapMusic") == 0)
         g_smxMapMuisc = false;
+    else if (strcmp(name, "fys-Opts") == 0)
+        g_smxCookies = false;
+    else if (strcmp(name, "clientprefs") == 0)
+        g_extCookies = false;
 }
 
 static void ConnectToDatabase(int retry)
@@ -560,6 +591,11 @@ public void OnClientPostAdminCheck(int client)
     // fire to module
     Cvars_FakeClientConVar(client);
     Stats_OnClientPostAdminCheck(client);
+}
+
+public void Opts_OnClientLoad(int client)
+{
+    Games_OnClientCookiesLoaded(client);
 }
 
 public void OnClientCookiesCached(int client)
