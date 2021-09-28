@@ -239,9 +239,6 @@ public Action Command_Physics(int args)
 
 void CheckPhysics()
 {
-    if (g_Locked != null)
-        return;
-
     cs_enable_player_physics_box.BoolValue = true;
     PrintToConsoleAll("[BspConVar]  cs_enable_player_physics_box enabled");
 
