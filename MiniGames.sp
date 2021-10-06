@@ -587,6 +587,10 @@ public void OnClientPostAdminCheck(int client)
             strcopy(g_szTicket[client], 32, ticket);
         }
     }
+    else
+    {
+        RandomString(g_szTicket[client], 32);
+    }
 
     // fire to module
     Cvars_FakeClientConVar(client);
