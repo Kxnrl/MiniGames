@@ -227,7 +227,11 @@ static void Teams_ChangeTeam()
         team_t t;
         array_players.GetArray(i, t, sizeof(team_t));
 
-        if (IsPlayerAlive(t.client) && t.nextTeam > TEAM_OB)
+        int nTeam = GetClientTeam(t.client);
+        if (nTeam <= TEAM_OB)
+            continue;
+
+        if (IsPlayerAlive(t.client))
         {
             CS_SwitchTeam(t.client, t.nextTeam);
             RenderPlayerColor(t.client);
@@ -237,7 +241,7 @@ static void Teams_ChangeTeam()
             ChangeClientTeam(t.client, t.nextTeam);
         }
 
-        if (t.nextTeam == GetClientTeam(t.client))
+        if (t.nextTeam == nTeam)
         {
             // not changed
             Text(t.client, "%T", "self random not change text", t.client);

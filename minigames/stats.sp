@@ -387,7 +387,7 @@ void Stats_PublicMessage(int client, bool disconnected = false)
     }
 
     // skip admin print
-    if (CheckCommandAccess(client, "sm_sh", ADMFLAG_ROOT, false))
+    if (CheckCommandAccess(client, "sm_ef", ADMFLAG_CONVARS, false))
         return;
 
     if (g_extGeoIP2)
