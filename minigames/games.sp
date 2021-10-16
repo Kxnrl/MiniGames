@@ -80,11 +80,11 @@ public Action Command_Main(int client, int args)
     FormatEx(line, 32, "%T", "main options", client);
     main.AddItem("s", line);
 
-    FormatEx(line, 32, "%T", "main mapmusic", client);
-    main.AddItem("u", line);
-
-    FormatEx(line, 32, "%T", "main ampmusic", client);
-    main.AddItem("s", line);
+    if (g_smxMapMuisc)
+    {
+        FormatEx(line, 32, "%T", "main mapmusic", client);
+        main.AddItem("u", line);
+    }
 
     FormatEx(line, 32, "%T", "main store", client);
     main.AddItem("i", line);
@@ -108,8 +108,7 @@ public int MenuHandler_MenuMain(Menu menu, MenuAction action, int client, int sl
             case 1: Command_Stats(  client, slot);
             case 2: Command_Options(client, slot);
             case 3: FakeClientCommandEx(client, "sm_mapmusic");
-            case 4: FakeClientCommandEx(client, "sm_music");
-            case 5: FakeClientCommandEx(client, "sm_store");
+            case 4: FakeClientCommandEx(client, "sm_store");
         }
     }
 }
@@ -127,9 +126,6 @@ public Action Command_Options(int client, int args)
 
     FormatEx(line, 32, "%T", "options title", client);
     options.SetTitle("[MG]  %s\n ", line);
-    
-    FormatEx(line, 32, "%T:  %T", "options mapmusic toggle", client, g_smxMapMuisc && MapMusic_GetStatus(client) ? "menu item Off" : "menu item On", client);
-    options.AddItem("yukiim", line, g_smxMapMuisc ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 
     FormatEx(line, 32, "%T:  %d", "options mapmusic volume", client, g_smxMapMuisc ? MapMusic_GetVolume(client) : 100);
     options.AddItem("yukiim", line, g_smxMapMuisc ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
@@ -172,15 +168,14 @@ public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int
     {
         switch (slot)
         {
-            case 0 : MapMusic_SetStatus(client, !MapMusic_GetStatus(client));
-            case 1 : 
+            case 0: 
             {
                 int volume = MapMusic_GetVolume(client) - 10;
                 ScopeValue(volume, 100, 0);
                 ResetValue(volume, 100, 0);
                 MapMusic_SetVolume(client, volume);
             }
-            default: Games_SetOptions(client, slot-2);
+            default: Games_SetOptions(client, slot-1);
         }
         FakeClientCommandEx(client, "sm_options");
     }

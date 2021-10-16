@@ -189,7 +189,7 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
 
     if (StrContains(command, "sm", false) == 0)
     {
-        LogMessage("[BspConVar]  Blocked sm command [%s]", command);
+        PrintToServer("[BspConVar]  Blocked sm command [%s]", command);
         DHookSetReturn(hReturn, false);
         return MRES_Supercede;
     }
@@ -214,7 +214,7 @@ public MRESReturn Event_AcceptInput(int pThis, Handle hReturn, Handle hParams)
     {
         if (g_CvarList.FindString(values[0]) == -1)
         {
-            LogMessage("[BspConVar]  Blocked non-whitelist convar [%s]", command);
+            PrintToServer("[BspConVar]  Blocked non-whitelist convar [%s]", command);
             DHookSetReturn(hReturn, false);
             return MRES_Supercede;
         }
