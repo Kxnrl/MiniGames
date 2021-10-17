@@ -300,7 +300,7 @@ static void Cvars_SetCvarDefault()
     sv_teamid_overhead.SetBool                (true,  true, false);
     mp_playerid.SetInt                        (2,     true, false);
 
-    phys_pushscale.SetInt              ( 24, true, true);
+    phys_pushscale.SetInt              (  3, true, true);
     cs_enable_player_physics_box.SetInt(  0, true, true);
     sv_turbophysics.SetInt             (  0, true, true);
 
@@ -686,7 +686,8 @@ void Cvars_OnRoundStart()
 
     // fixed
     // if ball game has been choosen, just insert change handled in stripper.
-    phys_pushscale.IntValue = 24;
+    // FIXME: we need to fix vphysics crash...
+    phys_pushscale.IntValue = 3;
     
     // fix skate invoke
     sv_standable_normal.FloatValue = 0.7;
