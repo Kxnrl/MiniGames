@@ -127,6 +127,7 @@ GlobalForward g_fwdOnRandomTeam;
 GlobalForward g_fwdOnVacElapsed;
 GlobalForward g_fwdOnVacEnabled;
 GlobalForward g_fwdOnRenderModelColor;
+GlobalForward g_fwdOnVacClientSlain;
 
 // options
 enum

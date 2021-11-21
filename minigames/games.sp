@@ -679,6 +679,9 @@ public Action Games_RoundTimer(Handle timer)
                 if (health < 1)
                 {
                     // kill player
+                    Call_StartForward(g_fwdOnVacClientSlain);
+                    Call_PushCell(client);
+                    Call_Finish();
                     ForcePlayerSuicide(client);
                 }
                 else
