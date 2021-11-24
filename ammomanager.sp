@@ -56,6 +56,8 @@ Handle SDKCall_SetReserveAmmoCount;
 Handle DHook_GetReserveAmmoMax;
 Handle AcceptInput;
 
+ConVar mg_ammo_max_override;
+
 public void OnPluginStart()
 {
     GameData config = new GameData("minigames.games");
@@ -113,6 +115,10 @@ public void OnPluginStart()
     DHookAddParam(AcceptInput, HookParamType_CBaseEntity);
     DHookAddParam(AcceptInput, HookParamType_Object, 20);
     DHookAddParam(AcceptInput, HookParamType_Int);
+
+    mg_ammo_max_override = CreateConVar("mg_ammo_max_override", "-1", "Override Max Reserve Ammo Value.", _, true, -1.0, true, 416.0);
+
+    HookEvent("round_prestart", Event_Round, EventHookMode_Post);
 }
 
 public void Pupd_OnCheckAllPlugins()
@@ -181,7 +187,7 @@ public MRESReturn Event_GetReserveAmmoMax(int pThis, Handle hReturn, Handle hPar
     if (strcmp(classname, "weapon_taser") == 0)
         return MRES_Ignored;
 
-    DHookSetReturn(hReturn, MAX_RESERVE_AMMO_MAX);
+    DHookSetReturn(hReturn, mg_ammo_max_override.IntValue == -1 ? MAX_RESERVE_AMMO_MAX : mg_ammo_max_override.IntValue);
 
     return MRES_Supercede;
 }
@@ -360,4 +366,9 @@ public Action Timer_GiveBack(Handle timer, DataPack context)
     EquipPlayerWeapon(client, entity);
 
     return Plugin_Stop;
+}
+
+public void Event_Round(Event e, const char[] n, bool b)
+{
+    mg_ammo_max_override.IntValue = -1;
 }
