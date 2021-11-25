@@ -17,7 +17,6 @@
 
 static ArrayList t_aRankCache = null;
 static Menu t_RankMenu = null;
-static int t_iCompLevel[MAXPLAYERS+1];
 static int t_iRank[MAXPLAYERS+1];
 
 
@@ -233,27 +232,13 @@ public Action Command_Rank(int client, int args)
     return Plugin_Handled;
 }
 
-void Ranks_OnMapStart()
-{
-    // hook scoreboard
-    HookScoreboard(true);
-}
-
-void Ranks_OnMapEnd()
-{
-    // unhook scoreboard
-    HookScoreboard(false);
-}
-
 void Ranks_OnClientConnected(int client)
 {
-    t_iCompLevel[client] = 0;
     t_iRank[client]      = 0;
 }
 
 void Ranks_OnClientDisconnect(int client)
 {
-    t_iCompLevel[client] = 0;
     t_iRank[client]      = 0;
 }
 
@@ -292,102 +277,12 @@ void Ranks_OnClientLoaded(int client)
     else
         t_iRank[client] = rank;
 
-    int score = Stats_GetTotalScore(client);
-
-    if (score >= 204800)
-        t_iCompLevel[client] = 18;
-    else if (score >= 153600)
-        t_iCompLevel[client] = 17;
-    else if (score >= 120000)
-        t_iCompLevel[client] = 16;
-    else if (score >= 86400)
-        t_iCompLevel[client] = 15;
-    else if (score >= 64800)
-        t_iCompLevel[client] = 14;
-    else if (score >= 51200)
-        t_iCompLevel[client] = 13;
-    else if (score >= 38400)
-        t_iCompLevel[client] = 12;
-    else if (score >= 25600)
-        t_iCompLevel[client] = 11;
-    else if (score >= 12800)
-        t_iCompLevel[client] = 10;
-    else if (score >= 6400)
-        t_iCompLevel[client] = 9;
-    else if (score >= 3200)
-        t_iCompLevel[client] = 8;
-    else if (score >= 1600)
-        t_iCompLevel[client] = 7;
-    else if (score >= 800)
-        t_iCompLevel[client] = 6;
-    else if (score >= 400)
-        t_iCompLevel[client] = 5;
-    else if (score >= 200)
-        t_iCompLevel[client] = 4;
-    else if (score >= 100)
-        t_iCompLevel[client] = 3;
-    else if (score >= 50)
-        t_iCompLevel[client] = 2;
-    else if (score >= 25)
-        t_iCompLevel[client] = 1;
-
     Stats_PublicMessage(client);
 }
 
 int Ranks_GetRank(int client)
 {
     return t_iRank[client];
-}
-
-int Ranks_GetLevel(int client)
-{
-    return t_iCompLevel[client];
-}
-
-void HookScoreboard(bool hook)
-{
-    static int  cs_player_manager = -1;
-    static bool bHook = false;
-    cs_player_manager = GetPlayerResourceEntity();
-    if (hook)
-    {
-        if (cs_player_manager == -1)
-        {
-            LogError("HookScoreboard -> %b -> cs_player_manager is not valid.");
-            return;
-        }
-
-        bHook = SDKHookEx(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
-
-        if (!bHook)
-            LogError("HookScoreboard -> Hook cs_player_manager failed!");
-    }
-    else
-    {
-        if (cs_player_manager == -1)
-        {
-            LogError("HookScoreboard -> %b -> cs_player_manager is not valid.");
-            return;
-        }
-
-        if (bHook)
-        {
-            SDKUnhook(cs_player_manager, SDKHook_ThinkPost, Hook_OnThinkPost);
-            cs_player_manager = -1;
-        }
-    }
-}
-
-public void Hook_OnThinkPost(int entity)
-{
-    if (!mg_rank_skillgroups.BoolValue)
-        return;
-
-    static int Offset = -1;
-    if (Offset == -1)
-        Offset  = FindSendPropInfo("CCSPlayerResource", "m_iCompetitiveRanking");
-
-    SetEntDataArray(entity, Offset, t_iCompLevel, MAXPLAYERS+1, _, true);
 }
 
 static void Ranks_FilterName(char[] buffer, int maxLen)

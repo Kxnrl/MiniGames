@@ -316,11 +316,11 @@ static void Games_UpdateGameHUD()
 
             if (mg_display_rating.BoolValue)
             {
-                FormatEx(message, 512, "【Lv.%d】 %N\n%T\n%s", Ranks_GetLevel(target), target, "spec hud rating", client, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetHSP(target), Stats_GetRating(target), Stats_GetTotalScore(target), t_szSpecHudContent[target]);
+                FormatEx(message, 512, "%N\n%T\n%s", target, "spec hud rating", client, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetHSP(target), Stats_GetRating(target), Stats_GetTotalScore(target), t_szSpecHudContent[target]);
             }
             else
             {
-                FormatEx(message, 512, "【Lv.%d】 %N\n%T\n%s", Ranks_GetLevel(target), target, "spec hud", client, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target), t_szSpecHudContent[target]);
+                FormatEx(message, 512, "%N\n%T\n%s", target, "spec hud", client, Ranks_GetRank(target), Stats_GetKills(target), Stats_GetDeaths(target), Stats_GetAssists(target), float(Stats_GetKills(target))/float(Stats_GetDeaths(target)+1), Stats_GetHSP(target), Stats_GetTotalScore(target), t_szSpecHudContent[target]);
             }
             ReplaceString(message, 512, "#", "＃");
 

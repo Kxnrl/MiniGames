@@ -70,7 +70,6 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     CreateNative("MG_GetTotalKnifeKills",   NativeCall_GetTotalKnifeKills);
     CreateNative("MG_GetTotalTaserKills",   NativeCall_GetTotalTaserKills);
     CreateNative("MG_GetRanks",             NativeCall_GetRanks);
-    CreateNative("MG_GetLevel",             NativeCall_GetLevel);
 
     // Store
     MarkNativeAsOptional("Store_GetClientCredits");
@@ -150,12 +149,7 @@ public int NativeCall_GetTotalTaserKills(Handle plugin, int numParams)
 
 public int NativeCall_GetRanks(Handle plugin, int numParams)
 {
-    return Ranks_GetLevel(GetNativeCell(1));
-}
-
-public int NativeCall_GetLevel(Handle plugin, int numParams)
-{
-    return Ranks_GetLevel(GetNativeCell(1));
+    return Ranks_GetRank(GetNativeCell(1));
 }
 
 public void OnPluginStart()
@@ -480,7 +474,6 @@ public void OnMapStart()
     // fire to module
     Stats_OnMapStart();
     Games_OnMapStart();
-    Ranks_OnMapStart();
     Teams_OnMapStart();
 }
 
@@ -527,7 +520,6 @@ public void OnMapEnd()
 {
     // fire to module
     Games_OnMapEnd();
-    Ranks_OnMapEnd();
 }
 
 public void OnClientConnected(int client)
