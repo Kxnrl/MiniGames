@@ -83,7 +83,6 @@ void Cvars_OnPluginStart()
     mg_button_watcher       = AutoExecConfig_CreateConVar("mg_button_watcher",      "1",        "Print button usage info.",                                         _, true, 0.0,   true, 1.0);
     mg_broadcast_leave      = AutoExecConfig_CreateConVar("mg_broadcast_leave",     "0",        "Broadcast on client disconnect.",                                  _, true, 0.0,   true, 1.0);
     mg_slap_after_vac       = AutoExecConfig_CreateConVar("mg_slap_after_vac",      "1",        "Slap player after vac timer elapsed.",                             _, true, 0.0,   true, 1.0);
-    mg_rank_skillgroups     = AutoExecConfig_CreateConVar("mg_rank_skillgroups",    "1",        "Display skill groups on scoreboard.",                              _, true, 0.0,   true, 1.0);
     mg_auto_defuser         = AutoExecConfig_CreateConVar("mg_auto_defuser",        "1",        "Give all CTs defuser when the bomb has been planted.",             _, true, 0.0,   true, 1.0);
     mg_display_rating       = AutoExecConfig_CreateConVar("mg_display_rating",      "1",        "Display player rating instead of analytics.",                      _, true, 0.0,   true, 1.0);
 

@@ -242,30 +242,6 @@ void Ranks_OnClientDisconnect(int client)
     t_iRank[client]      = 0;
 }
 
-void Ranks_OnPlayerRunCmd(int client, int buttons)
-{
-    if (!mg_rank_skillgroups.BoolValue)
-        return;
-
-    // process competitive ranking
-
-    static bool bLast[MAXPLAYERS+1];
-
-    if (!(buttons & IN_SCORE))
-    {
-        bLast[client] = false;
-        return;
-    }
-
-    if (bLast[client])
-        return;
-
-    bLast[client] = true;
-
-    if (StartMessageOne("ServerRankRevealAll", client) != null)
-        EndMessage();
-}
-
 void Ranks_OnClientLoaded(int client)
 {
     // loading rank

@@ -680,7 +680,6 @@ public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3
 {
     // fire to module
     Games_OnPlayerRunCmd(client, buttons, tickcount);
-    Ranks_OnPlayerRunCmd(client, buttons);
 
     return Plugin_Continue;
 }

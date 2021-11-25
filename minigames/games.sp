@@ -210,7 +210,7 @@ public Action Command_Hide(int client, int args)
 void Games_OnMapStart()
 {
     // timer to update hud
-    CreateTimer(1.0, Games_TickInterval, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
+    CreateTimer(0.2, Games_TickInterval, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Games_TickInterval(Handle timer)
@@ -223,6 +223,10 @@ public Action Games_TickInterval(Handle timer)
 // prevent EngineError no free edict...
 static void Games_CleanupWeapon()
 {
+    static int tick = 0;
+    if (++tick % 5 != 0)
+        return;
+
     bool cleanMapWeapon = false;
     int edicts = -1;
 
@@ -275,8 +279,8 @@ static void Games_UpdateGameHUD()
     for(int client = 1; client <= MaxClients; ++client)
         if (ClientValid(client) && IsClientObserver(client))
         {
-            // client is in - menu?
-            if (GetClientMenu(client, null) != MenuSource_None)
+            // client is in - menu? || client check scoreboard
+            if (GetClientMenu(client, null) != MenuSource_None || GetClientButtons(client) & IN_SCORE)
             {
                 iLastSpecTarget[client] = 0;
                 if (bLastDisplayHud[client])
