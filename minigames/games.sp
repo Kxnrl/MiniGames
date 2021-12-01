@@ -198,6 +198,8 @@ static void Games_SetOptions(int client, int option)
     {
         // immed refresh state
         Hooks_UpdateState();
+
+        Chat(client, "%T", g_kOptions[client][option] ? "transmit on" : "transmit off", client);
     }
 }
 

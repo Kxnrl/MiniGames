@@ -536,4 +536,16 @@
         "en"        "<font color='#ff0000'>Keybind crouch jump is now allowed"
         "chi"       "<font color='#ff0000'>一键大跳已被禁止"
     }
+
+    "transmit on"
+    {
+        "en"        "Hide teammate: {green} On"
+        "chi"       "队友屏蔽 {green}已开启"
+    }
+
+    "transmit off"
+    {
+        "en"        "Hide teammate: {green} Off"
+        "chi"       "队友屏蔽 {red}已关闭"
+    }
 }
