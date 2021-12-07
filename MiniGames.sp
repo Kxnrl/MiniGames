@@ -210,7 +210,6 @@ public void OnPluginStart()
     HookEvent("player_connect_full",  Event_PlayerConnected,  EventHookMode_Post);
     HookEvent("weapon_fire",          Event_WeaponFire,       EventHookMode_Post);
     HookEvent("cs_win_panel_match",   Event_WinPanel,         EventHookMode_Post);
-    HookEvent("announce_phase_end",   Event_AnnouncePhaseEnd, EventHookMode_Post);
     HookEvent("grenade_thrown",       Event_GrenadeThrown,    EventHookMode_Post);
     HookEvent("bomb_planted",         Event_BombPlanted,      EventHookMode_Post);
 
@@ -468,8 +467,10 @@ public void OnMapStart()
 {
     // we only work on mg_ maps
     GetCurrentMap(g_szMap, 128);
-    if (StrContains(g_szMap, "mg_", false) != 0)
+    if (strncmp(g_szMap, "mg_", 3, false) != 0)
         SetFailState("This plugin only for mg_ (MiniGames/MultiGames) map! -> %s", g_szMap);
+
+    g_bHnS = strncmp(g_szMap, "mg_hns_", 7, false) == 0;
 
     // fire to module
     Stats_OnMapStart();
@@ -821,9 +822,18 @@ public Action Event_PlayerTeams(Event event, const char[] name, bool dontBroadca
 
 public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast)
 {
+    int userid = event.GetInt("userid");
+
+    if (g_bHnS)
+    {
+        // we don't flash teammate.
+        RequestFrame(Games_PlayerUnblind, userid);
+        return;
+    }
+
     // 1 frame delay
     DataPack pack = new DataPack();
-    pack.WriteCell(event.GetInt("userid"));
+    pack.WriteCell(userid);
     pack.WriteCell(event.GetInt("attacker"));
     pack.WriteFloat(event.GetFloat("blind_duration"));
     pack.Reset();
@@ -876,13 +886,6 @@ public void Event_WinPanel(Event event, const char[] name, bool dontBroadcast)
 {
     // save all ...
     Stats_OnWinPanel();
-}
-
-public void Event_AnnouncePhaseEnd(Event event, const char[] name, bool dontBroadcast)
-{
-    // scoreboard ranking
-    if (StartMessageAll("ServerRankRevealAll") != null)
-        EndMessage();
 }
 
 public void Event_GrenadeThrown(Event event, const char[] name, bool dontBroadcast)

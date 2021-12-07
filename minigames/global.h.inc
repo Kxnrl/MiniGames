@@ -154,6 +154,7 @@ Handle g_hWeaponSwitch;
 
 // vars
 Database g_hMySQL  = null;
+bool g_bHnS = false;
 
 int g_iTeam[MAXPLAYERS+1];
 int g_iUId[MAXPLAYERS+1];

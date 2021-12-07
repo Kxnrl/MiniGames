@@ -335,6 +335,12 @@ static void Games_UpdateGameHUD()
             ShowHudText(client, HUD_CHANNEL_SPEC, message);
         }
 
+    if (g_bHnS)
+    {
+        // we dont need vac in HnS
+        return;
+    }
+
     // countdown wallhack
     static bool needClear;
     if (t_iWallHackCD > 0)
@@ -813,6 +819,16 @@ void Games_PlayerHurts(int client, int victim, int hitgroup)
                 ShowHudText(target, HUD_CHANNEL_MARKER, "\n\n\n\n\n╳\n\n\n\n\n%N", victim);
 
     lastTickNum[client] = currentTick;
+}
+
+void Games_PlayerUnblind(int userid)
+{
+    int victim = GetClientOfUserId(userid);
+    if (!ClientValid(victim))
+        return;
+
+    // no teamflash
+    SetEntPropFloat(victim, Prop_Send, "m_flFlashMaxAlpha", 0.5);
 }
 
 void Games_OnPlayerBlind(DataPack pack)
