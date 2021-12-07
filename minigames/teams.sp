@@ -27,6 +27,9 @@ void Teams_OnMapStart()
 
 void Teams_OnPlayerConnected(int userid)
 {
+    if (g_bHnS)
+        return;
+
     CreateTimer(0.1, Timer_FullConnected, userid, TIMER_FLAG_NO_MAPCHANGE);
 }
 
@@ -104,6 +107,9 @@ public Action Command_Jointeam(int client, const char[] command, int argc)
 {
     if (!ClientValid(client) || argc < 1)
         return Plugin_Handled;
+
+    if (g_bHnS)
+        return Plugin_Continue;
 
     char arg[4];
     GetCmdArg(1, arg, 4);
