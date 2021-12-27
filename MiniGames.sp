@@ -181,10 +181,6 @@ public void OnPluginStart()
     // team controller
     AddCommandListener(Command_Jointeam, "jointeam");
 
-    // fix HDR/LDR crash.
-    AddCommandListener(Command_MapChange, "changelevel");
-    AddCommandListener(Command_MapChange, "map");
-
     // ent_fire global
     RegAdminCmd("sm_ef", Command_EntFire, ADMFLAG_CONVARS);
 
@@ -906,19 +902,6 @@ public Action CS_OnCSWeaponDrop(int client, int weapon)
         return Plugin_Continue;
 
     return Cvars_AllowDropTaser() ? Plugin_Continue : Plugin_Stop;
-}
-
-public Action Command_MapChange(int client, const char[] command, int args)
-{
-    for(int i = 1; i <= MaxClients; i++)
-    {
-        if (!IsClientConnected(i) || IsFakeClient(i))
-            continue;
-
-        ClientCommand(i , "retry;");
-        LogMessage("Force %L reconnect...", i);
-    }
-    return Plugin_Continue;
 }
 
 public Action Timer_Tick(Handle timer)
