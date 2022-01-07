@@ -873,7 +873,8 @@ void Games_OnPlayerBlind(DataPack pack)
             else
             {
                 // take damage
-                SlapPlayer(client, damage, true);
+                //SlapPlayer(client, damage, true);
+                SDKHooks_TakeDamage(client, client, client, 1.0, DMG_SHOCK, -1);
             }
         }
     }
