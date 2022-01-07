@@ -844,7 +844,7 @@ void Games_OnPlayerBlind(DataPack pack)
     if (victim == client)
     {
         ChatAll("%t", "flashing self", victim);
-        SlapPlayer(client, 1, true);
+        SDKHooks_TakeDamage(client, client, client, 1.0, DMG_PREVENT_PHYSICS_FORCE);
         return;
     }
     
@@ -873,8 +873,7 @@ void Games_OnPlayerBlind(DataPack pack)
             else
             {
                 // take damage
-                //SlapPlayer(client, damage, true);
-                SDKHooks_TakeDamage(client, client, client, 1.0, DMG_SHOCK, -1);
+                SDKHooks_TakeDamage(client, client, client, float(damage), DMG_PREVENT_PHYSICS_FORCE);
             }
         }
     }
