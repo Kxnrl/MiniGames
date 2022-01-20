@@ -294,8 +294,9 @@ static void Cvars_SetCvarDefault()
     sv_staminalandcost.SetFloat(     0.04, true, false);
     sv_staminarecoveryrate.SetFloat( 60.0, true, false);
 
-    sv_teamid_overhead_always_prohibit.SetBool(true,  true, false);
-    sv_show_team_equipment_prohibit.SetBool   (true,  true, false);
+    //FIXME this will make vulkan client crash?? Idk why?
+    sv_teamid_overhead_always_prohibit.SetBool(false, true, false);
+    sv_show_team_equipment_prohibit.SetBool   (false, true, false);
     sv_teamid_overhead.SetBool                (true,  true, false);
     mp_playerid.SetInt                        (2,     true, false);
 
