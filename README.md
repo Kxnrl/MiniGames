@@ -73,5 +73,5 @@ CSGO game mode -> MiniGames for mg map.
   
   
   
-### 2021 Happy new year
-![Happy new year](https://www.kxnrl.com/assets/images/2021Arlene.jpg)
+### 2022 Happy new year
+![Happy new year](https://www.kxnrl.com/assets/images/2022StarchasmNyx.jpg)
