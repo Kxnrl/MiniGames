@@ -23,6 +23,8 @@ static bool t_bLoaded[MAXPLAYERS+1];
 static bool t_bEnabled = false;
 static  int t_iRoundCredits[MAXPLAYERS+1];
 
+static bool t_Skipped;
+
 
 static GlobalForward t_OnScoreIncreased;
 
@@ -480,6 +482,8 @@ void Stats_OnRoundStart()
     // once check players
     t_bEnabled = (GetClientCount(true) >= 6 && !IsWarmup());
 
+    t_Skipped = false;
+
     for (int i = 1; i <= MaxClients; i++)
     {
         // mark client as not spawn...
@@ -505,7 +509,7 @@ void Stats_OnClientSpawn(int client)
 
 void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, const char[] weapon)
 {
-    if (!t_bEnabled)
+    if (!t_bEnabled || t_Skipped)
         return;
 
     Stats_TraceClient(attacker, assister, victim, headshot, weapon);
@@ -587,7 +591,7 @@ void Stats_OnClientDeath(int victim, int attacker, int assister, bool headshot, 
 
 void Stats_PlayerHurts(int victim, int attacker, int damage, const char[] weapon)
 {
-    if (!t_bEnabled || victim == attacker || attacker == 0)
+    if (!t_bEnabled || victim == attacker || attacker == 0 || t_Skipped)
         return;
 
     t_Session[attacker].m_iTotalDamage += damage;
@@ -600,7 +604,7 @@ void Stats_PlayerHurts(int victim, int attacker, int damage, const char[] weapon
 
 void Stats_OnWeaponFire(int attacker, const char[] weapon)
 {
-    if (IsWeaponKnife(weapon) || IsWeaponInferno(weapon) || IsWeaponDodgeBall(weapon))
+    if (IsWeaponKnife(weapon) || IsWeaponInferno(weapon) || IsWeaponDodgeBall(weapon) || t_Skipped)
         return;
 
     t_Session[attacker].m_iShots++;
@@ -613,7 +617,7 @@ void Stats_OnRoundEnd()
 
 void Stats_RoundEndDelayed()
 {
-    if (!t_bEnabled)
+    if (!t_bEnabled || t_Skipped)
         return;
 
     for(int client = 1; client <= MaxClients; ++client)
@@ -750,4 +754,10 @@ float Stats_GetRatingEx(int k, int d, int a, int s, int h, int v, int r)
     + 0.214 * (float(a) / float(r + 1))
     // 局击杀KRP
     + 0.086 * (float(k) / float(r + 1));
+}
+
+int Stats_IgnoreRoundStats()
+{
+    t_Skipped = true;
+    return 0;
 }

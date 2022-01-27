@@ -71,6 +71,8 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     CreateNative("MG_GetTotalTaserKills",   NativeCall_GetTotalTaserKills);
     CreateNative("MG_GetRanks",             NativeCall_GetRanks);
 
+    CreateNative("MG_IgnoreRoundStats",     NativeCall_IgnoreRoundStats);
+
     // Store
     MarkNativeAsOptional("Store_GetClientCredits");
     MarkNativeAsOptional("Store_SetClientCredits");
@@ -150,6 +152,11 @@ public int NativeCall_GetTotalTaserKills(Handle plugin, int numParams)
 public int NativeCall_GetRanks(Handle plugin, int numParams)
 {
     return Ranks_GetRank(GetNativeCell(1));
+}
+
+public int NativeCall_IgnoreRoundStats(Handle plugin, int numParams)
+{
+    return Stats_IgnoreRoundStats();
 }
 
 public void OnPluginStart()

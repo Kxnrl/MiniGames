@@ -36,6 +36,8 @@ native int MG_GetTotalTaserKills(int client);
 native int MG_GetRanks(int client);
 native int MG_GetLevel(int client);
 
+native void MG_IgnoreRoundStats();
+
 forward bool MG_OnRandomTeam(int       terrorists, int       counterTerrorists, ArrayList array_players); // team_t;
 forward bool MG_OnVacEnabled(int Alive_terrorists, int Alive_counterTerrorists);
 forward void MG_OnScoreIncreased(int client, int score);
