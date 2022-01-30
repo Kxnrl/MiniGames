@@ -646,6 +646,20 @@ Action Games_OnClientSpawn(Handle timer, int userid)
     return Plugin_Stop;
 }
 
+void Games_OnClientDeath(int victim, int killer, int assister)
+{
+    t_iScoreBoard[victim][SB_Death]++;
+    t_iScoreBoard[killer][SB_Kill]++;
+    t_iScoreBoard[assister][SB_Assist]++;
+
+    if (killer)
+    AdjustKills(killer);
+    if (victim)
+    AdjustDeath(victim);
+    if (assister)
+    AdjustAssist(assister);
+}
+
 void Games_OnRoundStarted()
 {
     // mark

@@ -785,6 +785,7 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
     char weapon[32];
     event.GetString("weapon", weapon, 32, "");
 
+    Games_OnClientDeath(client, attacker, assister);
     Stats_OnClientDeath(client, attacker, assister, headshot, weapon);
     Hooks_UpdateState();
 }
