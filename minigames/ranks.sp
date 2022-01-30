@@ -125,7 +125,7 @@ public int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int 
         g_hMySQL.Query(RankDetailsCallback, m_szQuery, GetClientUserId(param1));
     }
     else if (action == MenuAction_Cancel && param2 == MenuCancel_ExitBack)
-        Command_Main(param1, param2);
+        FakeClientCommandEx(param1, "sm_mg");
 }
 
 public void RankDetailsCallback(Database db, DBResultSet results, const char[] error, int userid)

@@ -14,6 +14,15 @@
 /*                                                                */
 /******************************************************************/
 
+enum /* scoreboard_t */
+{
+    SB_Kill,
+    SB_Death,
+    SB_Assist,
+    SB_MaxAttributes
+}
+
+static StringMap t_Storage;
 
 static int  t_iWallHackCD = -1;
 static int  iLastSpecTarget[MAXPLAYERS+1];
@@ -25,6 +34,8 @@ static int t_iRoundNumber = 0;
 static bool t_bRoundEnding = false;
 static bool t_bPressed[2048];
 static bool bBombPlanted;
+
+static int t_iScoreBoard[MAXPLAYERS][SB_MaxAttributes];
 
 static Handle t_kOCookies[kO_MaxOptions];
 static char   t_szCookies[kO_MaxOptions][] = {
@@ -47,6 +58,8 @@ void Games_OnPluginStart()
     RegConsoleCmd("buyammo2",   Command_Main);
     RegConsoleCmd("sm_hide",    Command_Hide);
     RegConsoleCmd("sm_options", Command_Options);
+
+    t_Storage = new StringMap();
 }
 
 void Games_RegisterCookies()
@@ -57,7 +70,7 @@ void Games_RegisterCookies()
     }
 }
 
-public Action Command_Main(int client, int args)
+static Action Command_Main(int client, int args)
 {
     if (!ClientValid(client))
         return Plugin_Handled;
@@ -96,7 +109,7 @@ public Action Command_Main(int client, int args)
     return Plugin_Handled;
 }
 
-public int MenuHandler_MenuMain(Menu menu, MenuAction action, int client, int slot)
+static int MenuHandler_MenuMain(Menu menu, MenuAction action, int client, int slot)
 {
     if (action == MenuAction_End)
         delete menu;
@@ -113,7 +126,7 @@ public int MenuHandler_MenuMain(Menu menu, MenuAction action, int client, int sl
     }
 }
 
-public Action Command_Options(int client, int args)
+static Action Command_Options(int client, int args)
 {
     if (!ClientValid(client))
         return Plugin_Handled;
@@ -158,7 +171,7 @@ public Action Command_Options(int client, int args)
     return Plugin_Handled;
 }
 
-public int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int slot)
+static int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int slot)
 {
     if (action == MenuAction_End)
         delete menu;
@@ -203,7 +216,7 @@ static void Games_SetOptions(int client, int option)
     }
 }
 
-public Action Command_Hide(int client, int args)
+static Action Command_Hide(int client, int args)
 {
     Games_SetOptions(client, kO_Transmit);
     return Plugin_Handled;
@@ -215,7 +228,7 @@ void Games_OnMapStart()
     CreateTimer(0.2, Games_TickInterval, _, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public Action Games_TickInterval(Handle timer)
+static Action Games_TickInterval(Handle timer)
 {
     Games_UpdateGameHUD();
     Games_CleanupWeapon();
@@ -381,6 +394,8 @@ static void Games_UpdateGameHUD()
 void Games_OnMapEnd()
 {
     delete t_tRoundTimer;
+
+    t_Storage.Clear();
 }
 
 // reset ammo and slay.
@@ -454,6 +469,9 @@ void Games_OnClientConnected(int client)
 {
     t_szSpecHudContent[client][0] = '\0';
 
+    for (int i = 0; i < SB_MaxAttributes; i++)
+        t_iScoreBoard[client][i] = 0;
+
     for(int i = 0; i < kO_MaxOptions; ++i)
         g_kOptions[client][i] = false;
 }
@@ -464,6 +482,12 @@ void Games_OnClientCookiesLoaded(int client)
     {
         g_kOptions[client][i] = Opts_GetOptBool(client, t_szCookies[i], false);
     }
+
+    char steamid[20];
+    if (!GetClientAuthId(client, AuthId_SteamID64, steamid, 20))
+        return;
+
+    t_Storage.GetArray(steamid, t_iScoreBoard[client], sizeof(t_iScoreBoard[]));
 }
 
 void Games_OnClientCookiesCached(int client)
@@ -478,6 +502,15 @@ void Games_OnClientCookiesCached(int client)
         GetClientCookie(client, t_kOCookies[i], buffer, 4);
         g_kOptions[client][i] = (StringToInt(buffer) == 1);
     }
+}
+
+void Games_OnClientDisconnect(int client)
+{
+    char steamid[20];
+    if (!GetClientAuthId(client, AuthId_SteamID64, steamid, 20))
+        return;
+
+    t_Storage.SetArray(steamid, t_iScoreBoard[client], sizeof(t_iScoreBoard[]));
 }
 
 void Games_OnPlayerRunCmd(int client, int& buttons, int tickcount)
@@ -562,7 +595,7 @@ static void Games_LimitPreSpeed(int client, bool bOnGround, float curVelvec[3])
         IsOnGround[client] = false;
 }
 
-public Action Games_OnClientSpawn(Handle timer, int userid)
+Action Games_OnClientSpawn(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
     
@@ -653,7 +686,7 @@ public void Games_HudPosition(QueryCookie cookie, int client, ConVarQueryResult 
     bVACHudPosition[client] = view_as<bool>(val);
 }
 
-public Action Games_RoundTimer(Handle timer)
+static Action Games_RoundTimer(Handle timer)
 {
     // wallhack timer
     if (t_iWallHackCD > 0 && --t_iWallHackCD == 0)
@@ -890,6 +923,17 @@ void Games_RanderColor()
     }
 }
 
+void Games_ScoreBoards()
+{
+    for(int client = 1; client <= MaxClients; ++client)
+    if (IsClientInGame(client))
+    {
+        AdjustKills(client);
+        AdjustDeath(client);
+        AdjustAssist(client);
+    }
+}
+
 void RenderPlayerColor(int client)
 {
     Action res = Plugin_Continue;
@@ -916,6 +960,28 @@ void RenderPlayerColor(int client)
         // set to full-chain
         SetEntityRenderColor(client, 255, 255, 255, 255);
     }
+}
+
+void AdjustKills(int client)
+{
+    int old = GetEntProp(client, Prop_Data, "m_iFrags");
+    if (old != t_iScoreBoard[client][SB_Kill])
+        SetEntProp(client, Prop_Data, "m_iFrags", t_iScoreBoard[client][SB_Kill]);
+}
+
+void AdjustDeath(int client)
+{
+    int val = GetEntProp(client, Prop_Data, "m_iDeaths");
+
+    if (val != t_iScoreBoard[client][SB_Death])
+        SetEntProp(client, Prop_Data, "m_iDeaths", t_iScoreBoard[client][SB_Death]);
+}
+
+void AdjustAssist(int client)
+{
+    int val = CS_GetClientAssists(client);
+    if (val != t_iScoreBoard[client][SB_Assist])
+        CS_SetClientAssists(client, t_iScoreBoard[client][SB_Assist]);
 }
 
 /*******************************************************/

@@ -43,7 +43,9 @@
 #include <geoip2>            //https://github.com/Kxnrl/GeoIP2
 #include <TransmitManager>   //https://github.com/Kxnrl/sm-ext-TransmitManager
 #include <MovementManager>   //https://github.com/Kxnrl/sm-ext-Movement
+#undef AUTOLOAD_EXTENSIONS
 #include <clientprefs>
+#define AUTOLOAD_EXTENSIONS
 #define REQUIRE_EXTENSIONS
 
 // header
@@ -623,6 +625,7 @@ public void OnClientDisconnect(int client)
     // fire to module
     Ranks_OnClientDisconnect(client);
     Stats_OnClientDisconnect(client);
+    Games_OnClientDisconnect(client);
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
@@ -921,6 +924,7 @@ public Action Timer_Tick(Handle timer)
 public Action Timer_Interval(Handle timer)
 {
     Games_RanderColor();
+    Games_ScoreBoards();
 
     return Plugin_Continue;
 }

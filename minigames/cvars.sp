@@ -345,6 +345,10 @@ static void Cvars_EnforceOptions()
     ConVar_Easy_SetInt("sv_force_transmit_ents",    0, true, false);
     ConVar_Easy_SetInt("sv_occlude_players",        1, true, false);
 
+    // back up var 
+    ConVar_Easy_SetInt("mp_backup_round_auto",      0, true, false);
+    ConVar_Easy_SetStr("mp_backup_round_file",     "", true, false);
+
     // store module
     ConVar_Easy_SetInt("store_thirdperson_enabled", 0, true, false);
 }
