@@ -14,7 +14,6 @@
         "include/banning.inc": true,
         "include/basecomm.inc": true,
         "include/bitbuffer.inc": true,
-        "include/clientprefs.inc": true,
         "include/clients.inc": true,
         "include/commandfilters.inc": true,
         "include/commandline.inc": true,
