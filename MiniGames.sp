@@ -217,6 +217,7 @@ public void OnPluginStart()
     HookEvent("cs_win_panel_match",   Event_WinPanel,         EventHookMode_Post);
     HookEvent("grenade_thrown",       Event_GrenadeThrown,    EventHookMode_Post);
     HookEvent("bomb_planted",         Event_BombPlanted,      EventHookMode_Post);
+    HookEvent("decoy_started",        Event_DecoyStarted,     EventHookMode_Post);
 
     // for noblock
     g_offsetNoBlock = FindSendPropInfo("CBaseEntity", "m_CollisionGroup");
@@ -905,6 +906,19 @@ public void Event_BombPlanted(Event event, const char[] name, bool dontBroadcast
     Games_OnBombPlanted();
 }
 
+public void Event_DecoyStarted(Event event, const char[] name, bool dontBroadcast)
+{
+    int entity = event.GetInt("entityid", -1);
+    if (entity > MaxClients)
+        RemoveEntity(entity);
+}
+
+public Action CS_OnBuyCommand(int client, const char[] weapon)
+{
+    // remove decoy
+    return strcmp(weapon, "decoy") == 0 ? Plugin_Handled : Plugin_Continue;
+}
+
 public Action CS_OnCSWeaponDrop(int client, int weapon)
 {
     char classname[32];
@@ -1017,7 +1031,8 @@ void Hooks_UpdateState()
 // by Kyle
 void Hooks_OnEntityCreated(int entity, const char[] classname)
 {
-    if (StrContains(classname, "_projectile") > 0 && (classname[0] == 'd' || classname[0] == 's'))
+    // do decoy only
+    if ((classname[0] == 'd' /*|| classname[0] == 's'*/) && StrContains(classname, "_projectile") > 0)
         SDKHook(entity, SDKHook_SpawnPost, Hooks_OnEntitySpawnedPost);
 }
 
