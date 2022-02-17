@@ -42,7 +42,7 @@ void Stats_OnPluginStart()
     t_OnPublicMessages = new GlobalForward("MG_OnPublicMessages", ET_Hook,   Param_Cell, Param_Cell, Param_String);
 }
 
-public Action Command_Stats(int client, int args)
+static Action Command_Stats(int client, int args)
 {
     if (!client)
         return Plugin_Handled;
@@ -304,7 +304,7 @@ static void Stats_TraceClient(int killer, int assister, int victim, bool headsho
     MySQL_VoidQuery(m_szQuery);
 }
 
-public void LoadUserCallback(Database db, DBResultSet results, const char[] error, int userid)
+static void LoadUserCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
     if (!client)
@@ -354,7 +354,7 @@ public void LoadUserCallback(Database db, DBResultSet results, const char[] erro
     CreateTimer(15.0, Timer_LoadClientDelayed, userid, TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public Action Stats_ReloadClientData(Handle timer, int userid)
+static Action Stats_ReloadClientData(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
     if (!client)
@@ -375,7 +375,7 @@ static void Stats_CreateClient(int client)
     g_hMySQL.Query(CreateClientCallback, m_szQuery, GetClientUserId(client), DBPrio_High);
 }
 
-public void CreateClientCallback(Database db, DBResultSet results, const char[] error, int userid)
+static void CreateClientCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
     if (!client)
@@ -687,7 +687,7 @@ static void MySQL_VoidQuery(const char[] m_szQuery)
     g_hMySQL.Query(MySQL_VoidQueryCallback, m_szQuery, pack, DBPrio_Low);
 }
 
-public void MySQL_VoidQueryCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
+static void MySQL_VoidQueryCallback(Database db, DBResultSet results, const char[] error, DataPack pack)
 {
     if (results == null || error[0])
     {

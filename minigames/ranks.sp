@@ -32,7 +32,7 @@ void Ranks_OnPluginStart()
     CreateTimer(1200.0, Timer_RefreshRank, _, TIMER_REPEAT);
 }
 
-public Action Timer_RefreshRank(Handle timer)
+static Action Timer_RefreshRank(Handle timer)
 {
     Ranks_BuildRankCache();
     return Plugin_Stop;
@@ -113,7 +113,7 @@ public void RankCacheCallback(Database db, DBResultSet results, const char[] err
     }
 }
 
-public int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int param2)
+static int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int param2)
 {
     // loading details
     if (action == MenuAction_Select)
@@ -130,7 +130,7 @@ public int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int 
     return 0;
 }
 
-public void RankDetailsCallback(Database db, DBResultSet results, const char[] error, int userid)
+static void RankDetailsCallback(Database db, DBResultSet results, const char[] error, int userid)
 {
     int client = GetClientOfUserId(userid);
     if (!client)
@@ -204,7 +204,7 @@ void DisplayRankDetails(int client, const char[] username, stats_t data)
     panel.Send(client, MenuHandler_RankDetails, 15);
 }
 
-public int MenuHandler_RankDetails(Menu menu, MenuAction action, int param1, int param2)
+static int MenuHandler_RankDetails(Menu menu, MenuAction action, int param1, int param2)
 {
     if (action == MenuAction_End)
         delete menu;
@@ -216,7 +216,7 @@ public int MenuHandler_RankDetails(Menu menu, MenuAction action, int param1, int
     return 0;
 }
 
-public Action Command_Rank(int client, int args)
+static Action Command_Rank(int client, int args)
 {
     if (!client)
         return Plugin_Handled;

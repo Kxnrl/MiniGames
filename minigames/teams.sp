@@ -33,7 +33,7 @@ void Teams_OnPlayerConnected(int userid)
     CreateTimer(0.1, Timer_FullConnected, userid, TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public Action Timer_FullConnected(Handle timer, int userid)
+static Action Timer_FullConnected(Handle timer, int userid)
 {
     int client = GetClientOfUserId(userid);
     if (!ClientValid(client) || g_iTeam[client] >= TEAM_OB)
@@ -62,7 +62,7 @@ void Teams_OnRoundEnd()
         t_SwitchTimer = CreateTimer(1.5, Teams_RandomTeam, _, TIMER_FLAG_NO_MAPCHANGE);
 }
 
-public Action Teams_RandomTeam(Handle timer)
+static Action Teams_RandomTeam(Handle timer)
 {
     int cts, tes;
     ValidateTeamPlayers(cts, tes);
@@ -82,7 +82,7 @@ public Action Teams_RandomTeam(Handle timer)
     return Plugin_Stop;
 }
 
-public Action Timer_ChangeTeam(Handle timer)
+static Action Timer_ChangeTeam(Handle timer)
 {
     if (t_iSwitchCD < 0)
     {
@@ -103,7 +103,7 @@ public Action Timer_ChangeTeam(Handle timer)
     return Plugin_Continue;
 }
 
-public Action Command_Jointeam(int client, const char[] command, int argc)
+Action Command_Jointeam(int client, const char[] command, int argc)
 {
     if (!ClientValid(client) || argc < 1)
         return Plugin_Handled;

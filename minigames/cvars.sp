@@ -179,12 +179,12 @@ void Cvars_OnPluginStart()
     CreateAllMapConfigs();
 }
 
-public void Cvars_OnFFAChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+static void Cvars_OnFFAChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
     Hooks_UpdateState();
 }
 
-public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+static void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
     mp_ct_default_melee.SetString("", true, false);
     mp_ct_default_primary.SetString("", true, false);
@@ -220,7 +220,7 @@ public void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     }
 }
 
-public void Cvars_OnLateSpawnChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+static void Cvars_OnLateSpawnChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
     if (convar == mp_freezetime)
     {
@@ -704,7 +704,7 @@ void Cvars_OnRoundStart()
     }
 }
 
-public Action Command_SetCvar(int args)
+static Action Command_SetCvar(int args)
 {
     if (args != 2)
     {
@@ -723,7 +723,7 @@ public Action Command_SetCvar(int args)
     return Plugin_Handled;
 }
 
-public Action MuteConVarChanged(Event event, const char[] name, bool dontBroadcast)
+static Action MuteConVarChanged(Event event, const char[] name, bool dontBroadcast)
 {
     event.BroadcastDisabled = true;
     return Plugin_Changed;

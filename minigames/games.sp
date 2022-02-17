@@ -117,14 +117,14 @@ static int MenuHandler_MenuMain(Menu menu, MenuAction action, int client, int sl
     {
         switch(slot)
         {
-            case 0: Command_Rank(   client, slot);
-            case 1: Command_Stats(  client, slot);
+            case 0: FakeClientCommandEx(client, "sm_rank");
+            case 1: FakeClientCommandEx(client, "sm_stats");
             case 2: Command_Options(client, slot);
             case 3: FakeClientCommandEx(client, "sm_mapmusic");
             case 4: FakeClientCommandEx(client, "sm_store");
         }
     }
-    return 0
+    return 0;
 }
 
 static Action Command_Options(int client, int args)
@@ -702,7 +702,7 @@ void Games_OnRoundStarted()
         t_bPressed[button] = false;
 }
 
-public void Games_HudPosition(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
+static void Games_HudPosition(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
 {
     int val = StringToInt(cvarValue);
     bVACHudPosition[client] = view_as<bool>(val);
