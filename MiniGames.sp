@@ -938,6 +938,7 @@ public Action Timer_Tick(Handle timer)
 
 public Action Timer_Interval(Handle timer)
 {
+    Stats_QueueClient();
     Games_RanderColor();
     Games_ScoreBoards();
 

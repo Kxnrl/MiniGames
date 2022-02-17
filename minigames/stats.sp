@@ -23,17 +23,23 @@ static bool t_bLoaded[MAXPLAYERS+1];
 static bool t_bEnabled = false;
 static  int t_iRoundCredits[MAXPLAYERS+1];
 
+static ArrayList t_aQueue;
+
 static bool t_Skipped;
 
 
 static GlobalForward t_OnScoreIncreased;
+static GlobalForward t_OnPublicMessages;
 
 
 void Stats_OnPluginStart()
 {
     RegConsoleCmd("sm_stats", Command_Stats);
 
+    t_aQueue = new ArrayList();
+
     t_OnScoreIncreased = new GlobalForward("MG_OnScoreIncreased", ET_Ignore, Param_Cell, Param_Cell);
+    t_OnPublicMessages = new GlobalForward("MG_OnPublicMessages", ET_Hook,   Param_Cell, Param_Cell, Param_String);
 }
 
 public Action Command_Stats(int client, int args)
@@ -129,6 +135,19 @@ void Stats_OnClientDisconnect(int client)
     }
     
     Stats_SaveClient(client);
+}
+
+void Stats_QueueClient()
+{
+    if (t_aQueue.Length == 0)
+        return;
+
+    int userid = t_aQueue.Get(0);
+    t_aQueue.Erase(0);
+
+    int client = GetClientOfUserId(userid);
+    if (client)
+        Stats_PublicMessage(client);
 }
 
 /*******************************************************/
@@ -332,6 +351,7 @@ public void LoadUserCallback(Database db, DBResultSet results, const char[] erro
     t_bLoaded[client] = true;
 
     Ranks_OnClientLoaded(client);
+    CreateTimer(15.0, Timer_LoadClientDelayed, userid, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 public Action Stats_ReloadClientData(Handle timer, int userid)
@@ -378,6 +398,9 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
     t_bLoaded[client] = true;
 
     Ranks_OnClientLoaded(client);
+
+    // don't action for new player
+    Stats_PublicMessage(client);
 }
 
 void Stats_PublicMessage(int client, bool disconnected = false)
@@ -391,6 +414,21 @@ void Stats_PublicMessage(int client, bool disconnected = false)
     // skip admin print
     if (CheckCommandAccess(client, "sm_ef", ADMFLAG_CONVARS, false))
         return;
+
+    // check forward
+    Action res = Plugin_Continue;
+    char prepare[128]; // extra info
+    Call_StartForward(t_OnPublicMessages);
+    Call_PushCell(client);
+    Call_PushCell(disconnected);
+    Call_PushStringEx(prepare, 128, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+    Call_Finish(res);
+    if (res >= Plugin_Handled)
+        return;
+
+    char buffer[128];
+    if (res == Plugin_Changed)
+        strcopy(buffer, 128, prepare);
 
     if (g_extGeoIP2)
     {
@@ -413,6 +451,7 @@ void Stats_PublicMessage(int client, bool disconnected = false)
                     Ranks_GetRank(client), 
                     Stats_GetRating(client),
                     t_StatsDB[client].m_iTotalOnline/3600,
+                    buffer,
                     geo[0],
                     geo[1]);
         }
@@ -427,6 +466,7 @@ void Stats_PublicMessage(int client, bool disconnected = false)
                     Stats_GetHSP(client),
                     t_StatsDB[client].m_iTotalScores,
                     t_StatsDB[client].m_iTotalOnline/3600,
+                    buffer,
                     geo[0],
                     geo[1]);
         }
@@ -441,7 +481,8 @@ void Stats_PublicMessage(int client, bool disconnected = false)
                     disconnected ? "disconnect" : "join",
                     Ranks_GetRank(client), 
                     Stats_GetRating(client),
-                    t_StatsDB[client].m_iTotalOnline/3600);
+                    t_StatsDB[client].m_iTotalOnline/3600,
+                    buffer);
         }
         else
         {
@@ -453,7 +494,8 @@ void Stats_PublicMessage(int client, bool disconnected = false)
                     Stats_GetKDA(client),
                     Stats_GetHSP(client),
                     t_StatsDB[client].m_iTotalScores,
-                    t_StatsDB[client].m_iTotalOnline/3600);
+                    t_StatsDB[client].m_iTotalOnline/3600,
+                    buffer);
         }
         
     }
@@ -681,6 +723,20 @@ static void AddScore(int client, int score)
     Call_PushCell(client);
     Call_PushCell(score);
     Call_Finish();
+}
+
+static Action Timer_LoadClientDelayed(Handle timer, int userid)
+{
+    int client = GetClientOfUserId(userid);
+    if (client)
+    {
+        //Stats_PublicMessage(client);
+        
+        // Enqueue this
+        t_aQueue.Push(userid);
+    }
+
+    return Plugin_Stop;
 }
 
 /*******************************************************/

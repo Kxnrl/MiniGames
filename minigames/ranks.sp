@@ -252,8 +252,6 @@ void Ranks_OnClientLoaded(int client)
         t_iRank[client] = t_aRankCache.Length + 1;
     else
         t_iRank[client] = rank;
-
-    Stats_PublicMessage(client);
 }
 
 int Ranks_GetRank(int client)

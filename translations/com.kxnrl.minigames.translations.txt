@@ -86,30 +86,30 @@
 
     "public message"
     {
-        "#format"   "{1:N},{2:t},{3:d},{4:.2f},{5:.2f},{6:d},{7:d}"
-        "en"        "{green} {1} {normal}{2}the game, {darkblue}Rank:{green}{3}  {darkblue}KD: {green}{4}  {darkblue}HSRatio: {green}{5}{normal}%%  {darkblue}Scores: {green}{6}{normal}p  {darkblue}Onlines: {green}{7}{normal}hours"
-        "chi"       "{green} {1} {normal}{2}了游戏, {darkblue}排名: {green}{3}  {darkblue}杀亡比: {green}{4}  {darkblue}爆头率: {green}{5}{normal}%%  {darkblue}得分: {green}{6}  {darkblue}在线: {green}{7}{normal}小时"
+        "#format"   "{1:N},{2:t},{3:d},{4:.2f},{5:.2f},{6:d},{7:d},{8:s}"
+        "en"        "{green} {1} {normal}{2}the game, {darkblue}Rank:{green}{3} {darkblue}KD: {green}{4} {darkblue}HSRatio: {green}{5}{normal}%% {darkblue}Scores: {green}{6}{normal}p {darkblue}Onlines: {green}{7}{normal}hours {white}{8}"
+        "chi"       "{green} {1} {normal}{2}了游戏, {darkblue}排名: {green}{3} {darkblue}杀亡比: {green}{4} {darkblue}爆头率: {green}{5}{normal}%% {darkblue}得分: {green}{6} {darkblue}在线: {green}{7}{normal}小时 {white}{8}"
     }
 
     "public message rating"
     {
-        "#format"   "{1:N},{2:t},{3:d},{4:.2f},{5:d}"
-        "en"        "{green} {1} {normal}{2} the game, {darkblue}Rank: {green}{3} {darkblue} Rating: {green}{4} {darkblue} Onlines: {green}{5}{normal}hours"
-        "chi"       "{green} {1} {normal}{2}了游戏, {darkblue}排名: {green}{3}  {darkblue} Rating: {green}{4} {darkblue} 在线: {green}{5}{normal}小时"
+        "#format"   "{1:N},{2:t},{3:d},{4:.2f},{5:d},{6:s}"
+        "en"        "{green} {1} {normal}{2} the game, {darkblue}Rank: {green}{3} {darkblue} Rating: {green}{4} {darkblue} Onlines: {green}{5}{normal}hours {white}{6}"
+        "chi"       "{green} {1} {normal}{2}了游戏, {darkblue}排名: {green}{3} {darkblue} Rating: {green}{4} {darkblue} 在线: {green}{5}{normal}小时 {white}{6}"
     }
 
     "public message with geoip"
     {
-        "#format"   "{1:N},{2:t},{3:d},{4:.2f},{5:.2f},{6:d},{7:d},{8:s},{9:s}"
-        "en"        "{green} {1} {normal}{2}the game, {darkblue}Rank:{green}{3}  {darkblue}KD: {green}{4}  {darkblue}HSRatio: {green}{5}{normal}%%  {darkblue}Scores: {green}{6}{normal}p  {darkblue}Onlines: {green}{7}{normal}hours  {darkblue}From: {green}{9}, {8}"
-        "chi"       "{green} {1} {normal}{2}了游戏, {darkblue}排名: {green}{3}  {darkblue}杀亡比: {green}{4}  {darkblue}爆头率: {green}{5}{normal}%%  {darkblue}得分: {green}{6}  {darkblue}在线: {green}{7}{normal}小时  {darkblue}来自: {green}{8} {9}"
+        "#format"   "{1:N},{2:t},{3:d},{4:.2f},{5:.2f},{6:d},{7:d},{8:s},{9:s},{10:s}"
+        "en"        "{green} {1} {normal}{2}the game, {darkblue}Rank:{green}{3} {darkblue}KD: {green}{4} {darkblue}HSRatio: {green}{5}{normal}%% {darkblue}Scores: {green}{6}{normal}p {darkblue}Onlines: {green}{7}{normal}hours {white}{8} {darkblue}From: {green}{10}, {9}"
+        "chi"       "{green} {1} {normal}{2}了游戏, {darkblue}排名: {green}{3} {darkblue}杀亡比: {green}{4} {darkblue}爆头率: {green}{5}{normal}%% {darkblue}得分: {green}{6} {darkblue}在线: {green}{7}{normal}小时 {white}{8} {darkblue}来自: {green}{9} {10}"
     }
 
     "public message rating with geoip"
     {
-        "#format"   "{1:N},{2:t},{3:d},{4:.2f},{5:d},{6:s},{7:s}"
-        "en"        "{green} {1} {normal}{2} the game, {darkblue}Rank: {green}{3} {darkblue} Rating: {green}{4} {darkblue} Onlines: {green}{5}{normal}hours {darkblue} From {green}{6}, {7}"
-        "chi"       "{green} {1} {normal}{2}了游戏, {darkblue}排名: {green}{3}  {darkblue} 技巧分: {green}{4} {darkblue} 在线: {green}{5}{normal}小时 {darkblue} 来自 {green}{6} {7}"
+        "#format"   "{1:N},{2:t},{3:d},{4:.2f},{5:d},{6:s},{7:s},{8:s}"
+        "en"        "{green} {1} {normal}{2} the game, {darkblue}Rank: {green}{3} {darkblue} Rating: {green}{4} {darkblue} Onlines: {green}{5}{normal}hours {darkblue} {white}{6} From {green}{8}, {7}"
+        "chi"       "{green} {1} {normal}{2}了游戏, {darkblue}排名: {green}{3} {darkblue} 技巧分: {green}{4} {darkblue} 在线: {green}{5}{normal}小时 {darkblue} {white}{6} 来自 {green}{7} {8}"
     }
 
     "join"

@@ -400,6 +400,11 @@ stock int RandomInt(int min, int max)
     return RoundToCeil(float(random) / (float(2147483647) / float(max - min + 1))) + min - 1;
 }
 
+stock float RandomFloat(float min = 0.0, float max = 5201314.0)
+{
+    return (GetURandomFloat() * (max  - min)) + min;
+}
+
 stock void ConVar_Easy_SetInt(const char[] name, int val, bool replicate = true, bool notify = false)
 {
     ConVar cvar = FindConVar(name);
