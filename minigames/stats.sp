@@ -405,15 +405,24 @@ public void CreateClientCallback(Database db, DBResultSet results, const char[] 
 
 void Stats_PublicMessage(int client, bool disconnected = false)
 {
+    if (g_smxCookies)
+    {
+        if (!Opts_IsClientLoaded(client))
+        {
+            t_aQueue.Push(GetClientUserId(client));
+            return;
+        }
+
+        // skip admin print
+        if (Opts_GetOptBool(client, ADMIN_PRINT_CHECK, false) && CheckCommandAccess(client, "sm_ef", ADMFLAG_CONVARS, false))
+            return;
+    }
+
     if (!disconnected)
     {
         // private message
-        CreateTimer(6.88, Stats_PrivateMessage, GetClientUserId(client), TIMER_FLAG_NO_MAPCHANGE);
+        Stats_PrivateMessage(client);
     }
-
-    // skip admin print
-    if (CheckCommandAccess(client, "sm_ef", ADMFLAG_CONVARS, false))
-        return;
 
     // check forward
     Action res = Plugin_Continue;
@@ -501,19 +510,13 @@ void Stats_PublicMessage(int client, bool disconnected = false)
     }
 }
 
-public Action Stats_PrivateMessage(Handle timer, int userid)
+static void Stats_PrivateMessage(int client)
 {
-    int client = GetClientOfUserId(userid);
-    if (!ClientValid(client))
-        return Plugin_Stop;
-
     Chat(client, "\x04*****************************************");
     Chat(client, "\x04%T", "private message line 1", client);
     Chat(client, "\x05%T", "private message line 2", client, PI_VERSION, PI_AUTHOR);
     Chat(client, "\x05%T", "private message line 3", client);
     Chat(client, "\x05%T", "private message line 4", client, PI_URL);
-
-    return Plugin_Stop;
 }
 
 /*******************************************************/
