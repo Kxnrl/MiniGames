@@ -785,7 +785,7 @@ void Games_OnBombPlanted()
         if (GetClientTeam(client) == TEAM_CT)
         {
             // give defuser
-            GivePlayerItem(client, "item_defuser");
+            SetEntProp(client, Prop_Send, "m_bHasDefuser", true);
         }
     }
 }
