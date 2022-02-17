@@ -202,7 +202,7 @@ static void Games_SetOptions(int client, int option)
     {
         Opts_SetOptBool(client, t_szCookies[option], g_kOptions[client][option]);
     }
-    else if (g_smxCookies)
+    else if (g_extCookies)
     {
         SetClientCookie(client, t_kOCookies[option], g_kOptions[client][option] ? "1" : "0");
     }
@@ -502,6 +502,12 @@ void Games_OnClientCookiesCached(int client)
         GetClientCookie(client, t_kOCookies[i], buffer, 4);
         g_kOptions[client][i] = (StringToInt(buffer) == 1);
     }
+
+    char steamid[20];
+    if (!GetClientAuthId(client, AuthId_SteamID64, steamid, 20))
+        return;
+
+    t_Storage.GetArray(steamid, t_iScoreBoard[client], sizeof(t_iScoreBoard[]));
 }
 
 void Games_OnClientDisconnect(int client)
