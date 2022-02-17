@@ -124,6 +124,7 @@ static int MenuHandler_MenuMain(Menu menu, MenuAction action, int client, int sl
             case 4: FakeClientCommandEx(client, "sm_store");
         }
     }
+    return 0
 }
 
 static Action Command_Options(int client, int args)
@@ -192,6 +193,7 @@ static int MenuHandler_MenuOptions(Menu menu, MenuAction action, int client, int
         }
         FakeClientCommandEx(client, "sm_options");
     }
+    return 0;
 }
 
 static void Games_SetOptions(int client, int option)

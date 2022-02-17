@@ -126,6 +126,8 @@ public int MenuHandler_RankingTop(Menu menu, MenuAction action, int param1, int 
     }
     else if (action == MenuAction_Cancel && param2 == MenuCancel_ExitBack)
         FakeClientCommandEx(param1, "sm_mg");
+
+    return 0;
 }
 
 public void RankDetailsCallback(Database db, DBResultSet results, const char[] error, int userid)
@@ -211,6 +213,7 @@ public int MenuHandler_RankDetails(Menu menu, MenuAction action, int param1, int
         t_RankMenu.SetTitle("%T\n ", "top 99 title", param1);
         t_RankMenu.Display(param1, 60);
     }
+    return 0;
 }
 
 public Action Command_Rank(int client, int args)
