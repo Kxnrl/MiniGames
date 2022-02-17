@@ -425,8 +425,14 @@ void Stats_PublicMessage(int client, bool disconnected = false)
     Call_PushCell(disconnected);
     Call_PushStringEx(prepare, 128, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
     Call_Finish(res);
-    if (res >= Plugin_Handled)
+    if (res == Plugin_Stop)
         return;
+
+    if (res == Plugin_Handled)
+    {
+        t_aQueue.Push(GetClientUserId(client));
+        return;
+    }
 
     char buffer[128];
     if (res == Plugin_Changed)
