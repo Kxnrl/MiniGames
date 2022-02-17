@@ -405,17 +405,10 @@ static void CreateClientCallback(Database db, DBResultSet results, const char[] 
 
 void Stats_PublicMessage(int client, bool disconnected = false)
 {
-    if (g_smxCookies)
+    if (g_smxCookies && !Opts_IsClientLoaded(client))
     {
-        if (!Opts_IsClientLoaded(client))
-        {
-            t_aQueue.Push(GetClientUserId(client));
-            return;
-        }
-
-        // skip admin print
-        if (Opts_GetOptBool(client, ADMIN_PRINT_CHECK, false) && CheckCommandAccess(client, "sm_ef", ADMFLAG_CONVARS, false))
-            return;
+        t_aQueue.Push(GetClientUserId(client));
+        return;
     }
 
     if (!disconnected)

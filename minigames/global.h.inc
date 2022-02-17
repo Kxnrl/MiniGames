@@ -42,8 +42,6 @@ public Plugin myinfo =
 
 #define ADDON_DEFUSER (1<<5)
 
-#define ADMIN_PRINT_CHECK "Global.Commands.Stealth"
-
 // enum
 enum struct stats_t
 {
