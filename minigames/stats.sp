@@ -419,11 +419,11 @@ void Stats_PublicMessage(int client, bool disconnected = false)
 
     // check forward
     Action res = Plugin_Continue;
-    char prepare[128]; // extra info
+    char prepare[256]; // extra info
     Call_StartForward(t_OnPublicMessages);
     Call_PushCell(client);
     Call_PushCell(disconnected);
-    Call_PushStringEx(prepare, 128, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
+    Call_PushStringEx(prepare, 256, SM_PARAM_STRING_UTF8|SM_PARAM_STRING_COPY, SM_PARAM_COPYBACK);
     Call_Finish(res);
     if (res == Plugin_Stop)
         return;
@@ -434,9 +434,9 @@ void Stats_PublicMessage(int client, bool disconnected = false)
         return;
     }
 
-    char buffer[128];
+    char buffer[256];
     if (res == Plugin_Changed)
-        strcopy(buffer, 128, prepare);
+        strcopy(buffer, 256, prepare);
 
     if (g_extGeoIP2)
     {
