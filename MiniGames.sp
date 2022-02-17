@@ -992,6 +992,15 @@ void Hooks_UpdateState()
     if (!g_extTransmitManager)
         return;
 
+    // performance
+    int tick = GetGameTickCount();
+    static int last;
+
+    if (tick == last)
+        return;
+
+    last = tick;
+
     if (!mg_transmitblock.BoolValue || mp_teammates_are_enemies.BoolValue || Games_IsRoundEnding())
     {
         // force all transmit state
