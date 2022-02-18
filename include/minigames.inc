@@ -23,7 +23,7 @@ native int MG_GetTotalHeadshots(int client);
 native int MG_GetTotalKnifeKills(int client);
 native int MG_GetTotalTaserKills(int client);
 native int MG_GetRanks(int client);
-native int MG_GetRating(int client);
+native float MG_GetRating(int client);
 
 native void MG_IgnoreRoundStats();
 
@@ -56,7 +56,7 @@ public void __pl_MiniGames_SetNTVOptional()
     MarkNativeAsOptional("MG_GetTotalDeaths");
     MarkNativeAsOptional("MG_GetTotalHeadshots");
     MarkNativeAsOptional("MG_GetTotalKnifeKills");
-	MarkNativeAsOptional("MG_GetTotalTaserKills");
+    MarkNativeAsOptional("MG_GetTotalTaserKills");
 
     MarkNativeAsOptional("MG_GetRanks");
     MarkNativeAsOptional("MG_GetRating");
