@@ -72,6 +72,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     CreateNative("MG_GetTotalKnifeKills",   NativeCall_GetTotalKnifeKills);
     CreateNative("MG_GetTotalTaserKills",   NativeCall_GetTotalTaserKills);
     CreateNative("MG_GetRanks",             NativeCall_GetRanks);
+    CreateNative("MG_GetRating",            NativeCall_GetRating);
 
     CreateNative("MG_IgnoreRoundStats",     NativeCall_IgnoreRoundStats);
 
@@ -105,7 +106,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
     return APLRes_Success;
 }
 
-public int NativeCall_SetSpecHudContent(Handle plugin, int numParams)
+public any NativeCall_SetSpecHudContent(Handle plugin, int numParams)
 {
     int client = GetNativeCell(1);
 
@@ -116,47 +117,52 @@ public int NativeCall_SetSpecHudContent(Handle plugin, int numParams)
     return Games_SetSpecHudContent(client, vformat);
 }
 
-public int NativeCall_GetTotalScores(Handle plugin, int numParams)
+public any NativeCall_GetTotalScores(Handle plugin, int numParams)
 {
     return Stats_GetTotalScore(GetNativeCell(1));
 }
 
-public int NativeCall_GetTotalKills(Handle plugin, int numParams)
+public any NativeCall_GetTotalKills(Handle plugin, int numParams)
 {
     return Stats_GetKills(GetNativeCell(1));
 }
 
-public int NativeCall_GetTotalAssists(Handle plugin, int numParams)
+public any NativeCall_GetTotalAssists(Handle plugin, int numParams)
 {
     return Stats_GetAssists(GetNativeCell(1));
 }
 
-public int NativeCall_GetTotalDeaths(Handle plugin, int numParams)
+public any NativeCall_GetTotalDeaths(Handle plugin, int numParams)
 {
     return Stats_GetDeaths(GetNativeCell(1));
 }
 
-public int NativeCall_GetTotalHeadshots(Handle plugin, int numParams)
+public any NativeCall_GetTotalHeadshots(Handle plugin, int numParams)
 {
     return Stats_GetHeadShots(GetNativeCell(1));
 }
 
-public int NativeCall_GetTotalKnifeKills(Handle plugin, int numParams)
+public any NativeCall_GetTotalKnifeKills(Handle plugin, int numParams)
 {
     return Stats_GetKnifeKills(GetNativeCell(1));
 }
 
-public int NativeCall_GetTotalTaserKills(Handle plugin, int numParams)
+public any NativeCall_GetTotalTaserKills(Handle plugin, int numParams)
 {
     return Stats_GetTaserKills(GetNativeCell(1));
 }
 
-public int NativeCall_GetRanks(Handle plugin, int numParams)
+public any NativeCall_GetRanks(Handle plugin, int numParams)
 {
     return Ranks_GetRank(GetNativeCell(1));
 }
 
-public int NativeCall_IgnoreRoundStats(Handle plugin, int numParams)
+public any NativeCall_GetRating(Handle plugin, int numParams)
+{
+    return Stats_GetRating(GetNativeCell(1));
+}
+
+public any NativeCall_IgnoreRoundStats(Handle plugin, int numParams)
 {
     return Stats_IgnoreRoundStats();
 }
