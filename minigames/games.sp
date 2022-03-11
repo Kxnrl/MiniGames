@@ -791,7 +791,7 @@ void Games_OnRoundEnd(int winner)
             continue;
 
         int value = team == winner ? 2000 : 1400;
-        SetEntProp(client, Prop_Send, "m_iAccount", GetEntProp(client, Prop_Send, "m_iAccount") + value);
+        SetEntProp(i, Prop_Send, "m_iAccount", GetEntProp(i, Prop_Send, "m_iAccount") + value);
     }
 }
 
