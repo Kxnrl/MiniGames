@@ -610,9 +610,14 @@ Action Games_OnClientSpawn(Handle timer, int userid)
     if (!ClientValid(client))
         return Plugin_Stop;
 
-    SetEntProp(client, Prop_Send, "m_iAccount",   23333);                       // unlimit cash
-    SetEntProp(client, Prop_Send, "m_ArmorValue", mg_spawn_kevlar.IntValue);    // apply kevlar
-    SetEntProp(client, Prop_Send, "m_bHasHelmet", mg_spawn_helmet.IntValue);    // apply helmet
+    if (mg_economy_system.IntValue == 2)
+    {
+        // reset cash every round.
+        SetEntProp(client, Prop_Send, "m_iAccount", 23333);
+
+        SetEntProp(client, Prop_Send, "m_ArmorValue", mg_spawn_kevlar.IntValue);    // apply kevlar
+        SetEntProp(client, Prop_Send, "m_bHasHelmet", mg_spawn_helmet.IntValue);    // apply helmet
+    }
 
     SetEntPropFloat(client, Prop_Send, "m_flDetectedByEnemySensorTime", 0.0);   // disable wallhack
 
@@ -768,7 +773,7 @@ static Action Games_RoundTimer(Handle timer)
     return Plugin_Continue;
 }
 
-void Games_OnRoundEnd()
+void Games_OnRoundEnd(int winner)
 {
     if (t_tRoundTimer != null)
         KillTimer(t_tRoundTimer);
@@ -778,6 +783,16 @@ void Games_OnRoundEnd()
 
     t_bRoundEnding = true;
     bBombPlanted = false;
+
+    for (int i = 1; i <= MaxClients; ++i) if (ClientValid(i))
+    {
+        int team = GetClientTeam(i);
+        if (team <= TEAM_OB)
+            continue;
+
+        int value = team == winner ? 2000 : 1400;
+        SetEntProp(client, Prop_Send, "m_iAccount", GetEntProp(client, Prop_Send, "m_iAccount") + value);
+    }
 }
 
 void Games_OnBombPlanted(int client)
@@ -786,8 +801,7 @@ void Games_OnBombPlanted(int client)
 
     if (mg_auto_defuser.BoolValue)
     {
-        for(int i = 1; i <= MaxClients; ++i)
-        if (ClientValid(i) && IsPlayerAlive(i))
+        for (int i = 1; i <= MaxClients; ++i) if (ClientValid(i) && IsPlayerAlive(i))
         {
             // give defuser
             SetEntProp(i, Prop_Send, "m_bHasDefuser", true);

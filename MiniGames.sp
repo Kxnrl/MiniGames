@@ -880,10 +880,10 @@ public void Event_RoundStarted(Event event, const char[] name, bool dontBroadcas
 
 public void Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 {
-    //int winner = event.GetInt("winner");
+    int winner = event.GetInt("winner");
 
     Stats_OnRoundEnd();
-    Games_OnRoundEnd();
+    Games_OnRoundEnd(winner);
     Teams_OnRoundEnd();
 }
 

@@ -42,6 +42,7 @@ static ConVar sv_airaccelerate;
 // economy
 ConVar mp_playercashawards = null;
 ConVar mp_equipment_reset_rounds = null;
+ConVar mp_startmoney;
 ConVar cash_team_elimination_bomb_map = null;
 ConVar cash_team_elimination_hostage_map_t = null;
 ConVar cash_team_elimination_hostage_map_ct = null;
@@ -104,7 +105,7 @@ void Cvars_OnPluginStart()
     mg_slap_after_vac       = AutoExecConfig_CreateConVar("mg_slap_after_vac",      "1",        "Slap player after vac timer elapsed.",                             _, true, 0.0,   true, 1.0);
     mg_auto_defuser         = AutoExecConfig_CreateConVar("mg_auto_defuser",        "1",        "Give all CTs defuser when the bomb has been planted.",             _, true, 0.0,   true, 1.0);
     mg_display_rating       = AutoExecConfig_CreateConVar("mg_display_rating",      "1",        "Display player rating instead of analytics.",                      _, true, 0.0,   true, 1.0);
-    mg_economy_system      = AutoExecConfig_CreateConVar("mg_economy_system",     "2",        "Override game economy, 0 = game default, 1 = custom (win = 2000$, lost = 1400$, kill = 500$), 2 = reset every round.", _, true, 0.0,   true, 2.0);
+    mg_economy_system      = AutoExecConfig_CreateConVar("mg_economy_system",       "2",        "Override game economy, 0 = game default, 1 = custom (win = 2000$, lost = 1400$, kill = 500$), 2 = reset every round.", _, true, 0.0,   true, 2.0);
 
     mg_bonus_kill_via_gun     = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun",       "3", "How many credits to earn when player kill enemy with gun",                _, true, 0.0, true, 1000.0);
     mg_bonus_kill_via_gun_hs  = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun_hs",    "4", "How many credits to earn when player kill enemy with gun and headshot",   _, true, 0.0, true, 1000.0);
@@ -162,6 +163,7 @@ void Cvars_OnPluginStart()
     // economy
     mp_playercashawards = FindConVar("mp_playercashawards");
     mp_equipment_reset_rounds = FindConVar("mp_equipment_reset_rounds");
+    mp_startmoney = FindConVar("mp_startmoney");
     cash_team_elimination_bomb_map = FindConVar("cash_team_elimination_bomb_map");
     cash_team_elimination_hostage_map_t = FindConVar("cash_team_elimination_hostage_map_t");
     cash_team_elimination_hostage_map_ct = FindConVar("cash_team_elimination_hostage_map_ct");
@@ -178,7 +180,9 @@ void Cvars_OnPluginStart()
     cash_team_win_by_time_running_out_hostage = FindConVar("cash_team_win_by_time_running_out_hostage");
     cash_team_win_by_time_running_out_bomb = FindConVar("cash_team_win_by_time_running_out_bomb");
 
+    mp_playercashawards.AddChangeHook(Cvars_OnEconomyUpdated);
     mp_equipment_reset_rounds.AddChangeHook(Cvars_OnEconomyUpdated);
+    mp_startmoney.AddChangeHook(Cvars_OnEconomyUpdated);
     cash_team_elimination_bomb_map.AddChangeHook(Cvars_OnEconomyUpdated);
     cash_team_elimination_hostage_map_t.AddChangeHook(Cvars_OnEconomyUpdated);
     cash_team_elimination_hostage_map_ct.AddChangeHook(Cvars_OnEconomyUpdated);
@@ -899,6 +903,7 @@ void InternalUpdateGameEconomy()
 {
     mp_equipment_reset_rounds.IntValue = 0;
     mp_playercashawards.IntValue = 1;
+    mp_startmoney.IntValue = 800;
 
     cash_team_elimination_bomb_map.IntValue = 2700;
     cash_team_elimination_hostage_map_t.IntValue = 2000;
@@ -921,7 +926,25 @@ void InternalUpdateCustomEconomy()
 {
     mp_equipment_reset_rounds.IntValue = 0;
     mp_playercashawards.IntValue = 0;
+    mp_startmoney.IntValue = 800;
 
+    cash_team_elimination_bomb_map.IntValue = 0;
+    cash_team_elimination_hostage_map_t.IntValue = 0;
+    cash_team_elimination_hostage_map_ct.IntValue = 0;
+    cash_team_hostage_alive.IntValue = 0;
+    cash_team_hostage_interaction.IntValue = 0;
+    cash_team_loser_bonus.IntValue = 0;
+    cash_team_bonus_shorthanded.IntValue = 0;
+    cash_team_loser_bonus_consecutive_rounds.IntValue = 0;
+    cash_team_planted_bomb_but_defused.IntValue = 0;
+    cash_team_rescued_hostage.IntValue = 0;
+    cash_team_terrorist_win_bomb.IntValue = 0;
+    cash_team_win_by_defusing_bomb.IntValue = 0;
+    cash_team_win_by_hostage_rescue.IntValue = 0;
+    cash_team_win_by_time_running_out_hostage.IntValue = 0;
+    cash_team_win_by_time_running_out_bomb.IntValue = 0;
+
+    /*
     cash_team_elimination_bomb_map.IntValue = 2000;
     cash_team_elimination_hostage_map_t.IntValue = 2000;
     cash_team_elimination_hostage_map_ct.IntValue = 2000;
@@ -937,4 +960,5 @@ void InternalUpdateCustomEconomy()
     cash_team_win_by_hostage_rescue.IntValue = 2000;
     cash_team_win_by_time_running_out_hostage.IntValue = 2000;
     cash_team_win_by_time_running_out_bomb.IntValue = 2000;
+    */
 }
