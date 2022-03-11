@@ -792,7 +792,7 @@ public void Event_PlayerDeath(Event event, const char[] name, bool dontBroadcast
     char weapon[32];
     event.GetString("weapon", weapon, 32, "");
 
-    Games_OnClientDeath(client, attacker, assister);
+    Games_OnClientDeath(client, attacker, assister, headshot);
     Stats_OnClientDeath(client, attacker, assister, headshot, weapon);
     Hooks_UpdateState();
 }
@@ -909,7 +909,7 @@ public void Event_GrenadeThrown(Event event, const char[] name, bool dontBroadca
 
 public void Event_BombPlanted(Event event, const char[] name, bool dontBroadcast)
 {
-    Games_OnBombPlanted();
+    Games_OnBombPlanted(GetClientOfUserId(event.GetInt("userid")));
 }
 
 public void Event_DecoyStarted(Event event, const char[] name, bool dontBroadcast)

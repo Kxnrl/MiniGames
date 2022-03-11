@@ -39,6 +39,25 @@ static ConVar mp_taser_recharge_time;
 static ConVar sv_competitive_official_5v5;
 static ConVar sv_airaccelerate;
 
+// economy
+ConVar mp_playercashawards = null;
+ConVar mp_equipment_reset_rounds = null;
+ConVar cash_team_elimination_bomb_map = null;
+ConVar cash_team_elimination_hostage_map_t = null;
+ConVar cash_team_elimination_hostage_map_ct = null;
+ConVar cash_team_hostage_alive = null;
+ConVar cash_team_hostage_interaction = null;
+ConVar cash_team_loser_bonus = null;
+ConVar cash_team_bonus_shorthanded = null;
+ConVar cash_team_loser_bonus_consecutive_rounds = null;
+ConVar cash_team_planted_bomb_but_defused = null;
+ConVar cash_team_rescued_hostage = null;
+ConVar cash_team_terrorist_win_bomb = null;
+ConVar cash_team_win_by_defusing_bomb = null;
+ConVar cash_team_win_by_hostage_rescue = null;
+ConVar cash_team_win_by_time_running_out_hostage = null;
+ConVar cash_team_win_by_time_running_out_bomb = null;
+
 static ConVar sv_minupdaterate;
 static ConVar sv_maxupdaterate;
 static ConVar sv_mincmdrate;
@@ -85,6 +104,7 @@ void Cvars_OnPluginStart()
     mg_slap_after_vac       = AutoExecConfig_CreateConVar("mg_slap_after_vac",      "1",        "Slap player after vac timer elapsed.",                             _, true, 0.0,   true, 1.0);
     mg_auto_defuser         = AutoExecConfig_CreateConVar("mg_auto_defuser",        "1",        "Give all CTs defuser when the bomb has been planted.",             _, true, 0.0,   true, 1.0);
     mg_display_rating       = AutoExecConfig_CreateConVar("mg_display_rating",      "1",        "Display player rating instead of analytics.",                      _, true, 0.0,   true, 1.0);
+    mg_economy_system      = AutoExecConfig_CreateConVar("mg_economy_system",     "2",        "Override game economy, 0 = game default, 1 = custom (win = 2000$, lost = 1400$, kill = 500$), 2 = reset every round.", _, true, 0.0,   true, 2.0);
 
     mg_bonus_kill_via_gun     = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun",       "3", "How many credits to earn when player kill enemy with gun",                _, true, 0.0, true, 1000.0);
     mg_bonus_kill_via_gun_hs  = AutoExecConfig_CreateConVar("mg_bonus_kill_via_gun_hs",    "4", "How many credits to earn when player kill enemy with gun and headshot",   _, true, 0.0, true, 1000.0);
@@ -139,6 +159,44 @@ void Cvars_OnPluginStart()
     cs_enable_player_physics_box = FindConVar("cs_enable_player_physics_box");
     sv_turbophysics              = FindConVar("sv_turbophysics");
 
+    // economy
+    mp_playercashawards = FindConVar("mp_playercashawards");
+    mp_equipment_reset_rounds = FindConVar("mp_equipment_reset_rounds");
+    cash_team_elimination_bomb_map = FindConVar("cash_team_elimination_bomb_map");
+    cash_team_elimination_hostage_map_t = FindConVar("cash_team_elimination_hostage_map_t");
+    cash_team_elimination_hostage_map_ct = FindConVar("cash_team_elimination_hostage_map_ct");
+    cash_team_hostage_alive = FindConVar("cash_team_hostage_alive");
+    cash_team_hostage_interaction = FindConVar("cash_team_hostage_interaction");
+    cash_team_loser_bonus = FindConVar("cash_team_loser_bonus");
+    cash_team_bonus_shorthanded = FindConVar("cash_team_bonus_shorthanded");
+    cash_team_loser_bonus_consecutive_rounds = FindConVar("cash_team_loser_bonus_consecutive_rounds");
+    cash_team_planted_bomb_but_defused = FindConVar("cash_team_planted_bomb_but_defused");
+    cash_team_rescued_hostage = FindConVar("cash_team_rescued_hostage");
+    cash_team_terrorist_win_bomb = FindConVar("cash_team_terrorist_win_bomb");
+    cash_team_win_by_defusing_bomb = FindConVar("cash_team_win_by_defusing_bomb");
+    cash_team_win_by_hostage_rescue = FindConVar("cash_team_win_by_hostage_rescue");
+    cash_team_win_by_time_running_out_hostage = FindConVar("cash_team_win_by_time_running_out_hostage");
+    cash_team_win_by_time_running_out_bomb = FindConVar("cash_team_win_by_time_running_out_bomb");
+
+    mp_equipment_reset_rounds.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_elimination_bomb_map.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_elimination_hostage_map_t.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_elimination_hostage_map_ct.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_hostage_alive.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_hostage_interaction.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_loser_bonus.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_bonus_shorthanded.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_loser_bonus_consecutive_rounds.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_planted_bomb_but_defused.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_rescued_hostage.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_terrorist_win_bomb.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_win_by_defusing_bomb.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_win_by_hostage_rescue.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_win_by_time_running_out_hostage.AddChangeHook(Cvars_OnEconomyUpdated);
+    cash_team_win_by_time_running_out_bomb.AddChangeHook(Cvars_OnEconomyUpdated);
+
+    mg_economy_system.AddChangeHook(Cvars_OnEconomyUpdated);
+
     mp_ct_default_melee.AddChangeHook(Cvars_OnSettingChanged);
     mp_ct_default_primary.AddChangeHook(Cvars_OnSettingChanged);
     mp_ct_default_secondary.AddChangeHook(Cvars_OnSettingChanged);
@@ -182,6 +240,11 @@ void Cvars_OnPluginStart()
 static void Cvars_OnFFAChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
     Hooks_UpdateState();
+}
+
+static void Cvars_OnEconomyUpdated(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+    UpdateEconomyConfigs();
 }
 
 static void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const char[] newValue)
@@ -816,4 +879,62 @@ static void Cvars_LoadLastConfig()
     t_LastEBhop = sv_enablebunnyhopping.BoolValue;
     t_LastABhop = sv_autobunnyhopping.BoolValue;
     t_LastSpeed = -1.0;
+}
+
+void UpdateEconomyConfigs()
+{
+    switch (mg_economy_system.IntValue)
+    {
+        case 0: InternalUpdateGameEconomy();
+        case 1: InternalUpdateCustomEconomy();
+        case 2: 
+        {
+            mp_equipment_reset_rounds.IntValue = 1;
+            mp_playercashawards.IntValue = 0;
+        }
+    }
+}
+
+void InternalUpdateGameEconomy()
+{
+    mp_equipment_reset_rounds.IntValue = 0;
+    mp_playercashawards.IntValue = 1;
+
+    cash_team_elimination_bomb_map.IntValue = 2700;
+    cash_team_elimination_hostage_map_t.IntValue = 2000;
+    cash_team_elimination_hostage_map_ct.IntValue = 2300;
+    cash_team_hostage_alive.IntValue = 0;
+    cash_team_hostage_interaction.IntValue = 500;
+    cash_team_loser_bonus.IntValue = 2400;
+    cash_team_bonus_shorthanded.IntValue = 0;
+    cash_team_loser_bonus_consecutive_rounds.IntValue = 0;
+    cash_team_planted_bomb_but_defused.IntValue = 200;
+    cash_team_rescued_hostage.IntValue = 0;
+    cash_team_terrorist_win_bomb.IntValue = 2700;
+    cash_team_win_by_defusing_bomb.IntValue = 2700;
+    cash_team_win_by_hostage_rescue.IntValue = 3000;
+    cash_team_win_by_time_running_out_hostage.IntValue = 2000;
+    cash_team_win_by_time_running_out_bomb.IntValue = 2700;
+}
+
+void InternalUpdateCustomEconomy()
+{
+    mp_equipment_reset_rounds.IntValue = 0;
+    mp_playercashawards.IntValue = 0;
+
+    cash_team_elimination_bomb_map.IntValue = 2000;
+    cash_team_elimination_hostage_map_t.IntValue = 2000;
+    cash_team_elimination_hostage_map_ct.IntValue = 2000;
+    cash_team_hostage_alive.IntValue = 1400;
+    cash_team_hostage_interaction.IntValue = 500;
+    cash_team_loser_bonus.IntValue = 1400;
+    cash_team_bonus_shorthanded.IntValue = 0;
+    cash_team_loser_bonus_consecutive_rounds.IntValue = 0;
+    cash_team_planted_bomb_but_defused.IntValue = 200;
+    cash_team_rescued_hostage.IntValue = 0;
+    cash_team_terrorist_win_bomb.IntValue = 2000;
+    cash_team_win_by_defusing_bomb.IntValue = 2000;
+    cash_team_win_by_hostage_rescue.IntValue = 2000;
+    cash_team_win_by_time_running_out_hostage.IntValue = 2000;
+    cash_team_win_by_time_running_out_bomb.IntValue = 2000;
 }

@@ -654,7 +654,7 @@ Action Games_OnClientSpawn(Handle timer, int userid)
     return Plugin_Stop;
 }
 
-void Games_OnClientDeath(int victim, int killer, int assister)
+void Games_OnClientDeath(int victim, int killer, int assister, bool headshot)
 {
     t_iScoreBoard[victim][SB_Death]++;
     t_iScoreBoard[killer][SB_Kill]++;
@@ -666,6 +666,12 @@ void Games_OnClientDeath(int victim, int killer, int assister)
     AdjustDeath(victim);
     if (assister)
     AdjustAssist(assister);
+
+    if (mg_economy_system.IntValue == 1 && killer && victim == killer)
+    {
+        // give custom cash award
+        SetEntProp(killer, Prop_Send, "m_iAccount", GetEntProp(killer, Prop_Send, "m_iAccount") + (headshot ? 500 : 300));
+    }
 }
 
 void Games_OnRoundStarted()
@@ -774,21 +780,24 @@ void Games_OnRoundEnd()
     bBombPlanted = false;
 }
 
-void Games_OnBombPlanted()
+void Games_OnBombPlanted(int client)
 {
     bBombPlanted = true;
 
-    if (!mg_auto_defuser.BoolValue)
-        return;
-
-    for(int client = 1; client <= MaxClients; ++client)
-    if (ClientValid(client) && IsPlayerAlive(client))
+    if (mg_auto_defuser.BoolValue)
     {
-        if (GetClientTeam(client) == TEAM_CT)
+        for(int i = 1; i <= MaxClients; ++i)
+        if (ClientValid(i) && IsPlayerAlive(i))
         {
             // give defuser
-            SetEntProp(client, Prop_Send, "m_bHasDefuser", true);
+            SetEntProp(i, Prop_Send, "m_bHasDefuser", true);
         }
+    }
+
+    if (mg_economy_system.IntValue == 1)
+    {
+        // give money custom
+        SetEntProp(client, Prop_Send, "m_iAccount", GetEntProp(client, Prop_Send, "m_iAccount") + 500);
     }
 }
 

@@ -189,6 +189,7 @@ ConVar mg_broadcast_leave           = null;
 ConVar mg_slap_after_vac            = null;
 ConVar mg_auto_defuser              = null;
 ConVar mg_display_rating            = null;
+ConVar mg_economy_system            = null;
 
 ConVar mg_bonus_kill_via_gun        = null;
 ConVar mg_bonus_kill_via_gun_hs     = null;
