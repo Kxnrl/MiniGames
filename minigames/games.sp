@@ -613,7 +613,7 @@ Action Games_OnClientSpawn(Handle timer, int userid)
     if (mg_economy_system.IntValue == 2)
     {
         // reset cash every round.
-        SetEntProp(client, Prop_Send, "m_iAccount", 23333);
+        SetEntProp(client, Prop_Send, "m_iAccount", 10000);
 
         SetEntProp(client, Prop_Send, "m_ArmorValue", mg_spawn_kevlar.IntValue);    // apply kevlar
         SetEntProp(client, Prop_Send, "m_bHasHelmet", mg_spawn_helmet.IntValue);    // apply helmet
