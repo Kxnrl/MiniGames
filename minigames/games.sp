@@ -19,6 +19,7 @@ enum /* scoreboard_t */
     SB_Kill,
     SB_Death,
     SB_Assist,
+    SB_Score,
     SB_MaxAttributes
 }
 
@@ -490,6 +491,9 @@ void Games_OnClientCookiesLoaded(int client)
         return;
 
     t_Storage.GetArray(steamid, t_iScoreBoard[client], sizeof(t_iScoreBoard[]));
+
+    if (t_iScoreBoard[client][SB_Score] != 0)
+        CS_SetClientContributionScore(client, t_iScoreBoard[client][SB_Score]);
 }
 
 void Games_OnClientCookiesCached(int client)
@@ -510,6 +514,9 @@ void Games_OnClientCookiesCached(int client)
         return;
 
     t_Storage.GetArray(steamid, t_iScoreBoard[client], sizeof(t_iScoreBoard[]));
+
+    if (t_iScoreBoard[client][SB_Score] != 0)
+        CS_SetClientContributionScore(client, t_iScoreBoard[client][SB_Score]);
 }
 
 void Games_OnClientDisconnect(int client)
@@ -517,6 +524,8 @@ void Games_OnClientDisconnect(int client)
     char steamid[20];
     if (!GetClientAuthId(client, AuthId_SteamID64, steamid, 20))
         return;
+
+    t_iScoreBoard[client][SB_Score] = CS_GetClientContributionScore(client);
 
     t_Storage.SetArray(steamid, t_iScoreBoard[client], sizeof(t_iScoreBoard[]));
 }
