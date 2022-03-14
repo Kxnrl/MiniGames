@@ -681,10 +681,18 @@ void Games_OnClientDeath(int victim, int killer, int assister, bool headshot)
     if (assister)
     AdjustAssist(assister);
 
-    if (mg_economy_system.IntValue == 1 && killer && victim == killer)
+    if (mg_economy_system.IntValue == 1 && killer)
     {
-        // give custom cash award
-        SetEntProp(killer, Prop_Send, "m_iAccount", GetEntProp(killer, Prop_Send, "m_iAccount") + (headshot ? 500 : 300));
+        if (victim != killer)
+        {
+            // give custom cash award
+            SetEntProp(killer, Prop_Send, "m_iAccount", GetEntProp(killer, Prop_Send, "m_iAccount") + (headshot ? 500 : 300));
+        }
+        else
+        {
+            // punish if suicide
+            SetEntProp(victim, Prop_Send, "m_iAccount", GetEntProp(victim, Prop_Send, "m_iAccount") - 1000);
+        }
     }
 }
 
@@ -820,7 +828,7 @@ void Games_OnBombPlanted(int client)
     if (mg_economy_system.IntValue == 1)
     {
         // give money custom
-        SetEntProp(client, Prop_Send, "m_iAccount", GetEntProp(client, Prop_Send, "m_iAccount") + 500);
+        SetEntProp(client, Prop_Send, "m_iAccount", GetEntProp(client, Prop_Send, "m_iAccount") + 800);
     }
 }
 
