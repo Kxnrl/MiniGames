@@ -1040,7 +1040,7 @@ void Hooks_UpdateState()
         for (int entity = 1; entity <= MaxClients; entity++) if (IsClientInGame(entity) && !IsFakeClient(entity) && TransmitManager_IsEntityHooked(entity))
         {
             // transmit entity
-            bool final = mode == 1 ? canSee : (g_iTeam[entity] != g_iTeam[client] || canSee);
+            bool final = mode == 2 ? canSee : (g_iTeam[entity] != g_iTeam[client] || canSee);
             TransmitManager_SetEntityState(entity, client, final);
         }
     }
