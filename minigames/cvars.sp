@@ -96,7 +96,7 @@ void Cvars_OnPluginStart()
     mg_bhopspeed            = AutoExecConfig_CreateConVar("mg_bhopspeed",           "250.0",    "Max bunnyhopping speed(requires sv_enablebunnyhopping set to 1)",  _, true, 200.0, true, 3500.0);
     mg_randomteam           = AutoExecConfig_CreateConVar("mg_randomteam",          "1",        "Scramble Team after Round End",                                    _, true, 0.0,   true, 1.0);
     mg_wallhack_delay       = AutoExecConfig_CreateConVar("mg_wallhack_delay",      "150.0",    "VAC WALLHACK timer (Seconds)",                                     _, true, 60.0,  true, 180.0);
-    mg_transmitblock        = AutoExecConfig_CreateConVar("mg_transmitblock",       "1",        "Allow client hide teammate.",                                      _, true, 0.0,   true, 1.0);
+    mg_transmitblock        = AutoExecConfig_CreateConVar("mg_transmitblock",       "1",        "Allow client hide teammate. 1 = teammate, 2 = all",                _, true, 0.0,   true, 2.0);
     mg_geoiplanguage        = AutoExecConfig_CreateConVar("mg_geoiplanguage",       "en",       "Language of GeoIP2-City. \nList of language: \nBrazilian Portuguese (pt-BR), English (en), French (fr), German (de), Japanese (ja), Russian (ru), Simplified Chinese (zh-CN), and Spanish (es)");
     mg_render_player        = AutoExecConfig_CreateConVar("mg_render_player",       "0",        "Allow render player model color.",                                 _, true, 0.0,   true, 1.0);
     mg_block_keybind_cj     = AutoExecConfig_CreateConVar("mg_block_keybind_cj",    "1",        "Block keybind crouch jump.",                                       _, true, 0.0,   true, 1.0);
