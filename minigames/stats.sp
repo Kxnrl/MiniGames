@@ -180,6 +180,25 @@ static void Stats_SaveClient(int client)
         return;
     }
 
+    if (!mg_data_analytics.BoolValue)
+    {
+        // don't track data
+        t_Session[client].m_iKills         = 0;
+        t_Session[client].m_iDeaths        = 0;
+        t_Session[client].m_iAssists       = 0;
+        t_Session[client].m_iHits          = 0;
+        t_Session[client].m_iShots         = 0;
+        t_Session[client].m_iHeadshots     = 0;
+        t_Session[client].m_iKnifeKills    = 0;
+        t_Session[client].m_iTaserKills    = 0;
+        t_Session[client].m_iGrenadeKills  = 0;
+        t_Session[client].m_iMolotovKills  = 0;
+        t_Session[client].m_iTotalDamage   = 0;
+        t_Session[client].m_iSurvivals     = 0;
+        t_Session[client].m_iPlayRounds    = 0;
+        t_Session[client].m_iTotalScores   = 0;
+    }
+
     char name[32], ename[64], m_szQuery[1024];
     GetClientName(client, name, 32);
     g_hMySQL.Escape(name, ename, 64);
