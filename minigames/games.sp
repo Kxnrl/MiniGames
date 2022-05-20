@@ -906,13 +906,7 @@ void Games_PlayerHurts(int client, int victim, int hitgroup)
         SetHudTextParams(-1.0, -1.0, 0.25, 250, 128, 114, 128, 0, 0.125, 0.1, 0.125);
     }
 
-    ShowHudText(client, HUD_CHANNEL_MARKER, "\n\n\n\n\n╳\n\n\n\n\n%N", victim);
-
-    for (int target = 1; target <= MaxClients; ++target)
-        if (client != target && ClientValid(target) && IsClientObserver(target) && !g_kOptions[target][kO_HudHurt])
-            if (GetEntProp(target, Prop_Send, "m_iObserverMode") == 4)
-                if (GetEntPropEnt(target, Prop_Send, "m_hObserverTarget") == client)
-                    ShowHudText(target, HUD_CHANNEL_MARKER, "\n\n\n\n\n╳\n\n\n\n\n%N", victim);
+    ShowHudText(client, HUD_CHANNEL_FEEDBACK, "\n\n\n\n\n╳\n\n\n\n\n%N", victim);
 
     lastTickNum[client] = currentTick;
 }
