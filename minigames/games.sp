@@ -906,7 +906,7 @@ void Games_PlayerHurts(int client, int victim, int hitgroup)
         SetHudTextParams(-1.0, -1.0, 0.25, 250, 128, 114, 128, 0, 0.125, 0.1, 0.125);
     }
 
-    ShowHudText(client, HUD_CHANNEL_FEEDBACK, "\n\n\n\n\n╳\n\n\n\n\n%N", victim);
+    ShowHudText(client, HUD_CHANNEL_MARKER, "\n\n\n\n\n╳\n\n\n\n\n%N", victim);
 
     lastTickNum[client] = currentTick;
 }
