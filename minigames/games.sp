@@ -539,7 +539,7 @@ void Games_OnPlayerRunCmd(int client, int& buttons, int tickcount)
     Games_BlockKeybindCJ(client, buttons);
 
     float CurVelVec[3];
-    GetEntPropVector(client, Prop_Data, "m_vecAbsVelocity", CurVelVec); // use abs??
+    GetEntPropVector(client, Prop_Data, "m_vecVelocity", CurVelVec);
 
     // show speed hud
     if (tickcount % 8 == 0)
