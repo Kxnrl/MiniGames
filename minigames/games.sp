@@ -818,7 +818,7 @@ void Games_OnBombPlanted(int client)
 
     if (mg_auto_defuser.BoolValue)
     {
-        for (int i = 1; i <= MaxClients; ++i) if (ClientValid(i) && IsPlayerAlive(i))
+        for (int i = 1; i <= MaxClients; ++i) if (ClientValid(i) && IsPlayerAlive(i) && g_iTeam[i] == TEAM_CT)
         {
             // give defuser
             SetEntProp(i, Prop_Send, "m_bHasDefuser", true);
