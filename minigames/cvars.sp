@@ -38,26 +38,27 @@ static ConVar sv_fistpunch_damage_to_player_multiplier;
 static ConVar mp_taser_recharge_time;
 static ConVar sv_competitive_official_5v5;
 static ConVar sv_airaccelerate;
+static ConVar mp_disconnect_kills_players = null;
 
 // economy
-ConVar mp_playercashawards = null;
-ConVar mp_equipment_reset_rounds = null;
-ConVar mp_startmoney;
-ConVar cash_team_elimination_bomb_map = null;
-ConVar cash_team_elimination_hostage_map_t = null;
-ConVar cash_team_elimination_hostage_map_ct = null;
-ConVar cash_team_hostage_alive = null;
-ConVar cash_team_hostage_interaction = null;
-ConVar cash_team_loser_bonus = null;
-ConVar cash_team_bonus_shorthanded = null;
-ConVar cash_team_loser_bonus_consecutive_rounds = null;
-ConVar cash_team_planted_bomb_but_defused = null;
-ConVar cash_team_rescued_hostage = null;
-ConVar cash_team_terrorist_win_bomb = null;
-ConVar cash_team_win_by_defusing_bomb = null;
-ConVar cash_team_win_by_hostage_rescue = null;
-ConVar cash_team_win_by_time_running_out_hostage = null;
-ConVar cash_team_win_by_time_running_out_bomb = null;
+static ConVar mp_playercashawards = null;
+static ConVar mp_equipment_reset_rounds = null;
+static ConVar mp_startmoney;
+static ConVar cash_team_elimination_bomb_map = null;
+static ConVar cash_team_elimination_hostage_map_t = null;
+static ConVar cash_team_elimination_hostage_map_ct = null;
+static ConVar cash_team_hostage_alive = null;
+static ConVar cash_team_hostage_interaction = null;
+static ConVar cash_team_loser_bonus = null;
+static ConVar cash_team_bonus_shorthanded = null;
+static ConVar cash_team_loser_bonus_consecutive_rounds = null;
+static ConVar cash_team_planted_bomb_but_defused = null;
+static ConVar cash_team_rescued_hostage = null;
+static ConVar cash_team_terrorist_win_bomb = null;
+static ConVar cash_team_win_by_defusing_bomb = null;
+static ConVar cash_team_win_by_hostage_rescue = null;
+static ConVar cash_team_win_by_time_running_out_hostage = null;
+static ConVar cash_team_win_by_time_running_out_bomb = null;
 
 static ConVar sv_minupdaterate;
 static ConVar sv_maxupdaterate;
@@ -143,6 +144,7 @@ void Cvars_OnPluginStart()
     mp_teammates_are_enemies    = FindConVar("mp_teammates_are_enemies");
     sv_competitive_official_5v5 = FindConVar("sv_competitive_official_5v5");
     sv_airaccelerate            = FindConVar("sv_airaccelerate");
+    mp_disconnect_kills_players = FindConVar("mp_disconnect_kills_players");
 
     sv_minupdaterate    = FindConVar("sv_minupdaterate");
     sv_maxupdaterate    = FindConVar("sv_maxupdaterate");
@@ -182,6 +184,7 @@ void Cvars_OnPluginStart()
     cash_team_win_by_time_running_out_bomb = FindConVar("cash_team_win_by_time_running_out_bomb");
 
     mp_playercashawards.AddChangeHook(Cvars_OnEconomyUpdated);
+
     mp_equipment_reset_rounds.AddChangeHook(Cvars_OnEconomyUpdated);
     mp_startmoney.AddChangeHook(Cvars_OnEconomyUpdated);
     cash_team_elimination_bomb_map.AddChangeHook(Cvars_OnEconomyUpdated);
@@ -261,6 +264,7 @@ static void Cvars_OnSettingChanged(ConVar convar, const char[] oldValue, const c
     mp_t_default_primary.SetString("", true, false);
     mp_t_default_secondary.SetString("", true, false);
     sv_tags.SetString("MG,MiniGames,FUN,Skin", true, true);
+    mp_disconnect_kills_players.SetBool(false);
 
     if (sv_enablebunnyhopping.BoolValue)
     {
