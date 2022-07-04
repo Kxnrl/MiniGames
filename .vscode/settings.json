@@ -77,5 +77,6 @@
     },
     "sourcepawn.AuthorName": "Kyle",
     "sourcepawn.GithubName": "Kxnrl",
-    "sourcepawn.SourcemodHome": "E:\\WorkSpace\\Github\\MiniGames\\include"
+    "sourcepawn.SourcemodHome": "E:\\WorkSpace\\Github\\MiniGames\\include",
+    "sourcepawn.MainPath": "E:\\WorkSpace\\Github\\MiniGames\\MiniGames.sp"
 }

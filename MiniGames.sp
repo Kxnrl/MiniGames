@@ -177,6 +177,7 @@ public void OnPluginStart()
     g_fwdOnVacElapsed     = new GlobalForward("MG_OnVacElapsed",     ET_Event,  Param_Cell, Param_Cell);
     g_fwdOnVacEnabled     = new GlobalForward("MG_OnVacEnabled",     ET_Ignore, Param_Cell, Param_Cell);
     g_fwdOnVacClientSlain = new GlobalForward("MG_OnVacClientSlain", ET_Ignore, Param_Cell);
+    g_fwdOnRoundMvp       = new GlobalForward("MG_OnRoundMvp",       ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
 
     g_fwdOnRenderModelColor = new GlobalForward("MG_OnRenderModelColor", ET_Hook, Param_Cell);
 
@@ -868,6 +869,7 @@ public void Event_PlayerConnected(Event event, const char[] name, bool dontBroad
 
 public void Event_RoundStart(Event event, const char[] name, bool dontBroadcast)
 {
+    Games_OnRoundStart();
     Stats_OnRoundStart();
     Cvars_OnRoundStart();
     Teams_OnRoundStart();
@@ -938,6 +940,7 @@ public Action CS_OnCSWeaponDrop(int client, int weapon)
 public Action Timer_Tick(Handle timer)
 {
     Hooks_UpdateState();
+    Games_OnGameThink();
 
     return Plugin_Continue;
 }

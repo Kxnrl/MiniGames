@@ -26,6 +26,8 @@ enum /* scoreboard_t */
 static StringMap t_Storage;
 
 static int  t_iWallHackCD = -1;
+static int  t_iRoundKills[MAXPLAYERS+1];
+static int  t_iRoundAlive[MAXPLAYERS+1];
 static int  iLastSpecTarget[MAXPLAYERS+1];
 static bool bLastDisplayHud[MAXPLAYERS+1];
 static bool bVACHudPosition[MAXPLAYERS+1];
@@ -471,6 +473,8 @@ void Games_OnPostThinkPost(int client)
 void Games_OnClientConnected(int client)
 {
     t_szSpecHudContent[client][0] = '\0';
+    t_iRoundKills[client] = 0;
+    t_iRoundAlive[client] = 0;
 
     for (int i = 0; i < SB_MaxAttributes; i++)
         t_iScoreBoard[client][i] = 0;
@@ -528,6 +532,14 @@ void Games_OnClientDisconnect(int client)
     t_iScoreBoard[client][SB_Score] = CS_GetClientContributionScore(client);
 
     t_Storage.SetArray(steamid, t_iScoreBoard[client], sizeof(t_iScoreBoard[]));
+}
+
+void Games_OnGameThink()
+{
+    for (int i = 1; i <= MaxClients; ++i) if (ClientValid(i) && IsPlayerAlive(i))
+    {
+        t_iRoundAlive[i]++;
+    }
 }
 
 void Games_OnPlayerRunCmd(int client, int& buttons, int tickcount)
@@ -694,6 +706,19 @@ void Games_OnClientDeath(int victim, int killer, int assister, bool headshot)
             SetEntProp(victim, Prop_Send, "m_iAccount", GetEntProp(victim, Prop_Send, "m_iAccount") - 1000);
         }
     }
+
+    // track kills
+    if (killer && killer != victim)
+        t_iRoundKills[killer]++;
+}
+
+void Games_OnRoundStart()
+{
+    for (int i = 0; i < MAXPLAYERS; i++)
+    {
+        t_iRoundKills[i] = 0;
+        t_iRoundAlive[i] = 0;
+    }
 }
 
 void Games_OnRoundStarted()
@@ -801,6 +826,7 @@ void Games_OnRoundEnd(int winner)
     t_bRoundEnding = true;
     bBombPlanted = false;
 
+    // reset economy
     for (int i = 1; i <= MaxClients; ++i) if (ClientValid(i))
     {
         int team = GetClientTeam(i);
@@ -809,6 +835,55 @@ void Games_OnRoundEnd(int winner)
 
         int value = team == winner ? 2000 : 1400;
         SetEntProp(i, Prop_Send, "m_iAccount", GetEntProp(i, Prop_Send, "m_iAccount") + value);
+    }
+
+    //////////
+    /// mvp //
+    //////////
+    if (winner <= TEAM_OB)
+    {
+        // no winner ? draw??
+        return;
+    }
+
+    int mvp = -1;
+    int kills = 0;
+    int alive = 0;
+
+    // king of the kill
+    for (int i = 1; i <= MaxClients; ++i) if (ClientValid(i))
+    {
+        int team = GetClientTeam(i);
+        if (team != winner || !IsPlayerAlive(i))
+            continue;
+
+        if (kills < t_iRoundKills[i])
+        {
+            kills = t_iRoundKills[i];
+            mvp = i;
+        }
+    }
+
+    // last man standing
+    if (mvp == -1)
+    {
+        for (int i = 1; i <= MaxClients; ++i) if (ClientValid(i))
+        {
+            if (alive < t_iRoundAlive[i])
+            {
+                alive = t_iRoundAlive[i];
+                mvp = i;
+            }
+        }
+    }
+
+    if (mvp > 0)
+    {
+        Call_StartForward(g_fwdOnRoundMvp);
+        Call_PushCell(mvp);
+        Call_PushCell(kills);
+        Call_PushCell(alive);
+        Call_Finish();
     }
 }
 
