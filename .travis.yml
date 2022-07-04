@@ -1,3 +1,6 @@
+dist: focal
+language: c
+
 addons:
   apt_packages:
     - lib32z1
@@ -5,7 +8,6 @@ addons:
     - p7zip-full
     - rsync
 
-language: c
 
 env:
   - SOURCEMOD=1.11
