@@ -355,6 +355,7 @@ static void Cvars_SetCvarDefault()
     ConVar_Easy_SetInt("weapon_reticle_knife_show",         1, true, false);
     ConVar_Easy_SetInt("mp_equipment_reset_rounds",         1, true, false);
     ConVar_Easy_SetInt("mp_drop_grenade_enable",            0, true, false);
+    ConVar_Easy_SetInt("sv_specnoclip",                     0, true, false);
     
     sv_timebetweenducks.SetFloat(0.4, true, false);
 
