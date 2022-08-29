@@ -129,6 +129,7 @@ GlobalForward g_fwdOnVacEnabled;
 GlobalForward g_fwdOnRenderModelColor;
 GlobalForward g_fwdOnVacClientSlain;
 GlobalForward g_fwdOnRoundMvp;
+GlobalForward g_fwdOnRoundKills;
 
 // options
 enum

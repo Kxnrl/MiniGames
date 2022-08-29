@@ -31,6 +31,7 @@ forward bool MG_OnRandomTeam(int       terrorists, int       counterTerrorists, 
 forward bool MG_OnVacEnabled(int Alive_terrorists, int Alive_counterTerrorists);
 forward void MG_OnScoreIncreased(int client, int score);
 forward void MG_OnRoundMvp(int client, int kills, int alive);
+forward void MG_OnRoundKills(int client, int kills);
 
 forward Action MG_OnPublicMessages(int client, bool disconnected, char buffer[256]);
 forward Action MG_OnRenderModelColor(int client);

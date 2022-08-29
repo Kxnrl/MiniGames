@@ -853,6 +853,11 @@ void Games_OnRoundEnd(int winner)
     // king of the kill
     for (int i = 1; i <= MaxClients; ++i) if (ClientValid(i))
     {
+        Call_StartForward(g_fwdOnRoundKills);
+        Call_PushCell(i);
+        Call_PushCell(t_iRoundKills[i]);
+        Call_Finish();
+
         int team = GetClientTeam(i);
         if (team != winner || !IsPlayerAlive(i))
             continue;

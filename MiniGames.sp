@@ -178,6 +178,7 @@ public void OnPluginStart()
     g_fwdOnVacEnabled     = new GlobalForward("MG_OnVacEnabled",     ET_Ignore, Param_Cell, Param_Cell);
     g_fwdOnVacClientSlain = new GlobalForward("MG_OnVacClientSlain", ET_Ignore, Param_Cell);
     g_fwdOnRoundMvp       = new GlobalForward("MG_OnRoundMvp",       ET_Ignore, Param_Cell, Param_Cell, Param_Cell);
+    g_fwdOnRoundKills     = new GlobalForward("MG_OnRoundKills",     ET_Ignore, Param_Cell, Param_Cell);
 
     g_fwdOnRenderModelColor = new GlobalForward("MG_OnRenderModelColor", ET_Hook, Param_Cell);
 
