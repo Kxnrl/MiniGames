@@ -1,3 +1,5 @@
+// MAIN_FILE ../MiniGames.sp
+
 /******************************************************************/
 /*                                                                */
 /*                         MiniGames Core                         */
@@ -8,7 +10,6 @@
 /*                                                                */
 /*                                                                */
 /*  Copyright (C) 2022  Kyle                                      */
-/*  2018/03/05 16:51:01                                           */
 /*                                                                */
 /*  This code is licensed under the GPLv3 License.                */
 /*                                                                */
